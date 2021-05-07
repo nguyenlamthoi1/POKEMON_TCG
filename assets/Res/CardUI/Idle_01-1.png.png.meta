@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "0a9ca3d9-9a2a-4a55-b2f4-497ac98ef92d",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 320,
+  "height": 320,
+  "platformSettings": {},
+  "subMetas": {
+    "Idle_01-1.png": {
+      "ver": "1.0.4",
+      "uuid": "43995d38-6bef-441d-b198-dac3f3a846fa",
+      "rawTextureUuid": "0a9ca3d9-9a2a-4a55-b2f4-497ac98ef92d",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -10,
+      "offsetY": -30,
+      "trimX": 60,
+      "trimY": 140,
+      "width": 180,
+      "height": 100,
+      "rawWidth": 320,
+      "rawHeight": 320,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

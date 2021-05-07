@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "84a276a8-e0f3-427c-8419-02495ca71c61",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 761,
+  "height": 769,
+  "platformSettings": {},
+  "subMetas": {
+    "Game Boy Advance - Pokemon FireRed LeafGreen - Elite Four": {
+      "ver": "1.0.4",
+      "uuid": "2c038a51-20a2-4aa0-8c31-256018a88a94",
+      "rawTextureUuid": "84a276a8-e0f3-427c-8419-02495ca71c61",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 761,
+      "height": 769,
+      "rawWidth": 761,
+      "rawHeight": 769,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

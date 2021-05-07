@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "2dae97eb-8db4-45c7-98ea-2db44f518bc2",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 320,
+  "height": 320,
+  "platformSettings": {},
+  "subMetas": {
+    "PkmTypeIcon-7.png": {
+      "ver": "1.0.4",
+      "uuid": "d0d5c636-53d1-423a-8a71-9a0303cc21f9",
+      "rawTextureUuid": "2dae97eb-8db4-45c7-98ea-2db44f518bc2",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 320,
+      "height": 320,
+      "rawWidth": 320,
+      "rawHeight": 320,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
