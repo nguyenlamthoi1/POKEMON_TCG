@@ -11,6 +11,8 @@ window.CONST = {
         RUN_TIME: 1,
         END_GAME: 2,
         ON_GAME_START: "ongamestart",
+        ON_TURN_START: "onturnstart",
+        ON_TURN_END: "onturnend",
     },
     BATTLE_SLOT: {
         ACTIVE_TYPE: 0,
@@ -31,3 +33,12 @@ window.CONST = {
        
     }
 }
+window.SELECTION = {
+    TYPE: {
+        PLAYER_EMPTY_ACTIVE: 0,
+        PLAYER_EMPTY_BENCH: 1
+    },
+    CB_TYPE:{
+        SHOW_PKM: 0
+    }
+};

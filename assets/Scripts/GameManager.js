@@ -29,14 +29,17 @@ var Player = cc.Class({
     //Drop
     enableDrop: function(enabled){
         this._canDropCard = enabled;
-        if (enabled) this._gm.node.emit("droppable-changed-true", {id: this._id, enabled: this._canDropCard});
-        else this._gm.node.emit("droppable-changed-false",{id: this._id, enabled: this._canDropCard}); 
+        this._gm.node.emit("droppable-changed", {id: this._id, enabled: this._canDropCard});
     },
     isDropEnabled: function(){return this._canDropCard;},
     registerEvent: function(eventType, cb, target){
         this._gm.node.on(eventType, cb, target);
-    }
+    },
     //--
+    //Check
+    isOpponent: function(){
+        return !this.sameId(this._gm.controllingPlayerId);
+    }
 }
 );
 cc.Class({
@@ -78,6 +81,7 @@ cc.Class({
     onLoad () {
         //Global var
         GM = this;
+
         //Init data
         this.player = {
             1: new Player(), // -> Player -> Device owner
@@ -86,20 +90,20 @@ cc.Class({
         this.player[1].init(1, this);
         this.player[2].init(2, this);
 
-        controllingPlayerId = this.player1Id; //TODO: delete
+        this.controllingPlayerId = this.player[1].getId(); //TODO: delete
         this.player1Cards = fakeCard1; //TODO: delete 
         //Init UI
-
         this.handUI.getComponent("HandUI").init(this.player1Cards, this.player[1], this);
-        this.factory = new CardFactory(); this.factory.init(this);
+        this.processor = new Processor(); this.processor.init(this);
+        this.topUIScr = this.topUINode.getComponent("TopUI"); this.topUIScr.init(this);
 
+        //Listen to events
+        this.node.on(CONST.GAME_PHASE.ON_GAME_START, this.onGameStart, this);
+        this.node.on(CONST.GAME_PHASE.ON_TURN_START, this.onTurnStart, this);
+        this.node.on(CONST.GAME_PHASE.ON_TURN_END, this.onTurnEnd, this);
     },
     start () {
         cc.log("START_GAME");
-        
-        //Listen to events
-        this.node.on(GAME_PHASE.ON_GAME_START, this.onGameStart, this);
-
         this.changePhase(GAME_PHASE.START_GAME); //TODO: wait server notify START_GAME;
     },
     changePhase: function(phase){
@@ -109,11 +113,23 @@ cc.Class({
                 this.node.emit(CONST.GAME_PHASE.ON_GAME_START, phase);
         }
     },
+    changeTurn: function(phase){
+        //Swap turn id
+        var temp = this.currentTurnPlayer;
+        this.currentTurnPlayer = this.nextTurnPlayer;
+        this.nextTurnPlayer = temp;
+        cc.log("test_change_turn",this.player[1].sameId(this.currentTurnPlayer));
+        this.player[1].enableDrop(this.player[1].sameId(this.currentTurnPlayer.getId())); //Player can drop or not
+        this.node.emit(CONST.GAME_PHASE.ON_TURN_START, {player: this.currentTurnPlayer});
+        
+    },
     isPhase:function(phase){return this.currentPhase == phase;},
     onGameStart: function(){
+        //YOU ALWAYS GO FIRST
         //Set first turn
-        this.currentTurnId = this.player[1].getId();
-        this.nextTurnId = this.player[2].getId();
+        this.turnCount = 0;
+        this.currentTurnPlayer = this.player[1];
+        this.nextTurnPlayer = this.player[2];
         //Get first cards
         var handUIScr = this.handUI.getComponent("HandUI");
         handUIScr.draw(GAMESTART_CONST.NUM_DRAW);
@@ -121,19 +137,32 @@ cc.Class({
         var topUIScr = this.topUINode.getComponent("TopUI");
         topUIScr.notify("DROP YOUR ACTIVE POKEMON", cc.Color.WHITE, 20);
         //Show selectable Area If first turn belong to us(Player not Enemy)
-        if(this.player[1].sameId(this.currentTurnId)){
+        if(this.isPlayerTurn()){
             this.player[1].enableDrop(true); //Player can drop
         }
+        this.node.emit(CONST.GAME_PHASE.ON_TURN_START, {player: this.player[1]});
 
+    },
+    onTurnStart: function(){this.turnCount ++;},
+    onTurnEnd:function(){},
+    endTurn: function(){
+        //Check end turn
+        //if(this.processor.checkEndTurn() === false) return;
+        //Change turn
+        this.node.emit(CONST.GAME_PHASE.ON_TURN_END, {player: this.currentTurnPlayer});
+        this.changeTurn();
     },
     onDropCard: function(idx){
         cc.log("test_drop", idx);
-        this.factory.onReceiveCard(idx, this.player1Id);
-    }
-    ,
+        this.processor.onReceiveCard(idx, this.player1Id);
+    },
     //Get and Set
     getBattleArea: function(){return this.battleAreaNode;},
-    getTopUI: function(){return this.topUINode;}
+    getTopUI: function(){return this.topUINode;},
+    getprocessor: function(){return this.processor;},
+    getPlayer: function(){return this.player[1];},
+    //Check
+    isPlayerTurn: function(){return this.player[1].sameId(this.currentTurnPlayer.getId()); }
 
 });
 window.GM = null;

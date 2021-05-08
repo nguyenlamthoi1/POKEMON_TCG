@@ -14,6 +14,10 @@ const BATTLE_SLOT = {
             SELECTED: {width: 320, height: 320},
         }
     },
+    0: { //BENCH_INFO
+        SELECTABLE_SIZE: {width: 320, height: 320},
+        SELECTED_SIZE: {width: 280, height: 280},
+    },
     1: { //BENCH_INFO
         SELECTABLE_SIZE: {width: 320, height: 320},
         SELECTED_SIZE: {width: 280, height: 280},
@@ -68,6 +72,7 @@ cc.Class({
         this.selectIndicator.active = false;
     },
     showSelectableUI: function(){
+        cc.log("breakselect",JSON.stringify(BATTLE_SLOT));
         this.selectIndicator.width = BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.width;
         this.selectIndicator.height = BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.height;
         this.selectIndicator.color = BATTLE_SLOT.COLOR.WHITE;
@@ -84,7 +89,9 @@ cc.Class({
         this.selectIndicator.active = true;
     },
     showPokemonFromBall: function(cardId){
-        cc.log("show_pokemon",cardId);
+        //this._hasPKM = true;
+
+        cc.log("show_pokemon",this._hasPKM);
         // cardId = 1;
         var cardData = JARVIS.getCardData(cardId);
         var endScale = cardData.bigScale;
@@ -107,11 +114,11 @@ cc.Class({
             .to(1, {scale: endScale, opacity: 255}).start();
         //Show Hp bar
         this.hpBar.active = true;
+         
     },
     //Listeners
     _onTouchStart: function(){
         if (!this._isSelectable) return;
-
         cc.tween(this.selectIndicator)
             .to(0.1, {width: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.height})
             .start();
@@ -119,12 +126,10 @@ cc.Class({
     //_onTouchMove: function(){},
     _onTouchEnd: function(){
         if (!this._isSelectable) return;
-
         this._isSelectable = true;
         cc.tween(this.selectIndicator)
             .to(0.1, {width: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.height})
             .start();
-
         this._onSelectedCallBack && this._onSelectedCallBack();    
     },
     _onTouchCancel: function(){
@@ -135,9 +140,10 @@ cc.Class({
             .to(0.1, {width: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.height})
             .start();
     },
-    //Get
-    hasPokemon: function(){return this._hasPKM;},
+    //Check
+    hasPokemon: function(){cc.log("_hasPKM", this._hasPKM);return this._hasPKM;},
     
     //Set
+    setHasPkm: function(has){this._hasPKM = has;},
     setSelectedCallback: function(cb){this._onSelectedCallBack = cb;}
 });

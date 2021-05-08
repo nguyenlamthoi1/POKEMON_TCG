@@ -7,6 +7,7 @@
     "type": {
     "0": "grass_type"
    },
+    "hp": 60,
     "evolution": 1,
     "evoleFrom": 0,
     "smallCardUrl": "SmallPokemon/001",
@@ -21,6 +22,7 @@
      "type": {
      "0": "grass_type"
      },
+     "hp": 90,
      "evolution": 2,
      "evoleFrom": 1,
       "smallCardUrl": "SmallPokemon/002",
@@ -35,6 +37,7 @@
      "type": {
      "0": "grass_type"
      },
+     "hp": 120,
      "evolution": 3,
      "evoleFrom": 2,
       "smallCardUrl": "SmallPokemon/003",

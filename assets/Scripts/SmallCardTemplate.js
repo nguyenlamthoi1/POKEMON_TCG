@@ -60,8 +60,8 @@ cc.Class({
         this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
-        this.handUI.player.registerEvent("droppable-changed-true", this.onCanDropChanged, this);
-        this._isTouchable = this.handUI.player.isDropEnabled();
+        this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
+        this._isDroppable = this.handUI.player.isDropEnabled();
     },
     _getCardFrame: function(type){
         switch(type[0]){
@@ -121,12 +121,12 @@ cc.Class({
     //Listeners
     onTouchCardStart: function(touchEvent){
         //cc.log("TOUCH_SMALL_CARD_START", this.idxInHand);
-        if(!this._isTouchable) return;
+        //if(!this._isDroppable) return;
         //Show card name
         this.cardTitleText.enabled = true;
-        //if(!this._isTouchable) return;
+        //if(!this._isDroppable) return;
         this._oldPos = this.node.position;
-        //this._isTouchable = false;
+        //this._isDroppable = false;
        
 
         var endPos = this.node.position.add(cc.v2(0, 1).mul(80));
@@ -138,43 +138,43 @@ cc.Class({
         return false;
     },
     onTouchCardEnd: function(touchEvent){
-        if(!this._isTouchable) return;
-        //cc.log("touch_card_end", this.idxInHand);
-        this.node.position = this._oldPos;
-        //cc.log("EndTouch", this._oldPos.x,this._oldPos.y);
+        if(!this._isDroppable){
+            this.node.position = this._oldPos;
+            this.dropChecker.getComponent("CardDropChecker").onNotSelected();
+            return;
+        }
         //Fly up Node
         // cc.tween(this.node)
-        //     .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos1");this._isTouchable = true;}.bind(this)).start();
+        //     .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos1");this._isDroppable = true;}.bind(this)).start();
         //Hide card name
         this.cardTitleText.enabled = false;
         var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
 
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){
-            //cc.log("DropCard");
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
             this.onDrop();
+
         }
     },
     onTouchCardCancel: function(touchEvent){
-        if(!this._isTouchable) return;
-       // cc.log("touch_card_cancel", this.idxInHand);
-        this.node.position = this._oldPos;
-
-        //cc.log("EndTouch", this._oldPos.x,this._oldPos.y);
+        if(!this._isDroppable){
+            this.node.position = this._oldPos;
+            this.dropChecker.getComponent("CardDropChecker").onNotSelected();
+            return;
+        }
         //Fly up Node
         //cc.tween(this.node)
-        //    .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos2");this._isTouchable = true;}.bind(this)).start();
+        //    .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos2");this._isDroppable = true;}.bind(this)).start();
         this.cardTitleText.enabled = false;
         var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
 
-        if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){
-            cc.log("DropCard");
+        if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){    
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
             this.onDrop();
         }
     },
     onTouchCardMove: function(touchEvent){
-        if(!this._isTouchable) return;
+        //if(!this._isDroppable) return;
         var delta = touchEvent.getDelta();
         this.node.x = this.node.x + delta.x;
         this.node.y = this.node.y + delta.y;
@@ -191,9 +191,9 @@ cc.Class({
        
     },
     onCanDropChanged: function(event){
-        cc.log("small_Card_drop", JSON.stringify(event));
+        //cc.log("small_Card_drop",this.idxInHand, JSON.stringify(event));
         if(event.id == this.owner.getId())
-            this._isTouchable = event.enabled;
+            this._isDroppable = event.enabled;
     },
     onDrop: function(){
         //this.node.active = false;

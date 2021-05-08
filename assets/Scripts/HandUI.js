@@ -21,13 +21,14 @@ cc.Class({
 
         this.startPoint = new cc.v2(420, -403.228);
         this.deck = idList; //List of ids
-        this.deck = [1,2,3,4,5,6,7,8,9, 10];
+        //this.deck = [1,2,3,4,5,6,7,8,9, 10];
+        this.deck = [1,1,1,4,4,4];
         // this.deck = [];
         // for(var i=0;i<60;i++){
         //     this.deck.push(1);
         // }
         this.cardIdOnHand = [];
-        this.cardUIonHand = [];
+        this.cardUIOnHand = [];
         this.layoutComponent = this.node.getComponent(cc.Layout);
         this.smallCardInfo = {
             w: this.cardTemplate.data.width,
@@ -37,7 +38,7 @@ cc.Class({
         //Private var
         this._movingCache = [];
         //Listeners
-        this.drawBtn.node.on("click", this.onClickDrawBtn, this);
+        this.drawBtn.node.on("click", this.onClickDrawBtn, this); //TODO: DELETE
 
     },
     draw: function(numCard){
@@ -65,7 +66,8 @@ cc.Class({
             .to(DRAW_CONST.TIME_TO_HAND,{position: endMovingPoint}).start();
            
             this.cardIdOnHand.push(cardId);
-            this.cardUIonHand.push(cardUI);
+            this.cardUIOnHand.push(cardUI);
+            cc.log("JSON_TEST",JSON.stringify(this.cardIdOnHand));
         }
       
         while(this._movingCache.length > 0){
@@ -90,15 +92,15 @@ cc.Class({
         if(delta > 0){//Neu size Hand khong chua du bai
             this.layoutComponent.spacingX = (this.node.width - cardW * numCard) / (numCard - 1);
             this.layoutComponent.type = DRAW_CONST.HORIZONTAL; //Should replace with cc.Layout.Horizontal but cc.Layout.Horizontal = undefined
-            for (var i = 0; i< this.cardUIonHand.length; i++){
+            for (var i = 0; i< this.cardUIOnHand.length; i++){
                 var movingData = {};
-                movingData.cardUI = this.cardUIonHand[i];
-                movingData.start = this.cardUIonHand[i].position;
+                movingData.cardUI = this.cardUIOnHand[i];
+                movingData.start = this.cardUIOnHand[i].position;
                 this._movingCache.push(movingData);
             }
             this.layoutComponent.updateLayout();
-            for (var i = 0; i< this.cardUIonHand.length; i++){
-                this._movingCache[i].end = this.cardUIonHand[i].position;
+            for (var i = 0; i< this.cardUIOnHand.length; i++){
+                this._movingCache[i].end = this.cardUIOnHand[i].position;
             }
         }
     },
@@ -115,19 +117,20 @@ cc.Class({
     //Reset position when drop 1 card
     resetCardPosOnDrop: function(DroppedCardIdx){
         // if(DroppedCardIdx == undefined){
-        //     DroppedCardIdx = this.cardUIonHand.length;
+        //     DroppedCardIdx = this.cardUIOnHand.length;
         // }
         this.layoutComponent.type = DRAW_CONST.HORIZONTAL; //Should replace with cc.Layout.Horizontal but cc.Layout.Horizontal = undefined
 
-        for (var i = DroppedCardIdx; i < this.cardUIonHand.length; i++){
-            var cardUI = this.cardUIonHand[i];
+        for (var i = DroppedCardIdx; i < this.cardUIOnHand.length; i++){
+            var cardUI = this.cardUIOnHand[i];
+            var cardUIScr  = cardUI.getComponent("SmallCardTemplate");
+            //Update idx in hand
+            cardUIScr.idxInHand = i;
             //var startMovingPoint = cardUI.position;
-            cc.log("test_layout_1",this.layoutComponent.paddingLeft );
-            this.layoutComponent.paddingLeft = 0.10 * cc.director.getWinSize().width;
-            this.layoutComponent.paddingRight = 0.10 * cc.director.getWinSize().width;
+            this.layoutComponent.paddingLeft = 0.10 * cc.winSize.width;
+            this.layoutComponent.paddingRight = 0.10 * cc.winSize.width;
 
             this.layoutComponent.updateLayout(); //TODO: should use new position of layout updated
-            cc.log("test_layout_2",this.layoutComponent.paddingLeft );
 
             //endMovingPoint = cardUI.position;
 
@@ -139,10 +142,25 @@ cc.Class({
         this.layoutComponent.type = cc.Layout.NONE;
       
     },
+    resetCardPos: function(){
+        this.layoutComponent.type = DRAW_CONST.HORIZONTAL;
+        this.layoutComponent.updateLayout();
+        this.layoutComponent.type = cc.Layout.NONE;
+    },
+   
     onDropCard: function(idx){
-        //this.node.removeChild(this.cardUIonHand[idx]);
-         this.cardUIonHand.splice(idx, 1);
-       var dropCardId =this.cardIdOnHand.splice(idx, 1)[0];
+        //cc.log("test_idx",idx,JSON.stringify(this.cardIdOnHand), this.cardUIOnHand);
+        var processor = this.gameManager.processor;
+        var cardId = this.cardIdOnHand[idx];
+        var cardUI = this.cardUIOnHand[idx];
+        var canDrop = processor.checkOnDrop(cardId);
+        if(!canDrop){
+            cardUI.active=true;
+            return;
+        }
+        this.node.removeChild(this.cardUIOnHand[idx]);
+        this.cardUIOnHand.splice(idx, 1);
+        var dropCardId =this.cardIdOnHand.splice(idx, 1)[0];
         this.resetCardPosOnDrop(idx);
         this.gameManager.onDropCard(dropCardId);
     },
