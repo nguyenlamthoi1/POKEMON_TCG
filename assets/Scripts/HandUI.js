@@ -22,7 +22,11 @@ cc.Class({
         this.startPoint = new cc.v2(420, -403.228);
         this.deck = idList; //List of ids
         //this.deck = [1,2,3,4,5,6,7,8,9, 10];
-        this.deck = [1,1,1,4,4,4];
+        //this.deck = [1,1,1,4,4,4];
+        this.deck =["energy_1"
+        ,"energy_2","energy_3"
+        ,"energy_0","energy_4"
+    ];
         // this.deck = [];
         // for(var i=0;i<60;i++){
         //     this.deck.push(1);
@@ -153,16 +157,30 @@ cc.Class({
         var processor = this.gameManager.processor;
         var cardId = this.cardIdOnHand[idx];
         var cardUI = this.cardUIOnHand[idx];
-        var canDrop = processor.checkOnDrop(cardId);
-        if(!canDrop){
-            cardUI.active=true;
-            return;
-        }
-        this.node.removeChild(this.cardUIOnHand[idx]);
-        this.cardUIOnHand.splice(idx, 1);
-        var dropCardId =this.cardIdOnHand.splice(idx, 1)[0];
-        this.resetCardPosOnDrop(idx);
-        this.gameManager.onDropCard(dropCardId);
+        this.dropCardUI = cardUI;
+        this.dropCardId = cardId;
+        //var canDrop = processor.checkOnDrop(cardId);
+        // if(!canDrop){
+        //     cardUI.active=true;
+        //     return;
+        // }
+        this.gameManager.onDropCard(cardId);
+    },
+    onDropCardCancel: function(){
+        cc.log("test_cancel_hand");
+        this.dropCardUI.active = true;
+        this.dropCardUI.getComponent("SmallCardTemplate").backOldPosition();
+        this.dropCardUI = null;
+        this.dropCardId = null;
+        this.resetCardPos();
+    },
+    onDropCardApproved: function(){
+        this.node.removeChild(this.cardUIOnHand[this.dropCardId]);
+        this.cardUIOnHand.splice(this.dropCardId, 1);
+        this.cardIdOnHand.splice(this.dropCardId, 1)[0];
+        this.resetCardPosOnDrop(this.dropCardId);
+        this.dropCardUI = null;
+        this.dropCardId = null;
     },
     //Check
     hasBasicPkm: function(){

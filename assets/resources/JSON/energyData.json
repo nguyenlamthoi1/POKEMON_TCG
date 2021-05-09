@@ -1,0 +1,42 @@
+{
+  "energy_0":{
+    "id": "energy_0",
+    "category": "Energy",
+    "energyType": "fire",
+    "name": "Energy",
+    "smallCardUrl": "SmallEnergy/fireEnergy",
+    "smallScale": 0.5
+  },
+  "energy_1":{
+    "id": "energy_1",
+    "category": "Energy",
+    "energyType": "water",
+    "name": "Energy",
+    "smallCardUrl": "SmallEnergy/waterEnergy",
+    "smallScale": 0.5
+  },
+  "energy_2":{
+    "id": "energy_2",
+    "category": "Energy",
+    "energyType": "grass",
+    "name": "Energy",
+    "smallCardUrl": "SmallEnergy/grassEnergy",
+    "smallScale": 0.5
+  },
+  "energy_3":{
+    "id": "energy_3",
+    "category": "Energy",
+    "energyType": "electric",
+    "name": "Energy",
+    "smallCardUrl": "SmallEnergy/electricEnergy",
+    "smallScale": 0.5
+  },
+  "energy_4":{
+    "id": "energy_4",
+    "category": "Energy",
+    "energyType": "normal",
+    "name": "Energy",
+    "smallCardUrl": "SmallEnergy/normalEnergy",
+    "smallScale": 0.5
+  }
+}

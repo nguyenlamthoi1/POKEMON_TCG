@@ -33,7 +33,6 @@ cc.Class({
         hpBar: cc.Node
     },
     init: function(typeSlot) {
-        cc.log("break_3");
         //Define misc
         this.LOG_TAG = "[BATTLE_SLOT]";
         this._onSelectedCallBack = function(){cc.log(this.LOG_TAG, "SELECTED_CALLBACK")};

@@ -18,14 +18,17 @@ Processor = cc.Class({
         this.battleArea = gameManager.getBattleArea(); this.battleArea.getComponent("BattleArea").init(this.gameManager);
         this.TopUI = gameManager.getTopUI();
         this.notifier = this.TopUI.getComponent("TopUI");
+        this.handUI = this.gameManager.handUI.getComponent("HandUI");
     },
     onReceiveCard: function(cardId, playerId){ //Xu ly khi nhan duoc the bai danh xuong tu nguoi choi co id = playerId
         //Process card Id
         var cardData = JARVIS.getCardData(cardId);
         var canDrop = this.checkOnDrop(cardId, cardData); //Kiem tra co the drop the duoc khong
-        cc.log("test_Drop1");
-        if (!canDrop) return;
-        cc.log("test_Drop2");
+        if (!canDrop){
+            this.handUI.onDropCardCancel();
+            return;
+        } 
+       
 
         if(cardData == undefined) {cc.log(this.LOG_TAG, this.LANG.CARD_ID_NOT_CORRECT); return false;}
 
@@ -37,6 +40,7 @@ Processor = cc.Class({
             case this.CONST.CAT.POKEMON:
                 this.processPKMCard(cardId);
         }
+    
     },
     processPKMCard: function(cardId){
         
@@ -65,9 +69,21 @@ Processor = cc.Class({
         }else{
             //PLAY_TURN
         }
-        if(selectData != undefined)
+        if(selectData != undefined){
+            cc.log("listen_event",cardId);
+            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onCardApproved, this);
             battleAreaScr.showSelectabledUIs(cardId,selectData);
+        }
 
+    },
+    onCardCancel: function(){
+        cc.log("test_cancel_fac");
+        this.handUI.onDropCardCancel();
+    },
+    onCardApproved: function(){
+        this.gameManager.node.off(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+        this.handUI.onDropCardApproved();
     },
     //Callback
     onPokeballOpen: function(){

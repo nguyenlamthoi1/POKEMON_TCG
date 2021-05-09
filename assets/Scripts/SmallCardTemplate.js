@@ -23,7 +23,9 @@ cc.Class({
 
         cardFrames: [cc.SpriteFrame],
         colorTxt: [cc.Color],
-        failedImg: cc.SpriteFrame
+        //Failed SF
+        failedPkmSF: cc.SpriteFrame,
+        failedEnergySF: cc.SpriteFrame
        
     },
     init: function(data, idxInHand, dropChecker, handUI){
@@ -33,18 +35,38 @@ cc.Class({
         this.dropChecker = dropChecker;
         this.idxInHand = idxInHand;
         this.data = data;
+        this.category = data.category;
+
+        switch(this.category){
+            case CONST.CARD.CAT.PKM: //If this is pokemon card
+                this._initPkmCard(data);
+                break;
+            case CONST.CARD.CAT.ENERGY://If this is pokemon card
+                this._initEnergyCard(data);
+                break;
+        }
+        
+        
+        //Listeners
+        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
+        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
+        this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
+        this._isDroppable = this.handUI.player.isDropEnabled();
+    },
+    _initPkmCard:function(data){
         //Card name
         this.cardTitleText.string = data.name;
         this.cardTitleText.enabled = false;
-
-
         this.cardTitleText.node.color = this._getColorTxt(data.type);
+        //Card category title
         this.cardTypeText.string = data.category;
+        //Card container
         this.cardContainer.spriteFrame = this._getCardFrame(data.type);
-
-        this.cardImg.spriteFrame = this.failedImg; //Load dymanically
-        this._loadSpriteFrameForCardImg(data.smallCardUrl);
-
+        //Load Pokemon
+        this.cardImg.node.scale = data.smallScale ? data.smallScale: 1;
+        this._loadSpriteFrameForCardImg(data.smallCardUrl, this.failedPkmSF); //Load dymanically
         //Evolution info
         this.evolutionIcon.node.active = data.evolution > 1;
         this.evolutionTxt.string = data.evolution - 1;
@@ -55,44 +77,90 @@ cc.Class({
             this.types[typeKey].getComponent(cc.Sprite).spriteFrame = this._getTypeFrame(data.type[typeKey]);
         }
         
-        //Listeners
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
-        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
-        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
-        this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
-        this._isDroppable = this.handUI.player.isDropEnabled();
+    },
+    _initEnergyCard: function(data){
+        //Card name
+        this.cardTitleText.string = data.name;
+        this.cardTitleText.enabled = false;
+        this.cardTitleText.node.color = this._getColorTxt(data.energyType);
+        //Card category title
+        this.cardTypeText.string = data.category;
+        //Card container
+        this.cardContainer.spriteFrame = this._getCardFrame(data.energyType);       
+        //Load energy
+        this.cardImg.node.scale = data.smallScale ? data.smallScale : 1;
+        this._loadSpriteFrameForCardImg(data.smallCardUrl, this.failedEnergySF);//Load dymanically
+        //Turn off
+        this.evolutionIcon.node.active = false;
+        for(var i = 0; i < this.types.length; i ++)  this.types[i].active = false;
     },
     _getCardFrame: function(type){
-        switch(type[0]){
-            case POKEMON.FIRE_TYPE:
-                return this.cardFrames[0];
-            case POKEMON.WATER_TYPE:
-                return this.cardFrames[1];
-            case POKEMON.GRASS_TYPE:
-                return this.cardFrames[2];
-            case POKEMON.ELECTRIC_TYPE:
-                return this.cardFrames[3];
-            default: 
-                return this.cardFrames[this.cardFrames.length];
+        if(this.category  == CONST.CARD.CAT.PKM){
+            switch(type[0]){
+                case POKEMON.FIRE_TYPE:
+                    return this.cardFrames[0];
+                case POKEMON.WATER_TYPE:
+                    return this.cardFrames[1];
+                case POKEMON.GRASS_TYPE:
+                    return this.cardFrames[2];
+                case POKEMON.ELECTRIC_TYPE:
+                    return this.cardFrames[3];
+                default: 
+                    return this.cardFrames[this.cardFrames.length - 1];
+            }
         }
+        if(this.category == CONST.CARD.CAT.ENERGY){
+            switch(type){
+                case CONST.ENERGY.FIRE:
+                    return this.cardFrames[4];
+                case CONST.ENERGY.WATER:
+                    return this.cardFrames[1];
+                case CONST.ENERGY.GRASS:
+                    return this.cardFrames[2];
+                case CONST.ENERGY.ELECTRIC:
+                    return this.cardFrames[3];
+                case CONST.ENERGY.NORMAL:
+                    return this.cardFrames[5];
+                default: 
+                    return this.cardFrames[this.colorTxt.length - 1];
+            }
+        }
+        
     },
     _getColorTxt: function(type){
-        switch(type[0]){
-            case POKEMON.FIRE_TYPE:
-                return this.colorTxt[0];
-            case POKEMON.WATER_TYPE:
-                return this.colorTxt[1];
-            case POKEMON.GRASS_TYPE:
-                return this.colorTxt[2];
-            case POKEMON.ELECTRIC_TYPE:
-                return this.colorTxt[3];
-            default: 
-                return this.colorTxt[this.colorTxt.length];
+        if(this.category  == CONST.CARD.CAT.PKM){
+            switch(type[0]){
+                case POKEMON.FIRE_TYPE:
+                    return this.colorTxt[0];
+                case POKEMON.WATER_TYPE:
+                    return this.colorTxt[1];
+                case POKEMON.GRASS_TYPE:
+                    return this.colorTxt[2];
+                case POKEMON.ELECTRIC_TYPE:
+                    return this.colorTxt[3];
+                default: 
+                    return this.colorTxt[this.colorTxt.length - 1];
+            }
         }
+        if(this.category == CONST.CARD.CAT.ENERGY){
+            switch(type){
+                case CONST.ENERGY.FIRE:
+                    return this.colorTxt[4];
+                case CONST.ENERGY.WATER:
+                    return this.colorTxt[1];
+                case CONST.ENERGY.GRASS:
+                    return this.colorTxt[2];
+                case CONST.ENERGY.ELECTRIC:
+                    return this.colorTxt[3];
+                case CONST.ENERGY.NORMAL:
+                        return this.colorTxt[5];
+                default:                 
+                    return this.colorTxt[this.colorTxt.length - 1];
+            }
+        }
+       
     },
     _getTypeFrame: function(type){
-        cc.log("test_Type", type);
         switch(type){
             case POKEMON.FIRE_TYPE:
                 return this.typeFrames[0];
@@ -106,32 +174,26 @@ cc.Class({
                 return this.typeFrames[this.typeFrames.length];
         }
     },
-    _loadSpriteFrameForCardImg: function(smallCardUrl){
-        cc.log("load_res", smallCardUrl);
+    _loadSpriteFrameForCardImg: function(smallCardUrl, failedSF){
+       
         cc.resources.load(smallCardUrl, cc.SpriteFrame, function(err, loadedSpriteFrame){
             if(!err){
                 this.cardImg.spriteFrame = loadedSpriteFrame;
-                cc.log("IMG_LOAD_SUC");
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][][SUCCESS]", smallCardUrl);
             }else{
-                cc.log("IMG_LOAD_FAIL");
-
+                this.cardImg.spriteFrame = failedSF;
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][][FAILED]", smallCardUrl);
             }
         }.bind(this))
     },
     //Listeners
     onTouchCardStart: function(touchEvent){
         //cc.log("TOUCH_SMALL_CARD_START", this.idxInHand);
-        //if(!this._isDroppable) return;
         //Show card name
         this.cardTitleText.enabled = true;
-        //if(!this._isDroppable) return;
         this._oldPos = this.node.position;
-        //this._isDroppable = false;
-       
-
-        var endPos = this.node.position.add(cc.v2(0, 1).mul(80));
-        cc.log("TouchCard", endPos.x , endPos.y);
-        this.node.position = endPos;
+        //var endPos = this.node.position.add(cc.v2(0, 1).mul(80));
+        this.node.position =  this.node.parent.convertToNodeSpaceAR(touchEvent.getLocation());
         //Fly up Node
         // cc.tween(this.node)
         //     .to(0.1, {position: endPos}).start();
@@ -153,7 +215,11 @@ cc.Class({
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
             this.onDrop();
-
+        }
+        else
+        {
+            //When drop card outside drop area
+            this.node.position = this._oldPos;
         }
     },
     onTouchCardCancel: function(touchEvent){
@@ -171,18 +237,20 @@ cc.Class({
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){    
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
             this.onDrop();
+        }  
+        else
+        {
+            //When drop card outside drop area
+            this.node.position = this._oldPos;
         }
     },
     onTouchCardMove: function(touchEvent){
-        //if(!this._isDroppable) return;
         var delta = touchEvent.getDelta();
         this.node.x = this.node.x + delta.x;
         this.node.y = this.node.y + delta.y;
         var touchLoc = touchEvent.getLocation();
-        //var dropCheckerPos = this.dropChecker.position;
-        //var dropCheckerWPos=  this.dropChecker.parent.convertToWorldSpaceAR(dropCheckerPos);
         var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
-        //cc.log("touch_card_move", this.dropChecker.width, this.dropChecker.y,localPosOfTouch.x,localPosOfTouch.y);
+        //cc.log("touch_card_move",touchLoc.x,touchLoc.y);
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){
             this.dropChecker.getComponent("CardDropChecker").onSelected();
         }else{
@@ -200,5 +268,8 @@ cc.Class({
         this.node.active=false;
         this.handUI.onDropCard(this.idxInHand);
     },
+    backOldPosition: function(){
+        this.node.position = this._oldPos;
+    }
     
 });

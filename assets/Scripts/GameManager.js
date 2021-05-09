@@ -147,7 +147,11 @@ cc.Class({
     onTurnEnd:function(){},
     endTurn: function(){
         //Check end turn
-        //if(this.processor.checkEndTurn() === false) return;
+        if(this.processor.checkEndTurn() === false) {
+            return;
+        }
+        cc.log("checkEndturn_true");
+
         //Change turn
         this.node.emit(CONST.GAME_PHASE.ON_TURN_END, {player: this.currentTurnPlayer});
         this.changeTurn();

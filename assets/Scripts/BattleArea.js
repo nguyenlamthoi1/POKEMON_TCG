@@ -71,11 +71,12 @@ cc.Class({
       this.endTurnBtn.node.active = true;
       this.gm.getPlayer().enableDrop(true);
     }
-      for (var battleSlot of this.playerBench){
-        var battleSlotScr = battleSlot.getComponent("BattleSlot");
-        battleSlotScr.hideSelectableUI();
-      }
-    },  
+    for (var battleSlot of this.playerBench){
+      var battleSlotScr = battleSlot.getComponent("BattleSlot");
+      battleSlotScr.hideSelectableUI();
+    }  
+    this.playerActiveSlot.getComponent("BattleSlot").hideSelectableUI();
+  },  
   _getSelectedCallback: function(selectData, cardId, battleSlot){
     var retCb;
     if(selectData.callbackType == SELECTION.CB_TYPE.SHOW_PKM){
@@ -89,7 +90,10 @@ cc.Class({
       var battleSlotLPos = this.playerTrainer.convertToNodeSpaceAR(battleSlotWPos);
       trainer.throwBall(battleSlotLPos, battleSlotScr.showPokemonFromBall.bind(battleSlotScr,cardId));
       //Turn off selected
-        this.hideSelectableUIs();
+      this.hideSelectableUIs();
+      //Notify selection done
+      this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_DONE);
+
       }.bind(this, battleSlot, cardId);
     } 
     return retCb;
@@ -98,6 +102,7 @@ cc.Class({
   onTouchCancel: function(){
     cc.log("onTouchCancel");
     this.hideSelectableUIs();
+    this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_CANCEL);
   },
   //Check
   playerHasActivePkm: function(){
