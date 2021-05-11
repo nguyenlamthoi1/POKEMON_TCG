@@ -1,0 +1,37 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "red_Idle",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.8,
+  "sample": 5,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "spriteFrame": [
+          {
+            "frame": 0,
+            "value": {
+              "__uuid__": "83127eb3-4df5-4bf0-84f5-adb3f52a3bf3"
+            }
+          },
+          {
+            "frame": 0.4,
+            "value": {
+              "__uuid__": "b4a1b20b-3876-48a5-8cbd-34c75e3c9181"
+            }
+          },
+          {
+            "frame": 0.6,
+            "value": {
+              "__uuid__": "a77f218f-1657-421e-91a9-175790f09f1b"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "events": []
+}

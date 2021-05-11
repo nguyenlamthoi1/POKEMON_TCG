@@ -74,13 +74,15 @@ cc.Class({
         handUI: cc.Node,
         battleAreaNode: cc.Node,
         topUINode: cc.Node,
-        notifier: cc.Node
+        notifier: cc.Node,
+        //Versus UI
+        versusUI: cc.Node
     },
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        
+        this.versusUI.getComponent("VersusUI").show(2.5);
         //Load SF
         //RES_MGR.loadRes(FAKE_CARDS);
         //Global var
