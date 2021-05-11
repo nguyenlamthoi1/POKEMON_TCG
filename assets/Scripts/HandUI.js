@@ -23,9 +23,10 @@ cc.Class({
         this.deck = idList; //List of ids
         //this.deck = [1,2,3,4,5,6,7,8,9, 10];
         //this.deck = [1,1,1,4,4,4];
-        this.deck =["energy_1"
-        ,"energy_2","energy_3"
-        ,"energy_0","energy_4"
+        this.deck =[
+           1,1,1,"energy_2","energy_2","energy_2"
+        // ,"energy_2","energy_3"
+        // ,"energy_0","energy_4"
     ];
         // this.deck = [];
         // for(var i=0;i<60;i++){
@@ -114,9 +115,10 @@ cc.Class({
     
     //Listeners
     onClickDrawBtn: function(){
-        cc.log("Draw_Card");
+        cc.log("Draw_Card",RES_MGR.getRes("SmallPokemon/003"));
+        this.gameManager.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/003");
         //this.node.y = this.node.y + 100;
-        this.draw(1);
+        //this.draw(1);
     },
     //Reset position when drop 1 card
     resetCardPosOnDrop: function(DroppedCardIdx){

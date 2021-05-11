@@ -30,7 +30,8 @@ cc.Class({
         selectIndicator: cc.Node,
         errorSF: cc.SpriteFrame,
         pokemonSprite: cc.Sprite,
-        hpBar: cc.Node
+        hpBar: cc.Node,
+        energy: cc.Node
     },
     init: function(typeSlot) {
         //Define misc
@@ -115,6 +116,9 @@ cc.Class({
         this.hpBar.active = true;
          
     },
+    showAttachedEnergy: function(){
+
+    },
     //Listeners
     _onTouchStart: function(){
         if (!this._isSelectable) return;
@@ -124,11 +128,16 @@ cc.Class({
     },
     //_onTouchMove: function(){},
     _onTouchEnd: function(){
+       
+
         if (!this._isSelectable) return;
+       ;
         this._isSelectable = true;
         cc.tween(this.selectIndicator)
             .to(0.1, {width: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.height})
             .start();
+            cc.log("touch_end_select",JSON.stringify(this._onSelectedCallBack));
+        if(this._onSelectedCallBack==undefined) cc.log("cb_is_undefined"); else cc.log("cb_is_not_undefined");
         this._onSelectedCallBack && this._onSelectedCallBack();    
     },
     _onTouchCancel: function(){

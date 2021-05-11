@@ -36,12 +36,17 @@ Processor = cc.Class({
 
         // var trainer =this.battleArea.getComponent("BattleArea").getPlayerTrainer().getComponent("Trainer");
         // trainer.throwBall();
+        cc.log("test_process",cardData.category ,this.CONST.CAT.ENERGY);
         switch(cardData.category){
             case this.CONST.CAT.POKEMON:
                 this.processPKMCard(cardId);
+            case this.CONST.CAT.ENERGY:
+                this.processEnergyCard(cardId);
         }
     
     },
+
+    //--------PROCESS_CARD--------------
     processPKMCard: function(cardId){
         
         cc.log("ProcessPKMCard");
@@ -50,7 +55,7 @@ Processor = cc.Class({
         notifier.notify("SELECTING..");
         battleAreaScr = this.battleArea.getComponent("BattleArea");
         var selectData;
-        if(this.gameManager.isPhase(CONST.GAME_PHASE.START_GAME)){
+        if(this.gameManager.isPhase(CONST.GAME_PHASE.START)){
             //START_TURN
             var playerActiveSlotScr = battleAreaScr.getPlayerActiveSlot().getComponent("BattleSlot");
             if(!playerActiveSlotScr.hasPokemon()){ //Should select empty active slot
@@ -77,6 +82,33 @@ Processor = cc.Class({
         }
 
     },
+    processEnergyCard: function(cardId){
+        
+        cc.log(this.LOG_TAG, "PROCESS_ENERGY_CARD");
+        //Show Battle Slot avaiable
+        var notifier = this.TopUI.getComponent("TopUI");
+        notifier.notify("SELECTING..");
+        battleAreaScr = this.battleArea.getComponent("BattleArea");
+        var selectData;
+        if(this.gameManager.isPhase(CONST.GAME_PHASE.START)){
+            
+        }else{
+            //PLAY PHASE
+            selectData = {
+                type: SELECTION.TYPE.PLAYER_ALL_PKM,
+                callbackType: SELECTION.CB_TYPE.SHOW_PKM
+            };
+        }
+        if(selectData != undefined){
+            cc.log("listen_event",cardId);
+            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onCardApproved, this);
+            battleAreaScr.showSelectabledUIs(cardId,selectData);
+        }
+
+    },
+    //--------END_PROCESS_CARD-----------
+
     onCardCancel: function(){
         cc.log("test_cancel_fac");
         this.handUI.onDropCardCancel();
@@ -95,21 +127,26 @@ Processor = cc.Class({
         var battleScr = this.battleArea.getComponent("BattleArea");
         var playerActiveSlotScr = battleScr.getPlayerActiveSlot().getComponent("BattleSlot");
         if(cardData == undefined) cardData = JARVIS.getCardData(cardId);
-        cc.log("checK_on_drop1", cardData.evolution, CONST.CARD.EVOL.BASIC );
-        cc.log("checK_on_drop2", JSON.stringify(cardData));
-
-        if(this.gameManager.isPhase(CONST.GAME_PHASE.START_GAME) 
-            && cardData.category == CONST.CARD.CAT.PKM && cardData.evolution == CONST.CARD.EVOL.BASIC){
+        // cc.log("checK_on_drop1", cardData.evolution, CONST.CARD.EVOL.BASIC );
+        // cc.log("checK_on_drop2", JSON.stringify(cardData));
+        //cc.log("test_check_drop",this.gameManager.currentPhase, CONST.GAME_PHASE.START,cardData.category,  cardData.evolution, cardData.id);
+        if(this.gameManager.isPhase(CONST.GAME_PHASE.START)){
+            if (cardData.category == CONST.CARD.CAT.PKM && cardData.evolution == CONST.CARD.EVOL.BASIC){
                 return true;
             }
-        else{
-            notifier.notify("YOU SHOULD DROP BASIC POKEMON CARD IN FIRST TURN", cc.Color.RED, 15);
-            return false;
+            else{ 
+                notifier.notify("YOU SHOULD DROP BASIC POKEMON CARD IN FIRST TURN", cc.Color.RED, 15);
+                return false;
+            }
         }
+        else{
+           
+        }    
+        return true;
     },
     checkEndTurn: function(){
         var battleScr = this.battleArea.getComponent("BattleArea");
-        if(this.gameManager.isPhase(CONST.GAME_PHASE.START_GAME) && battleScr.playerHasActivePkm()){
+        if(this.gameManager.isPhase(CONST.GAME_PHASE.START) && battleScr.playerHasActivePkm()){
                 return true;
             }
         else{

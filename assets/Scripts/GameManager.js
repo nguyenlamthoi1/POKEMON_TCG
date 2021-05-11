@@ -1,7 +1,8 @@
 
+
 const GAME_PHASE = {
     SETUP: -1,
-    START_GAME: 0,
+    START: 0,
     RUN_TIME: 1,
     END_GAME: 2,
     ON_GAME_START: "ongamestart",
@@ -67,7 +68,7 @@ cc.Class({
         player1Cards: [],
         player2Cards: [],
         currentPhase: GAME_PHASE.SETUP,
-        
+        testNode: cc.Sprite,
 
         //nodes in Top UI
         handUI: cc.Node,
@@ -79,9 +80,11 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        
+        //Load SF
+        //RES_MGR.loadRes(FAKE_CARDS);
         //Global var
         GM = this;
-
         //Init data
         this.player = {
             1: new Player(), // -> Player -> Device owner
@@ -104,24 +107,37 @@ cc.Class({
     },
     start () {
         cc.log("START_GAME");
-        this.changePhase(GAME_PHASE.START_GAME); //TODO: wait server notify START_GAME;
+        this.changePhase(CONST.GAME_PHASE.START); //TODO: wait server notify START_GAME;
+        cc.log("test_res", RES_MGR.getRes("SmallPokemon/002") );
+        //this.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/002");
     },
     changePhase: function(phase){
         this.currentPhase = phase;
         switch (phase){
-            case GAME_PHASE.START_GAME:
+            case CONST.GAME_PHASE.START:
                 this.node.emit(CONST.GAME_PHASE.ON_GAME_START, phase);
+            case CONST.GAME_PHASE.PLAY:
+                this.node.emit(CONST.GAME_PHASE.ON_GAME_START_PLAY, phase);
         }
     },
-    changeTurn: function(phase){
+    changeTurn: function(phase){//Start a new turn
+        //--Set up before run new turn
         //Swap turn id
         var temp = this.currentTurnPlayer;
         this.currentTurnPlayer = this.nextTurnPlayer;
         this.nextTurnPlayer = temp;
-        cc.log("test_change_turn",this.player[1].sameId(this.currentTurnPlayer));
+        //Player can drop
         this.player[1].enableDrop(this.player[1].sameId(this.currentTurnPlayer.getId())); //Player can drop or not
+        this.turnCount ++;
+        //Start play phase if start phase is done
+        cc.log("this.turnCount", this.turnCount);
+        if(this.turnCount == 2 && this.isPhase(CONST.GAME_PHASE.START)){//If we pass 2 set up active pkm turn then start play phase
+            cc.log("changePhase", CONST.GAME_PHASE.PLAY);
+            this.changePhase(CONST.GAME_PHASE.PLAY);
+        }
+        //--Done Set up 
+        //launch Event
         this.node.emit(CONST.GAME_PHASE.ON_TURN_START, {player: this.currentTurnPlayer});
-        
     },
     isPhase:function(phase){return this.currentPhase == phase;},
     onGameStart: function(){
@@ -143,7 +159,9 @@ cc.Class({
         this.node.emit(CONST.GAME_PHASE.ON_TURN_START, {player: this.player[1]});
 
     },
-    onTurnStart: function(){this.turnCount ++;},
+    onTurnStart: function(){
+      
+    },
     onTurnEnd:function(){},
     endTurn: function(){
         //Check end turn

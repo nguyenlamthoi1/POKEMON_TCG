@@ -1,6 +1,5 @@
 
 DataManager = cc.Class({
-   
     ctor: function(){
         this.LOG_TAG = "DataManager";
         this.cardInfo = null;
@@ -10,13 +9,22 @@ DataManager = cc.Class({
             "JSON/energyData"
         ];
     },
-    init: function(){
-        cc.log(this.LOG_TAG, "[INIT]");
+    init:  function(){
+        this.cardInfo = {};
+        
+    },
+    load: function(){
+        //For loading
+        this.finishLoaded = false;
+        this.LoadedStepCount = 0;
+        this.totalLoadErr = 0;
+        this.totalStep = this.JSON_FILES.length;
         for (var i = 0; i < this.JSON_FILES.length; i++){
-            cc.log(this.LOG_TAG, "[START_LOAD]", this.JSON_FILES[i]);
+            //cc.log(this.LOG_TAG, "[START_LOAD]", this.JSON_FILES[i]);
             cc.resources.load(this.JSON_FILES[i], function(err, jsonAsset){
                 if(err){
                     cc.log(this.LOG_TAG, jsonAsset.name, "[READ_ERROR]", err);
+                    this.totalLoadErr ++;
                 }
                 else{
                     if(this.cardInfo === null) this.cardInfo = jsonAsset.json;
@@ -25,9 +33,10 @@ DataManager = cc.Class({
                     }
                     cc.log(this.LOG_TAG, jsonAsset.name, "[READ_SUCCESS]");
                 }
+                this.LoadedStepCount ++;
             }.bind(this));
         }
-        cc.log(this.LOG_TAG, "[FINAL_READ]", JSON.stringify(this.cardInfo));
+        //cc.log(this.LOG_TAG, "[FINAL_READ]", JSON.stringify(this.cardInfo));
 
     },
     getCardData: function(cardId){
@@ -36,5 +45,5 @@ DataManager = cc.Class({
     }
 });
 
-window.JARVIS = new DataManager();
-window.JARVIS.init();
+//window.JARVIS = new DataManager();
+//window.JARVIS.init();

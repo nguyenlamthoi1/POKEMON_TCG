@@ -10,10 +10,11 @@ window.CONST = {
     },
     GAME_PHASE: {
         SETUP: -1,
-        START_GAME: 0,
-        RUN_TIME: 1,
+        START: 0,
+        PLAY: 1,
         END_GAME: 2,
         ON_GAME_START: "ongamestart",
+        ON_GAME_START_PLAY: "ongamestartplay",
         ON_TURN_START: "onturnstart",
         ON_TURN_END: "onturnend",
         ON_SELECT_CANCEL: "select-canceled",
@@ -47,7 +48,8 @@ window.CONST = {
 window.SELECTION = {
     TYPE: {
         PLAYER_EMPTY_ACTIVE: 0,
-        PLAYER_EMPTY_BENCH: 1
+        PLAYER_EMPTY_BENCH: 1,
+        PLAYER_ALL_PKM: 2
     },
     CB_TYPE:{
         SHOW_PKM: 0

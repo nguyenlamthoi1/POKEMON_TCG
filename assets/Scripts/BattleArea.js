@@ -33,38 +33,72 @@ cc.Class({
     this.cancelSelectBtn.node.active = true;
     this.endTurnBtn.node.active = false;
     //cc.log("show_select",JSON.stringify(selectData));
-    //Find empty active slot
-    if(selectData.type == SELECTION.TYPE.PLAYER_EMPTY_ACTIVE){
-      var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
+    switch(selectData.type){
+      case SELECTION.TYPE.PLAYER_EMPTY_ACTIVE:{//Find empty active slot
+        var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
         battleSlotScr.setSelectedCallback(
          
           this._getSelectedCallback(selectData, cardId, this.playerActiveSlot)
         );
-      battleSlotScr.showSelectableUI();
-      return true;
-     }
-      //Find n empty active slot
-      else if(selectData.type == SELECTION.TYPE.PLAYER_EMPTY_BENCH){
-      var numSlotNeedSelect = selectData.selectNum;
-      if(numSlotNeedSelect < 1) return false;
-      var numFound = 0;
-      for (var battleSlot of this.playerBench){
-        var battleSlotScr = battleSlot.getComponent("BattleSlot");
-        if(!battleSlotScr.hasPokemon()){
-          battleSlotScr.setSelectedCallback(
-            this._getSelectedCallback(selectData, cardId, battleSlot)
-          );
         battleSlotScr.showSelectableUI();
-        numFound ++;
-        if(numFound == numSlotNeedSelect) return true;
+        return true;
+      };
+      break;
+      case SELECTION.TYPE.PLAYER_EMPTY_BENCH:{  //Find n empty bench slot
+        var numSlotNeedSelect = selectData.selectNum;
+        if(numSlotNeedSelect < 1) return false;
+        var numFound = 0;
+        for (var battleSlot of this.playerBench){  
+          var battleSlotScr = battleSlot.getComponent("BattleSlot");
+          if(!battleSlotScr.hasPokemon()){
+            battleSlotScr.setSelectedCallback(
+              this._getSelectedCallback(selectData, cardId, battleSlot)
+            );
+          battleSlotScr.showSelectableUI();
+          numFound ++;
+          if(numFound == numSlotNeedSelect) return true;
+          }
         }
-      }
-    }   
-    else{
+      };
+      break;
+      case SELECTION.TYPE.PLAYER_ALL_PKM:{
+        cc.log("show_select");
+        //Active slot
+        var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
+        battleSlotScr.setSelectedCallback(
+          
+          function(){ 
+            cc.log("DO_STH");
+            this.hideSelectableUIs();
+            this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_DONE);}.bind(this)
 
+          //this._getSelectedCallback(selectData, cardId, this.playerActiveSlot)
+        );
+        battleSlotScr.showSelectableUI();
+        //Bench slots
+        for (var battleSlot of this.playerBench){  
+          var battleSlotScr = battleSlot.getComponent("BattleSlot");
+          
+          if(battleSlotScr.hasPokemon()){
+            
+            battleSlotScr.setSelectedCallback(
+              function(){  
+                cc.log("DO_STH");
+              this.hideSelectableUIs();
+              this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_DONE);}.bind(this)
+  
+            );
+          battleSlotScr.showSelectableUI();
+          }
+        }
+        return true;
+      };
+      break;
     }
+   
   },
   hideSelectableUIs: function(){
+    cc.log("hide_ui");
     //Hide cancel btn
     this.cancelSelectBtn.node.active = false;
     if(this.gm.isPlayerTurn()){
