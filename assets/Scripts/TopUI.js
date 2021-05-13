@@ -6,6 +6,7 @@ cc.Class({
     properties: {
       notifier: cc.Label,
       cancelSelectBtn : cc.Button,
+      selectBtn: cc.Button,
       endTurnBtn: cc.Button,
       endEnemyTurnBtn: cc.Button
     },
@@ -16,7 +17,7 @@ cc.Class({
         this.endTurnBtn.node.active = false;
         this.endEnemyTurnBtn.node.active = false;
         this.cancelSelectBtn.node.active = false;
-
+        this.selectBtn.node.active = false;
         this.endTurnBtn.node.on("click", this.onTouchEndTurnBtn, this);
         this.endEnemyTurnBtn.node.on("click",this.onTouchEndTurnBtn, this);
         this.cancelSelectBtn.node.on("click", this.onTouchCancelSelectBtn, this);

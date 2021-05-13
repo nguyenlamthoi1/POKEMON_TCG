@@ -10,11 +10,12 @@ DataManager = cc.Class({
         ];
     },
     init:  function(){
-        this.cardInfo = {};
+        //this.cardInfo = {};
         
     },
     load: function(){
         //For loading
+        this.cardInfo = {};
         this.finishLoaded = false;
         this.LoadedStepCount = 0;
         this.totalLoadErr = 0;
@@ -31,7 +32,7 @@ DataManager = cc.Class({
                     else{
                         this.cardInfo = Object.assign(this.cardInfo, jsonAsset.json);
                     }
-                    cc.log(this.LOG_TAG, jsonAsset.name, "[READ_SUCCESS]");
+                    //cc.log(this.LOG_TAG, jsonAsset.name, "[READ_SUCCESS]", JSON.stringify(jsonAsset.json));
                 }
                 this.LoadedStepCount ++;
             }.bind(this));
@@ -45,5 +46,6 @@ DataManager = cc.Class({
     }
 });
 
-//window.JARVIS = new DataManager();
-//window.JARVIS.init();
+// window.JARVIS = new DataManager();
+// window.JARVIS.init();
+// window.JARVIS.load();

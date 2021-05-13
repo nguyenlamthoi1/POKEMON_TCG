@@ -28,8 +28,9 @@ cc.Class({
         failedEnergySF: cc.SpriteFrame
        
     },
-    init: function(data, idxInHand, dropChecker, handUI){
-        cc.log("INIT_CARD",JSON.stringify(data));
+    init: function(data, idxInHand, dropChecker, handUI, cardId){
+        cc.log("INIT_CARD", idxInHand, cardId, JSON.stringify(data));
+        this.cardId = cardId;
         this.handUI = handUI;
         this.owner = handUI.player;
         this.dropChecker = dropChecker;
@@ -179,10 +180,10 @@ cc.Class({
         cc.resources.load(smallCardUrl, cc.SpriteFrame, function(err, loadedSpriteFrame){
             if(!err){
                 this.cardImg.spriteFrame = loadedSpriteFrame;
-                cc.log("[LOAD_IMG_FOR_SMALL_CARD][][SUCCESS]", smallCardUrl);
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][SUCCESS]", smallCardUrl);
             }else{
                 this.cardImg.spriteFrame = failedSF;
-                cc.log("[LOAD_IMG_FOR_SMALL_CARD][][FAILED]", smallCardUrl);
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][FAILED]", smallCardUrl);
             }
         }.bind(this))
     },

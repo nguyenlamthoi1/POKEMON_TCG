@@ -80,7 +80,7 @@ cc.Class({
            //this.startGame.bind(this)
        );
        var checkAllLoaded = function(){
-           cc.log("load_scene_main",RES_MGR.finishLoaded,this._isGameSceneReady);
+           //cc.log("load_scene_main",RES_MGR.finishLoaded,this._isGameSceneReady);
             if(RES_MGR.finishLoaded && this._isGameSceneReady){
                 cc.log(this.LOG_TAG, "[MOVE_MAIN_SCENE]");
                 cc.director.loadScene("Main");
@@ -88,11 +88,6 @@ cc.Class({
        };
        this.schedule(checkAllLoaded, interval);
     //    this.schedule(function(){cc.log("SCHEDULE_2")}, interval);
-    },
-    startGame: function(){
-        this.hideLoading();
-        cc.log("START_GAME");
-        //cc.director.loadScene("Main");
     },
     showLoading: function(){
         this.loadingUI.active = true;

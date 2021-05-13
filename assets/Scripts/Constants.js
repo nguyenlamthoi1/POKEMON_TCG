@@ -23,6 +23,7 @@ window.CONST = {
     BATTLE_SLOT: {
         ACTIVE_TYPE: 0,
         BENCH_TYPE: 1,
+        ON_SLOT_SELECTED: "on-slot-selected"
     },
     CARD: {
         CAT:{
@@ -55,3 +56,9 @@ window.SELECTION = {
         SHOW_PKM: 0
     }
 };
+window.GAME_ACTION = {
+    TYPE: {
+        SUMMON_A_POKEMON: 0,
+        EVOLVE_POKEMON: 1
+    }
+}

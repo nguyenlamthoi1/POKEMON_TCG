@@ -43,25 +43,12 @@ var Player = cc.Class({
     }
 }
 );
+window.GM = null;
+
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
         controllingPlayerId: -1,
         player1Id: -1,
         player2Id: -1,
@@ -82,9 +69,9 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        this.versusUI.getComponent("VersusUI").show(2.5);
-        //Load SF
-        //RES_MGR.loadRes(FAKE_CARDS);
+        const DELAY_VS = 2.5
+        this.versusUI.getComponent("VersusUI").show(DELAY_VS);
+        this.schedule( this.start.bind(this),0,1,DELAY_VS);
         //Global var
         GM = this;
         //Init data
@@ -106,11 +93,11 @@ cc.Class({
         this.node.on(CONST.GAME_PHASE.ON_GAME_START, this.onGameStart, this);
         this.node.on(CONST.GAME_PHASE.ON_TURN_START, this.onTurnStart, this);
         this.node.on(CONST.GAME_PHASE.ON_TURN_END, this.onTurnEnd, this);
+       
     },
     start () {
-        cc.log("START_GAME");
         this.changePhase(CONST.GAME_PHASE.START); //TODO: wait server notify START_GAME;
-        cc.log("test_res", RES_MGR.getRes("SmallPokemon/002") );
+        // cc.log("test_res", RES_MGR.getRes("SmallPokemon/002") );
         //this.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/002");
     },
     changePhase: function(phase){
@@ -133,8 +120,9 @@ cc.Class({
         this.turnCount ++;
         //Start play phase if start phase is done
         cc.log("this.turnCount", this.turnCount);
-        if(this.turnCount == 2 && this.isPhase(CONST.GAME_PHASE.START)){//If we pass 2 set up active pkm turn then start play phase
-            cc.log("changePhase", CONST.GAME_PHASE.PLAY);
+        if(this.isPhase(CONST.GAME_PHASE.START) && this.turnCount == 2){//If we pass 2 set up active pkm turn then start play phase
+            cc.log("START_PLAY_TURN", CONST.GAME_PHASE.PLAY);
+            this.turnCount == 0;
             this.changePhase(CONST.GAME_PHASE.PLAY);
         }
         //--Done Set up 
@@ -151,6 +139,7 @@ cc.Class({
         //Get first cards
         var handUIScr = this.handUI.getComponent("HandUI");
         handUIScr.draw(GAMESTART_CONST.NUM_DRAW);
+        //setTimeout(function(){this.handUI.getComponent("HandUI").draw(GAMESTART_CONST.NUM_DRAW)}.bind(this),1);
         //Notify
         var topUIScr = this.topUINode.getComponent("TopUI");
         topUIScr.notify("DROP YOUR ACTIVE POKEMON", cc.Color.WHITE, 20);
@@ -185,8 +174,9 @@ cc.Class({
     getTopUI: function(){return this.topUINode;},
     getprocessor: function(){return this.processor;},
     getPlayer: function(){return this.player[1];},
+    getCurrentTurn: function(){return this.turnCount;},
     //Check
-    isPlayerTurn: function(){return this.player[1].sameId(this.currentTurnPlayer.getId()); }
-
+    isPlayerTurn: function(){return this.player[1].sameId(this.currentTurnPlayer.getId());},
+    isStartPhase: function(){return this.currentPhase == CONST.GAME_PHASE.START;},
+    isTurnPhase: function(){return this.currentPhase == CONST.GAME_PHASE.PLAY;}
 });
-window.GM = null;
