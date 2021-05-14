@@ -69,8 +69,8 @@ cc.Class({
         this.cardImg.node.scale = data.smallScale ? data.smallScale: 1;
         this._loadSpriteFrameForCardImg(data.smallCardUrl, this.failedPkmSF); //Load dymanically
         //Evolution info
-        this.evolutionIcon.node.active = data.evolution > 1;
-        this.evolutionTxt.string = data.evolution - 1;
+        this.evolutionIcon.node.active = data.stage > 1;
+        this.evolutionTxt.string = data.stage - 1;
         //Type PKM info: fire, water,..
         for(var i = 0; i < this.types.length; i ++)  this.types[i].active = false;
         for (var typeKey in data.type) { 

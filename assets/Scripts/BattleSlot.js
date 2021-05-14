@@ -31,9 +31,11 @@ cc.Class({
         selectedIndex: cc.Label,
         errorSF: cc.SpriteFrame,
         pokemonSprite: cc.Sprite,
+        evolutionPkmSprite: cc.Sprite,
         hpBar: cc.Node,
-        energy: cc.Node
-        
+        energy: cc.Node,
+        effect: cc.Node,
+
     },
     init: function (typeSlot) {
         //Define misc
@@ -43,7 +45,7 @@ cc.Class({
         this.typeSlot = typeSlot;
         this._isSelectable = false;
         this._hasPKM = false;
-        this._PkmData = null;
+        this._pkmData = null;
         this._inPlayTurn = -1;
         this._containedCardIds = [];
         this._selected = false;
@@ -105,15 +107,18 @@ cc.Class({
         //Load sprite frame for pokemon
         var bigPkmUrl = cardData.bigPokemonUrl;
         this.pokemonSprite.node.active = true;
-        cc.resources.load(bigPkmUrl, cc.SpriteFrame, function (error, loadedSpriteFrame) {
-            if (!error) {
-                cc.log(this.LOG_TAG, "LOAD_POKEMON_SUCC");
-                this.pokemonSprite.spriteFrame = loadedSpriteFrame;
-            } else {
-                cc.log(this.LOG_TAG, "LOAD_POKEMON_FAILED");
-                this.pokemonSprite.spriteFrame = this.errorSF;
-            }
-        }.bind(this));
+        this.evolutionPkmSprite.node.active = false;
+        // cc.resources.load(bigPkmUrl, cc.SpriteFrame, function (error, loadedSpriteFrame) {
+        //     if (!error) {
+        //         cc.log(this.LOG_TAG, "LOAD_POKEMON_SUCC");
+        //         this.pokemonSprite.spriteFrame = loadedSpriteFrame;
+        //     } else {
+        //         cc.log(this.LOG_TAG, "LOAD_POKEMON_FAILED");
+        //         this.pokemonSprite.spriteFrame = this.errorSF;
+        //     }
+        // }.bind(this));
+        this.pokemonSprite.spriteFrame = RES_MGR.getRes(bigPkmUrl);;
+        this.evolutionPkmSprite.spriteFrame = RES_MGR.getRes(bigPkmUrl);
         this.pokemonSprite.node.scale = endScale * 0.1;
         this.pokemonSprite.node.opacity = 0;
         cc.tween(this.pokemonSprite.node)
@@ -125,6 +130,47 @@ cc.Class({
     showAttachedEnergy: function () {
 
     },
+    showEvolution: function (cardEvolve, cardToEvolve) {
+        this._hasPKM = true;
+       // cc.log("showEvolution",cardEvolve,cardToEvolve, bigPkmUrl);
+        cardId = 1;
+        var cardData = JARVIS.getCardData(cardToEvolve);
+
+        var endScale = cardData.bigScale;
+        //Load sprite frame for pokemon
+        var bigPkmUrl = cardData.bigPokemonUrl;
+        this.pokemonSprite.node.active = true;
+        //cc.log("test_evolv2", cardEvolve,cardToEvolve);
+        this.pokemonSprite.spriteFrame = RES_MGR.getRes(bigPkmUrl);
+
+        this.pokemonSprite.node.scale = endScale * 0.1;
+        this.pokemonSprite.node.opacity = 0;
+        cc.tween(this.pokemonSprite.node)
+            .to(1, { scale: endScale, opacity: 255 }).start();
+
+        cardData = JARVIS.getCardData(cardEvolve);
+        //endScale =  cardData.bigScale;
+        cc.log("cardData",cardData.bigScale );
+        endScale =  0.08;
+        //Load sprite frame for pokemon
+        bigPkmUrl = cardData.bigPokemonUrl;
+        this.evolutionPkmSprite.node.active = true;
+        this.evolutionPkmSprite.spriteFrame = RES_MGR.getRes(bigPkmUrl);
+
+        this.evolutionPkmSprite.node.scale = endScale;
+        this.evolutionPkmSprite.node.opacity = 255;
+        cc.tween(this.evolutionPkmSprite.node)
+            .to(1, { scale: endScale * 0.1, opacity: 0 }).start();
+        cc.log(
+            "test_null", this.effect
+        )
+        this.effect.active = true;
+        this.effect.getComponent(cc.Animation).play("evolutionEffect");
+
+        // //Show Hp bar
+        // this.hpBar.active = true;
+
+    },
     //Listeners
     _onTouchStart: function () {
         if (!this._isSelectable) return;
@@ -134,14 +180,14 @@ cc.Class({
     },
     //_onTouchMove: function(){},
     _onTouchEnd: function () {
-       
+
         if (!this._isSelectable) return;
         ;
         this._isSelectable = true;
-       
+
         cc.log("ON_SLOT_TOUCH_END");
-        this.node.emit(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, {selected: this._selected, battleSlot: this});
-        
+        this.node.emit(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, { selected: this._selected, battleSlot: this });
+
         // cc.tween(this.selectIndicator)
         //     .to(0.1, { width: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTABLE_SIZE.height })
         //     .start();
@@ -154,11 +200,11 @@ cc.Class({
         this._isSelectable = true;
         this.onUnSelected();
     },
-    onSelected: function(){
+    onSelected: function () {
         this._selected = !this._selected;
         this.selectIndicator.color = cc.Color.GREEN;
     },
-    onUnSelected: function(){
+    onUnSelected: function () {
         this._selected = false;
         this.selectIndicator.color = cc.Color.WHITE;
         cc.tween(this.selectIndicator)
@@ -166,18 +212,23 @@ cc.Class({
             .start();
     },
     //Action
-    showSelectedIndex: function(idx){
+    showSelectedIndex: function (idx) {
         this.selectedIndex.node.active = true;
         this.selectedIndex.node.color = cc.Color.GREEN;
         this.selectedIndex.string = idx;
     },
-    hideSelectedIndex: function(){
+    hideSelectedIndex: function () {
         this.selectedIndex.node.active = false;
     },
     //Check
     hasPokemon: function () {
         //cc.log("_hasPKM", this._hasPKM);
         return this._hasPKM;
+    },
+    hasPokemonToEvolve: function (stageCardId, turnDrop) {
+        var stageCardData = JARVIS.getCardData(stageCardId);
+        cc.log("check_evolve", this._pkmData.pkdId, stageCardData.evolveFrom, turnDrop, this._inPlayTurn);
+        return this._pkmData.pkdId == stageCardData.evolveFrom && turnDrop > this._inPlayTurn;
     },
 
     //Set
@@ -191,11 +242,16 @@ cc.Class({
     },
     setPkmCardId: function (cardId) {
         this._cardId = cardId;
+        this._pkmData = JARVIS.getCardData(cardId);
         cc.log(this.LOG_TAG, "CARD_POKEMON_ID", this._cardId);
     },
-    setNewCard: function(cardId){
+    setNewCard: function (cardId) {
         this._containedCardIds.push(cardId);
         cc.log(this.LOG_TAG, "CARD_POKEMON_ID", this._containedCardIds);
     },
-    setSelectedCallback: function (cb) { this._onSelectedCallBack = cb; }
+    setSelectedCallback: function (cb) { this._onSelectedCallBack = cb; },
+    //Get
+    getCardPokemonId: function () {
+        return this._cardId;
+    }
 });

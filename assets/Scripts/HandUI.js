@@ -184,7 +184,7 @@ cc.Class({
     hasBasicPkm: function(){
         for (var cardId of this.cardIdOnHand){
             var cardData = JARVIS.getCardData(cardId);
-            if(cardData.evolution == 0 || cardData.evolution == 1 || cardData.evolution == undefined ) return true; 
+            if(cardData.stage == 0 || cardData.stage == 1 || cardData.stage == undefined ) return true; 
         }
         return false;
     }

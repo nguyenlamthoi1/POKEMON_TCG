@@ -20,7 +20,7 @@ Processor = cc.Class({
         this.notifier = this.TopUI.getComponent("TopUI");
         this.handUI = this.gameManager.handUI.getComponent("HandUI");
         //Get action processor
-        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gameManager,this, this.battleArea.getComponent("BattleArea"));
+        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gameManager, this, this.battleArea.getComponent("BattleArea"));
     },
     onReceiveCard: function (cardId, playerId) { //Xu ly khi nhan duoc the bai danh xuong tu nguoi choi co id = playerId
         //Process card Id
@@ -64,6 +64,7 @@ Processor = cc.Class({
             //START_TURN
             var playerActiveSlotScr = battleAreaScr.getPlayerActiveSlot().getComponent("BattleSlot");
             if (!playerActiveSlotScr.hasPokemon()) { //Should select empty active slot
+                cc.log("SELEC_EMPTY_ACTIVE");
                 selectData = {
                     type: SELECTION.TYPE.PLAYER_EMPTY_ACTIVE,
                     selectNum: 1,
@@ -84,10 +85,27 @@ Processor = cc.Class({
             }
         } else {
             //PLAY_TURN
-            selectData = {
-                type: SELECTION.TYPE.PLAYER_ALL_PKM,
-                callbackType: SELECTION.CB_TYPE.EVOL_POKEMON
-            };
+            if (JARVIS.isBasicPokemonCard(cardId)) {
+                cc.log("break1");
+                selectData = {
+                    type: SELECTION.TYPE.PLAYER_EMPTY_BENCH,
+                    selectNum: 1,
+                    callbackType: SELECTION.CB_TYPE.SHOW_PKM,
+                    action: {
+                        actionType: GAME_ACTION.TYPE.SUMMON_A_POKEMON
+                    }
+                };
+            } else {
+                selectData = {
+                    type: SELECTION.TYPE.ALL_PKM_TO_EVOLVE,
+                    callbackType: SELECTION.CB_TYPE.EVOL_POKEMON,
+                    selectNum: 1,
+                    action: {
+                        actionType: GAME_ACTION.TYPE.EVOLVE_A_POKEMON
+                    }
+                };
+            }
+
         }
         if (selectData != undefined) {
             cc.log("ProcessPKMCard2", cardId);
@@ -135,7 +153,7 @@ Processor = cc.Class({
     },
     onSelectDone: function (event) {
         cc.log("PROCESS_SELECTING", JSON.stringify(this.selectData), event.para.length);
-        this.actionProc.process(this.selectData.action.actionType,  this.droppedCardId ,event.para);
+        this.actionProc.process(this.selectData.action.actionType, this.droppedCardId, event.para);
     },
 
     //Check
@@ -148,7 +166,7 @@ Processor = cc.Class({
         // cc.log("checK_on_drop2", JSON.stringify(cardData));
         //cc.log("test_check_drop",this.gameManager.currentPhase, CONST.GAME_PHASE.START,cardData.category,  cardData.evolution, cardData.id);
         if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
-            if (cardData.category == CONST.CARD.CAT.PKM && cardData.evolution == CONST.CARD.EVOL.BASIC) {
+            if (JARVIS.isBasicPokemonCard(cardId)) {
                 return true;
             }
             else {
@@ -163,13 +181,17 @@ Processor = cc.Class({
     },
     checkEndTurn: function () {
         var battleScr = this.battleArea.getComponent("BattleArea");
-        if (this.gameManager.isPhase(CONST.GAME_PHASE.START) && battleScr.playerHasActivePkm()) {
-            return true;
+        cc.log('test_end_turn', this.gameManager.isPhase(CONST.GAME_PHASE.START), battleScr.playerHasActivePkm());
+        if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
+            if (battleScr.playerHasActivePkm()) {
+                return true;
+            }
+            else {
+                this.notifier.notify("YOU SHOULD HAVE POKEMON\n AT ACTIVE SLOT", cc.Color.RED, 20, 3);
+                return false;
+            }
         }
-        else {
-            this.notifier.notify("YOU SHOULD HAVE POKEMON\n AT ACTIVE SLOT", cc.Color.RED, 20, 3);
-            return false;
-        }
+
     }
 });
 
@@ -180,12 +202,20 @@ var ActionProcessor = cc.Class({
         this.battleArea = battleArea;
     },
     process: function (actionType, cardId, para) {
-        cc.log("actionType", actionType, GAME_ACTION.TYPE.SUMMON_A_POKEMON);
+        cc.log("actionType", actionType, GAME_ACTION.TYPE.SUMMON_A_POKEMON, para.length, cardId);
         switch (actionType) {
             case GAME_ACTION.TYPE.SUMMON_A_POKEMON:
                 {
                     //SummonPKM
                     this.battleArea.summonPokemon(para[0], cardId);
+                    //Notify selection done
+                    this.mainProc.onCardApproved();
+                }
+                break;
+            case GAME_ACTION.TYPE.EVOLVE_A_POKEMON:
+                {
+                    //SummonPKM
+                    this.battleArea.evolvePokemon(para[0], cardId);
                     //Notify selection done
                     this.mainProc.onCardApproved();
                 }

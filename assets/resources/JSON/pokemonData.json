@@ -8,8 +8,8 @@
       "0": "grass_type"
     },
     "hp": 60,
-    "evolution": 1,
-    "evoleFrom": 0,
+    "stage": 1,
+    "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/001",
     "bigPokemonUrl": "BigPokemon/001",
     "bigScale": 0.08
@@ -23,8 +23,8 @@
       "0": "grass_type"
     },
     "hp": 90,
-    "evolution": 2,
-    "evoleFrom": 1,
+    "stage": 2,
+    "evolveFrom": 1,
     "smallCardUrl": "SmallPokemon/002",
     "bigPokemonUrl": "BigPokemon/002",
     "bigScale": 0.1
@@ -38,8 +38,8 @@
       "0": "grass_type"
     },
     "hp": 120,
-    "evolution": 3,
-    "evoleFrom": 2,
+    "stage": 3,
+    "evolveFrom": 2,
     "smallCardUrl": "SmallPokemon/003",
     "bigPokemonUrl": "BigPokemon/003",
     "bigScale": 0.2
@@ -53,8 +53,8 @@
       "0": "fire_type"
     },
     "hp": 60,
-    "evolution": 1,
-    "evoleFrom": 0,
+    "stage": 1,
+    "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/004",
     "bigPokemonUrl": "BigPokemon/004",
     "bigScale": 0.08
@@ -68,8 +68,8 @@
       "0": "fire_type"
     },
     "hp": 90,
-    "evolution": 2,
-    "evoleFrom": 4,
+    "stage": 2,
+    "evolveFrom": 4,
     "smallCardUrl": "SmallPokemon/005",
     "bigPokemonUrl": "BigPokemon/005",
     "bigScale": 0.1
@@ -83,8 +83,8 @@
       "0": "fire_type"
     },
     "hp": 120,
-    "evolution": 3,
-    "evoleFrom": 5,
+    "stage": 3,
+    "evolveFrom": 5,
     "smallCardUrl": "SmallPokemon/006",
     "bigPokemonUrl": "BigPokemon/006",
     "bigScale": 0.2
@@ -98,8 +98,8 @@
       "0": "water_type"
     },
     "hp": 60,
-    "evolution": 1,
-    "evoleFrom": 0,
+    "stage": 1,
+    "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/007",
     "bigPokemonUrl": "BigPokemon/007",
     "bigScale": 0.08
@@ -113,8 +113,8 @@
       "0": "water_type"
     },
     "hp": 90,
-    "evolution": 2,
-    "evoleFrom": 7,
+    "stage": 2,
+    "evolveFrom": 7,
     "smallCardUrl": "SmallPokemon/008",
     "bigPokemonUrl": "BigPokemon/008",
     "bigScale": 0.1
@@ -128,8 +128,8 @@
       "0": "water_type"
     },
     "hp": 120,
-    "evolution": 3,
-    "evoleFrom": 8,
+    "stage": 3,
+    "evolveFrom": 8,
     "smallCardUrl": "SmallPokemon/009",
     "bigPokemonUrl": "BigPokemon/008",
     "bigScale": 0.2
@@ -142,8 +142,8 @@
     "type": {
       "0": "water_type"
     },
-    "evolution": 3,
-    "evoleFrom": 8,
+    "stage": 3,
+    "evolveFrom": 8,
     "smallCardUrl": "SmallPokemon/009",
     "bigScale": 0.2
   }

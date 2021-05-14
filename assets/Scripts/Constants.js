@@ -32,7 +32,7 @@ window.CONST = {
             SPTER: "Supporter",
             Item: "Item"
         },
-        EVOL: {
+        STAGE: {
             BASIC: 1,
             STAGE_1: 2,
             STAGE_2: 3
@@ -50,7 +50,8 @@ window.SELECTION = {
     TYPE: {
         PLAYER_EMPTY_ACTIVE: 0,
         PLAYER_EMPTY_BENCH: 1,
-        PLAYER_ALL_PKM: 2
+        PLAYER_ALL_PKM: 2,
+        ALL_PKM_TO_EVOLVE: 3
     },
     CB_TYPE:{
         SHOW_PKM: 0
@@ -59,6 +60,6 @@ window.SELECTION = {
 window.GAME_ACTION = {
     TYPE: {
         SUMMON_A_POKEMON: 0,
-        EVOLVE_POKEMON: 1
+        EVOLVE_A_POKEMON: 1
     }
 }

@@ -40,9 +40,15 @@ DataManager = cc.Class({
         //cc.log(this.LOG_TAG, "[FINAL_READ]", JSON.stringify(this.cardInfo));
 
     },
+    //Get
     getCardData: function(cardId){
         //cc.log(this.LOG_TAG, "[GET_CARD_DATA]", JSON.stringify(this.cardInfo));
         return this.cardInfo[cardId];
+    },
+    //Set
+    //Check
+    isBasicPokemonCard: function(cardId){
+        return this.cardInfo[cardId].category == CONST.CARD.CAT.PKM && this.cardInfo[cardId].stage == CONST.CARD.STAGE.BASIC; 
     }
 });
 
