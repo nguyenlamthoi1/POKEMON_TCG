@@ -75,7 +75,8 @@ cc.Class({
        //Load res and scene
        this.loadData(
            [
-                {obj: RES_MGR, para: [1,2,3,4,5,6]}
+                {obj: RES_MGR, para: [1,2,3,4,5,6,"energy_2","energy_3"
+                ,"energy_0","energy_4","energy_1"]}
            ],
            //this.startGame.bind(this)
        );

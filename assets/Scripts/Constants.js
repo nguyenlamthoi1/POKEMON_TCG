@@ -60,6 +60,7 @@ window.SELECTION = {
 window.GAME_ACTION = {
     TYPE: {
         SUMMON_A_POKEMON: 0,
-        EVOLVE_A_POKEMON: 1
+        EVOLVE_A_POKEMON: 1,
+        ATTACH_ENERGY: 2,
     }
 }

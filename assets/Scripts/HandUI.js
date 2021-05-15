@@ -24,9 +24,9 @@ cc.Class({
         //this.deck = [1,2,3,4,5,6,7,8,9, 10];
         //this.deck = [1,1,1,4,4,4];
         this.deck =[
-           1,2,3,4,5,6
-        // ,"energy_2","energy_3"
-        // ,"energy_0","energy_4"
+           1,2,3,4,5,6,
+           "energy_2","energy_3"
+           ,"energy_0","energy_4","energy_1"
         ];
         //this.deck = FAKE_CARDS
         // this.deck = [];

@@ -33,8 +33,9 @@ cc.Class({
         pokemonSprite: cc.Sprite,
         evolutionPkmSprite: cc.Sprite,
         hpBar: cc.Node,
-        energy: cc.Node,
+        energyPanel: cc.Node,
         effect: cc.Node,
+
 
     },
     init: function (typeSlot) {
@@ -49,6 +50,8 @@ cc.Class({
         this._inPlayTurn = -1;
         this._containedCardIds = [];
         this._selected = false;
+        //  Energy data
+        this._energyIcons = []; this._energyIcons.push(this.energyPanel.getChildByName("EnergyIcon"));
 
         //Init UI
         switch (typeSlot) {
@@ -98,12 +101,9 @@ cc.Class({
     },
     showPokemonFromBall: function (cardId) {
         //this._hasPKM = true;
-
-        cc.log("show_pokemon", this._hasPKM);
         // cardId = 1;
         var cardData = JARVIS.getCardData(cardId);
         var endScale = cardData.bigScale;
-        cc.log("test_slot_data", JSON.stringify(cardData));
         //Load sprite frame for pokemon
         var bigPkmUrl = cardData.bigPokemonUrl;
         this.pokemonSprite.node.active = true;
@@ -127,12 +127,40 @@ cc.Class({
         this.hpBar.active = true;
 
     },
-    showAttachedEnergy: function () {
+    showAttachedEnergy: function (energyCardId) {
+        var cardData = JARVIS.getCardData(energyCardId);
+        var layout = this.energyPanel.getComponent(cc.Layout);
+        var foundEnergyIcon;
+        for (var energyIcon of this._energyIcons) {
+            if (!energyIcon.active) {
+                cc.log("found_free_energy")
+                foundEnergyIcon = energyIcon;
+                break;
+            }
+        }
+        if (!foundEnergyIcon) {//Not found free Energy Icon
+            cc.log("not_found_free_energy")
+            foundEnergyIcon = cc.instantiate(this._energyIcons[0]);
+            this.energyPanel.addChild(foundEnergyIcon);
+        }
+        layout.updateLayout();
+        foundEnergyIcon.active = true;
+        foundEnergyIcon.getComponent(cc.Sprite).spriteFrame = RES_MGR.getRes(cardData.smallCardUrl);
+        var localCenterPoint = this.energyPanel.convertToNodeSpaceAR(cc.v2(cc.winSize.width / 2, cc.winSize.height /2));
+        var endPos = energyIcon.position;
+        var endScale = energyIcon.scale;
+        energyIcon.position = localCenterPoint;
+        energyIcon.scale =  energyIcon.scale * 4;
+        energyIcon.angle = 0;
+        cc.tween(energyIcon).
+            to(0.5, {position: endPos, scale: endScale, angle: 360})
+            .start();
 
     },
+
     showEvolution: function (cardEvolve, cardToEvolve) {
         this._hasPKM = true;
-       // cc.log("showEvolution",cardEvolve,cardToEvolve, bigPkmUrl);
+        // cc.log("showEvolution",cardEvolve,cardToEvolve, bigPkmUrl);
         cardId = 1;
         var cardData = JARVIS.getCardData(cardToEvolve);
 
@@ -150,8 +178,8 @@ cc.Class({
 
         cardData = JARVIS.getCardData(cardEvolve);
         //endScale =  cardData.bigScale;
-        cc.log("cardData",cardData.bigScale );
-        endScale =  0.08;
+        cc.log("cardData", cardData.bigScale);
+        endScale = 0.08;
         //Load sprite frame for pokemon
         bigPkmUrl = cardData.bigPokemonUrl;
         this.evolutionPkmSprite.node.active = true;
@@ -246,8 +274,15 @@ cc.Class({
         cc.log(this.LOG_TAG, "CARD_POKEMON_ID", this._cardId);
     },
     setNewCard: function (cardId) {
-        this._containedCardIds.push(cardId);
-        cc.log(this.LOG_TAG, "CARD_POKEMON_ID", this._containedCardIds);
+        var cardData = JARVIS.getCardData();
+        if (cardData == CONST.CARD.CAT.PKM) {
+            this._containedCardIds.push(cardId);
+            cc.log(this.LOG_TAG, "ADD_CARD_POKEMON_ID", this._containedCardIds);
+        } else {
+            this._containedCardIds.unshift(cardId);
+            cc.log(this.LOG_TAG, "ADD_OTHER_CARD_POKEMON_ID", this._containedCardIds);
+        }
+
     },
     setSelectedCallback: function (cb) { this._onSelectedCallBack = cb; },
     //Get

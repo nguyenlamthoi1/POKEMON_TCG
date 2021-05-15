@@ -77,31 +77,13 @@ cc.Class({
         cc.log("show_select");
         //Active slot
         var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
-        // battleSlotScr.setSelectedCallback(
-
-        //   function () {
-        //     cc.log("DO_STH");
-        //     this.hideSelectableUIs();
-        //     //this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_DONE);
-        //   }.bind(this)
-
-        //   //this._getSelectedCallback(selectData, cardId, this.playerActiveSlot)
-        // );
+        this.playerActiveSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
         battleSlotScr.showSelectableUI();
         //Bench slots
         for (var battleSlot of this.playerBench) {
           var battleSlotScr = battleSlot.getComponent("BattleSlot");
-
           if (battleSlotScr.hasPokemon()) {
-
-            // battleSlotScr.setSelectedCallback(
-            //   function () {
-            //     cc.log("DO_STH");
-            //     this.hideSelectableUIs();
-            //     //this.gm.node.emit(CONST.GAME_PHASE.ON_SELECT_DONE);
-            //   }.bind(this)
-
-            // );
+            battleSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
             battleSlotScr.showSelectableUI();
           }
         }
@@ -235,7 +217,7 @@ cc.Class({
   summonPokemon: function (battleSlot, cardId) {
     cc.log("SUMMON_A_POKEMON");
     var trainer = this.playerTrainer.getComponent("Trainer");
-    //Set up Battle Slot when have new Pokemon
+     //Set up data
     battleSlot.setHasPkm(true);
     battleSlot.setInPlayTurn(this.gm.getCurrentTurn());
     battleSlot.setPkmCardId(cardId);
@@ -251,12 +233,22 @@ cc.Class({
     cc.log("EVOLVE_POKEMON");
     var cardEvolved = cardId;
     var cardToEvolve = battleSlot.getCardPokemonId();
-    //Set up Battle Slot when have new Pokemon
+    //Set up data
     battleSlot.setHasPkm(true);
     battleSlot.setInPlayTurn(this.gm.getCurrentTurn());
     battleSlot.setPkmCardId(cardId);
     battleSlot.setNewCard(cardId);
     battleSlot.showEvolution(cardToEvolve, cardEvolved);
+    //Turn off selected
+    this.hideSelectableUIs();
+  },
+  attachEnergy: function(battleSlot, cardId){
+    cc.log("ATTACH_ENERGY");
+    //Set up data
+    this.gm.getCurrentPlayer().setDroppedEnergy(true);
+    battleSlot.setNewCard(cardId);
+    //Do action
+    battleSlot.showAttachedEnergy(cardId);
     //Turn off selected
     this.hideSelectableUIs();
   }

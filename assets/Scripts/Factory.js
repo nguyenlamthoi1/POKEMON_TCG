@@ -13,14 +13,14 @@ Processor = cc.Class({
             CARD_ID_NOT_CORRECT: "[ERROR] [CARD_ID_NOT_CORRECT]"
         }
 
-        this.gameManager = gameManager;
+        this.gm = gameManager;
         //Get all UIs needed
         this.TopUI = gameManager.getTopUI();
-        this.battleArea = gameManager.getBattleArea(); this.battleArea.getComponent("BattleArea").init(this.gameManager, this.TopUI.getComponent("TopUI"));
+        this.battleArea = gameManager.getBattleArea(); this.battleArea.getComponent("BattleArea").init(this.gm, this.TopUI.getComponent("TopUI"));
         this.notifier = this.TopUI.getComponent("TopUI");
-        this.handUI = this.gameManager.handUI.getComponent("HandUI");
+        this.handUI = this.gm.handUI.getComponent("HandUI");
         //Get action processor
-        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gameManager, this, this.battleArea.getComponent("BattleArea"));
+        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gm, this, this.battleArea.getComponent("BattleArea"));
     },
     onReceiveCard: function (cardId, playerId) { //Xu ly khi nhan duoc the bai danh xuong tu nguoi choi co id = playerId
         //Process card Id
@@ -60,7 +60,7 @@ Processor = cc.Class({
         // notifier.notify("SELECTING");
         battleAreaScr = this.battleArea.getComponent("BattleArea");
         var selectData;
-        if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
+        if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
             //START_TURN
             var playerActiveSlotScr = battleAreaScr.getPlayerActiveSlot().getComponent("BattleSlot");
             if (!playerActiveSlotScr.hasPokemon()) { //Should select empty active slot
@@ -109,8 +109,8 @@ Processor = cc.Class({
         }
         if (selectData != undefined) {
             cc.log("ProcessPKMCard2", cardId);
-            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
-            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
+            this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+            this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
             battleAreaScr.showSelectabledUIs(cardId, selectData);
         }
         this.selectData = selectData;
@@ -123,22 +123,35 @@ Processor = cc.Class({
         notifier.notify("SELECTING..");
         battleAreaScr = this.battleArea.getComponent("BattleArea");
         var selectData;
-        if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
+        if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
 
-        } else {
-            //PLAY PHASE
-            selectData = {
-                type: SELECTION.TYPE.PLAYER_ALL_PKM,
-                callbackType: SELECTION.CB_TYPE.SHOW_PKM,
+        }
+        else {
+            //Check if energy card can drop or not
+            var currentPlayer = this.gm.getCurrentPlayer();
+            if (!currentPlayer.droppedEnergy()) {
+                //PLAY PHASE
+                selectData = {
+                    type: SELECTION.TYPE.PLAYER_ALL_PKM,
+                    selectNum: 1,
+                    callbackType: SELECTION.CB_TYPE.SHOW_PKM,
+                    action: {
+                        actionType: GAME_ACTION.TYPE.ATTACH_ENERGY
+                    }
+                };
+            }
+            else{
+                this.onCardCancel();
+            }
 
-            };
         }
         if (selectData != undefined) {
             cc.log("listen_event", cardId);
-            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
-            this.gameManager.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
+            this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+            this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
             battleAreaScr.showSelectabledUIs(cardId, selectData);
         }
+        this.selectData = selectData;
 
     },
     //--------END_PROCESS_CARD-----------
@@ -148,7 +161,7 @@ Processor = cc.Class({
         this.handUI.onDropCardCancel();
     },
     onCardApproved: function () {
-        //this.gameManager.node.off(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
+        //this.gm.node.off(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
         this.handUI.onDropCardApproved();
     },
     onSelectDone: function (event) {
@@ -164,8 +177,8 @@ Processor = cc.Class({
         if (cardData == undefined) cardData = JARVIS.getCardData(cardId);
         // cc.log("checK_on_drop1", cardData.evolution, CONST.CARD.EVOL.BASIC );
         // cc.log("checK_on_drop2", JSON.stringify(cardData));
-        //cc.log("test_check_drop",this.gameManager.currentPhase, CONST.GAME_PHASE.START,cardData.category,  cardData.evolution, cardData.id);
-        if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
+        //cc.log("test_check_drop",this.gm.currentPhase, CONST.GAME_PHASE.START,cardData.category,  cardData.evolution, cardData.id);
+        if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
             if (JARVIS.isBasicPokemonCard(cardId)) {
                 return true;
             }
@@ -181,8 +194,8 @@ Processor = cc.Class({
     },
     checkEndTurn: function () {
         var battleScr = this.battleArea.getComponent("BattleArea");
-        cc.log('test_end_turn', this.gameManager.isPhase(CONST.GAME_PHASE.START), battleScr.playerHasActivePkm());
-        if (this.gameManager.isPhase(CONST.GAME_PHASE.START)) {
+        cc.log('test_end_turn', this.gm.isPhase(CONST.GAME_PHASE.START), battleScr.playerHasActivePkm());
+        if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
             if (battleScr.playerHasActivePkm()) {
                 return true;
             }
@@ -216,6 +229,14 @@ var ActionProcessor = cc.Class({
                 {
                     //SummonPKM
                     this.battleArea.evolvePokemon(para[0], cardId);
+                    //Notify selection done
+                    this.mainProc.onCardApproved();
+                }
+                break;
+            case GAME_ACTION.TYPE.ATTACH_ENERGY:
+                {
+                    //SummonPKM
+                    this.battleArea.attachEnergy(para[0], cardId);
                     //Notify selection done
                     this.mainProc.onCardApproved();
                 }

@@ -15,7 +15,7 @@ ResourcesManager = cc.Class({
         for (var cardId of cardIds) {
             var cardData = JARVIS.getCardData(cardId);
 
-            //Load small pokemon SF
+            //Load small card pokemon SF
             var smallCardUrl = cardData.smallCardUrl;
             if (smallCardUrl != undefined) {
                 this.totalStep += 1;
@@ -23,7 +23,7 @@ ResourcesManager = cc.Class({
                     if (!err) {
                         cc.log(this.LOG_TAG, "[LOAD_SUCCESS]", url);
                         this._SF[url] = loadedSpriteFrame;
-                        this._smallPkmSF = loadedSpriteFrame;
+                        //this._smallPkmSF = loadedSpriteFrame;
 
                     } else {
                         //this.cardImg.spriteFrame = failedSF;
@@ -54,7 +54,7 @@ ResourcesManager = cc.Class({
                     }
                     this.LoadedStepCount += 1;
                 }.bind(this, bigCardUrl))
-            }
+            }            
         }
     },
     getRes: function (url) {

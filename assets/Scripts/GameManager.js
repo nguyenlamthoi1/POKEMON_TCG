@@ -24,6 +24,7 @@ var Player = cc.Class({
         this._gm = gameManager;
         this._id = id;
         this._canDropCard = false;
+        this._droppedEnergy = false;
     },
     getId: function(){return this._id},
     sameId: function(id){return this._id == id;},
@@ -37,10 +38,15 @@ var Player = cc.Class({
         this._gm.node.on(eventType, cb, target);
     },
     //--
+    //Set
+    setDroppedEnergy: function(dropped){this._droppedEnergy = dropped;},
     //Check
     isOpponent: function(){
         return !this.sameId(this._gm.controllingPlayerId);
-    }
+    },
+    droppedEnergy:function(){
+        return this._droppedEnergy;
+    },
 }
 );
 window.GM = null;
@@ -115,6 +121,8 @@ cc.Class({
         var temp = this.currentTurnPlayer;
         this.currentTurnPlayer = this.nextTurnPlayer;
         this.nextTurnPlayer = temp;
+        //Set up data for current player
+        this.currentTurnPlayer.setDroppedEnergy(false);
         //Player can drop
         this.player[1].enableDrop(this.player[1].sameId(this.currentTurnPlayer.getId())); //Player can drop or not
         this.turnCount ++;
@@ -174,6 +182,7 @@ cc.Class({
     getTopUI: function(){return this.topUINode;},
     getprocessor: function(){return this.processor;},
     getPlayer: function(){return this.player[1];},
+    getCurrentPlayer: function(){ return this.currentTurnPlayer;},
     getCurrentTurn: function(){return this.turnCount;},
     //Check
     isPlayerTurn: function(){return this.player[1].sameId(this.currentTurnPlayer.getId());},
