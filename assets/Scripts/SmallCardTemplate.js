@@ -53,6 +53,7 @@ cc.Class({
         this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
+        //this.node.on(CONST.EVENT.ON_TOUCH_HOLD, this.onTouchHold, this);
         this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
         this._isDroppable = this.handUI.player.isDropEnabled();
     },
@@ -172,7 +173,7 @@ cc.Class({
             case POKEMON.ELECTRIC_TYPE:
                 return this.typeFrames[3];
             default: 
-                return this.typeFrames[this.typeFrames.length];
+                return this.typeFrames[this.typeFrames.length - 1];
         }
     },
     _loadSpriteFrameForCardImg: function(smallCardUrl, failedSF){
@@ -189,6 +190,7 @@ cc.Class({
     },
     //Listeners
     onTouchCardStart: function(touchEvent){
+        cc.log("TOUCH_SMALL_CARD");
         //cc.log("TOUCH_SMALL_CARD_START", this.idxInHand);
         //Show card name
         this.cardTitleText.enabled = true;
@@ -198,9 +200,20 @@ cc.Class({
         //Fly up Node
         // cc.tween(this.node)
         //     .to(0.1, {position: endPos}).start();
+        var touch = touchEvent.touch;
+        this._touchEnd = false;
+        this.scheduleOnce(
+            function(touch){
+                cc.log("HOLD_SMALL_CARD", JSON.stringify(touch.getDelta().mag()));
+                var delta = touch.getDelta().mag();
+                if(delta == 0) this.node.emit(CONST.EVENT.ON_TOUCH_HOLD, this.cardId);
+            }.bind(this, touch)
+        ,0.5)
         return false;
     },
     onTouchCardEnd: function(touchEvent){
+        this._touchEnd = true;
+        this.cardTitleText.enabled = false;
         if(!this._isDroppable){
             this.node.position = this._oldPos;
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
@@ -210,7 +223,7 @@ cc.Class({
         // cc.tween(this.node)
         //     .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos1");this._isDroppable = true;}.bind(this)).start();
         //Hide card name
-        this.cardTitleText.enabled = false;
+        
         var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
 
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){
@@ -224,6 +237,8 @@ cc.Class({
         }
     },
     onTouchCardCancel: function(touchEvent){
+        this._touchEnd = true;
+        this.cardTitleText.enabled = false;
         if(!this._isDroppable){
             this.node.position = this._oldPos;
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
@@ -232,7 +247,6 @@ cc.Class({
         //Fly up Node
         //cc.tween(this.node)
         //    .to(0.1, {position: this._oldPos}).call(function(){cc.log("backPos2");this._isDroppable = true;}.bind(this)).start();
-        this.cardTitleText.enabled = false;
         var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
 
         if(localPosOfTouch.y > 0 && localPosOfTouch.y < this.dropChecker.height){    

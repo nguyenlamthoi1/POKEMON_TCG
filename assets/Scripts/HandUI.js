@@ -16,7 +16,7 @@ cc.Class({
     },
     init: function(idList, player, gameManager) {
         //External ref
-        this.gameManager = gameManager;
+        this.gm = gameManager;
         this.player = player;
 
         this.startPoint = new cc.v2(420, -403.228);
@@ -59,7 +59,11 @@ cc.Class({
 
             var cardUI = cc.instantiate(this.cardTemplate);
             cardUI.getComponent("SmallCardTemplate").init(cardData, this.cardIdOnHand.length, this.dropChecker, this,cardId);
-           
+            cardUI.on(CONST.EVENT.ON_TOUCH_HOLD, this._onSmallCardHold, this);
+            cardUI.on(cc.Node.EventType.TOUCH_END, this._onSmallCardUnHold, this);
+            cardUI.on(cc.Node.EventType.TOUCH_CANCEL, this._onSmallCardUnHold, this);
+            cardUI.on(cc.Node.EventType.TOUCH_MOVE, this._onSmallCardUnHold, this);
+
             this.node.addChild(cardUI);
             this.layoutComponent.updateLayout();
             var endMovingPoint = cardUI.position;
@@ -114,7 +118,7 @@ cc.Class({
     //Listeners
     onClickDrawBtn: function(){
         //cc.log("Draw_Card",RES_MGR.getRes("SmallPokemon/003"));
-        //this.gameManager.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/003");
+        //this.gm.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/003");
         //this.node.y = this.node.y + 100;
         this.draw(1);
     },
@@ -162,7 +166,7 @@ cc.Class({
         this.dropCardId = cardId;
         this.idxDropCard = idx;
         //cc.log("HAND_DROP", idx, cardId, this.cardIdOnHand, this.cardUIOnHand);
-        this.gameManager.onDropCard(cardId);
+        this.gm.onDropCard(cardId);
     },
     onDropCardCancel: function(){
         this.dropCardUI.active = true;
@@ -179,6 +183,14 @@ cc.Class({
         this.dropCardId = null;
         this.resetCardPosOnDrop(this.idxDropCard);
 
+    },
+    _onSmallCardHold: function(cardId){
+        var topUI = this.gm.getTopUI().getComponent("TopUI");
+        topUI.showPokemonCardInfo(cardId, true);
+    },
+    _onSmallCardUnHold: function(){
+        var topUI = this.gm.getTopUI().getComponent("TopUI");
+        topUI.showPokemonCardInfo(undefined, false);
     },
     //Check
     hasBasicPkm: function(){

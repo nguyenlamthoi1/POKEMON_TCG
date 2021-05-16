@@ -8,7 +8,9 @@ cc.Class({
       cancelSelectBtn : cc.Button,
       selectBtn: cc.Button,
       endTurnBtn: cc.Button,
-      endEnemyTurnBtn: cc.Button
+      endEnemyTurnBtn: cc.Button,
+      bigPokemonCard: cc.Node,
+      touchOut: cc.Node
     },
     init: function(gameManager)
     {
@@ -23,7 +25,11 @@ cc.Class({
         this.cancelSelectBtn.node.on("click", this.onTouchCancelSelectBtn, this);
         this.gm.node.on(CONST.GAME_PHASE.ON_TURN_START, this.onTurnStart, this);
         this.gm.node.on(CONST.GAME_PHASE.ON_TURN_END, this.onTurnEnd, this);
+
+        this.touchOut.on(cc.Node.EventType.TOUCH_START, this._exitUI, this);
+        this.bigPokemonCard.on(cc.Node.EventType.TOUCH_START, this._onTouchBigPokemonCard, this);
     },
+
     notify: function(txt , color, fontSize, seconds, inf){
         if(this._isNotifying && this.sched){
             clearTimeout(this._sched);
@@ -37,6 +43,21 @@ cc.Class({
         this._isNotifying = true;
         if(seconds == undefined) seconds = 3;
         if(!inf) this._sched = setTimeout(function(){cc.log("setTimeOut");this._isNotifying = false; this.notifier.node.active =false;}.bind(this), seconds * 1000);
+    },
+    showPokemonCardInfo: function(cardId){
+        //var cardId = 1;
+        if(cardId == undefined){
+            this.bigPokemonCard.active = false;
+            this.touchOut.active = false;
+            return;
+        }
+        this.scheduleOnce(function(){this.touchOut.active = true;}.bind(this),0.5);
+        var cardData = JARVIS.getCardData(cardId);
+        if(cardData.category == CONST.CARD.CAT.PKM){
+            this.bigPokemonCard.active = true;
+            this.bigPokemonCard.getComponent("BigCardTemplate").init(cardId);
+
+        }
     },
     onTouchEndTurnBtn: function(){
         cc.log("PLAYER_ID",this.player.getId(), "END_TURN");
@@ -65,5 +86,13 @@ cc.Class({
             this.endTurnBtn.node.active = false;
         }
         //this.endTurnBtn.node.active = false; //TODO: REOPEN IN FUTURE
+    },
+    _exitUI: function(){
+        cc.log("exit");
+        this.bigPokemonCard.active = false;
+        this.touchOut.active = false;
+    },
+    _onTouchBigPokemonCard(event){
+        event.stopPropagation();
     }
 });

@@ -12,7 +12,18 @@
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/001",
     "bigPokemonUrl": "BigPokemon/001",
-    "bigScale": 0.08
+    "bigScale": 0.08,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Leech Seed",
+        "cost": {
+          "grass": 2
+        },
+        "value": "20",
+        "des": ""
+      }
+    }
   },
   "2": {
     "id": 2,
@@ -27,7 +38,28 @@
     "evolveFrom": 1,
     "smallCardUrl": "SmallPokemon/002",
     "bigPokemonUrl": "BigPokemon/002",
-    "bigScale": 0.1
+    "bigScale": 0.1,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Vine Whip",
+        "cost": {
+          "grass": 1,
+          "normal": 2
+        },
+        "value": "30",
+        "des": ""
+      },
+      "1": {
+        "moveId": "M0",
+        "name": "Poison Powder",
+        "cost": {
+         "grass": 3
+        },
+        "value": "20",
+        "des": ""
+      }
+    }
   },
   "3": {
     "id": 3,
@@ -42,7 +74,18 @@
     "evolveFrom": 2,
     "smallCardUrl": "SmallPokemon/003",
     "bigPokemonUrl": "BigPokemon/003",
-    "bigScale": 0.2
+    "bigScale": 0.2,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Solar Beam",
+        "cost": {
+          "grass": 4
+        },
+        "value": "60",
+        "des": ""
+      }
+    }
   },
   "4": {
     "id": 4,
@@ -57,7 +100,38 @@
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/004",
     "bigPokemonUrl": "BigPokemon/004",
-    "bigScale": 0.08
+    "bigScale": 0.08,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Scratch",
+        "cost": {
+          "normal": 1
+        },
+        "value": "10",
+        "des": ""
+      },
+      "1": {
+        "moveId": "M0",
+        "name": "Ember",
+        "cost": {
+          "fire": 1,
+          "normal": 1
+        },
+        "value": "20",
+        "des": ""
+      }
+    },
+    "1": {
+      "moveId": "M0",
+      "name": "Ember",
+      "cost": {
+        "fire": 1,
+        "normal": 1
+      },
+      "value": 10,
+      "des": ""
+    }
   },
   "5": {
     "id": 5,
@@ -72,7 +146,28 @@
     "evolveFrom": 4,
     "smallCardUrl": "SmallPokemon/005",
     "bigPokemonUrl": "BigPokemon/005",
-    "bigScale": 0.1
+    "bigScale": 0.1,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Slash",
+        "cost": {
+          "fire": 1,
+          "normal": 2
+        },
+        "value": "30",
+        "des": ""
+      },
+      "1": {
+        "moveId": "M0",
+        "name": "Flame Thrower",
+        "cost": {
+          "fire": 3
+        },
+        "value": "50",
+        "des": ""
+      }
+    }
   },
   "6": {
     "id": 6,
@@ -87,7 +182,18 @@
     "evolveFrom": 5,
     "smallCardUrl": "SmallPokemon/006",
     "bigPokemonUrl": "BigPokemon/006",
-    "bigScale": 0.2
+    "bigScale": 0.2,
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "name": "Fire Spin",
+        "cost": {
+          "fire": 4
+        },
+        "value": "100",
+        "des": ""
+      }
+    }
   },
   "7": {
     "id": 7,

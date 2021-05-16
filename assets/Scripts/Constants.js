@@ -6,7 +6,7 @@ window.POKEMON = {
 }
 window.CONST = {
     EVENT: {
-      
+      ON_TOUCH_HOLD: "ontouchhold"
     },
     GAME_PHASE: {
         SETUP: -1,
@@ -57,10 +57,4 @@ window.SELECTION = {
         SHOW_PKM: 0
     }
 };
-window.GAME_ACTION = {
-    TYPE: {
-        SUMMON_A_POKEMON: 0,
-        EVOLVE_A_POKEMON: 1,
-        ATTACH_ENERGY: 2,
-    }
-}
+

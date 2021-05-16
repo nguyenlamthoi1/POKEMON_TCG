@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "47425519-68b2-4d12-aea8-4143efd59be2",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 64,
+  "height": 64,
+  "platformSettings": {},
+  "subMetas": {
+    "pikachuCoin_6": {
+      "ver": "1.0.4",
+      "uuid": "3846e9a3-c68b-4dbf-8c39-4bd7ffdedda0",
+      "rawTextureUuid": "47425519-68b2-4d12-aea8-4143efd59be2",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 64,
+      "height": 64,
+      "rawWidth": 64,
+      "rawHeight": 64,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

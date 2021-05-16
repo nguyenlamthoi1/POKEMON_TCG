@@ -45,6 +45,8 @@ cc.Class({
         //Init data
         this.typeSlot = typeSlot;
         this._isSelectable = false;
+        this._isInfoShowable = true;
+
         this._hasPKM = false;
         this._pkmData = null;
         this._inPlayTurn = -1;
@@ -89,11 +91,13 @@ cc.Class({
         this.selectIndicator.color = BATTLE_SLOT.COLOR.WHITE;
         this.selectIndicator.active = true;
         this._isSelectable = true;
+        this._isInfoShowable = false;
         //cc.log("test_w",JSON.stringify(this.selectIndicator.width));
     },
     hideSelectableUI: function () {
         this.selectIndicator.active = false;
         this._isSelectable = false;
+        this._isInfoShowable = true;
     },
     showSelectedUI: function () {
         this.selectIndicator.color = BATTLE_SLOT.COLOR.GREEN;
@@ -201,7 +205,19 @@ cc.Class({
     },
     //Listeners
     _onTouchStart: function () {
+        cc.log("TOUCH_START_1");
+        
+        if(this._isInfoShowable) {
+            
+            var topUI = GM.getTopUI().getComponent("TopUI");
+            if(this._cardId != undefined){
+                cc.log("show_card_info");
+                topUI.showPokemonCardInfo(this._cardId, true);
+
+            }
+        }
         if (!this._isSelectable) return;
+
         cc.tween(this.selectIndicator)
             .to(0.1, { width: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.height })
             .start();
@@ -209,6 +225,14 @@ cc.Class({
     //_onTouchMove: function(){},
     _onTouchEnd: function () {
 
+        if(this._isInfoShowable) {
+            var topUI = GM.getTopUI().getComponent("TopUI");
+            if(this._cardId != undefined){
+                cc.log("show_card_info");
+                topUI.showPokemonCardInfo(this._cardId, false);
+
+            }
+        }
         if (!this._isSelectable) return;
         ;
         this._isSelectable = true;
@@ -224,6 +248,15 @@ cc.Class({
         //this._onSelectedCallBack && this._onSelectedCallBack();
     },
     _onTouchCancel: function () {
+        if(this._isInfoShowable) {
+            var topUI = GM.getTopUI().getComponent("TopUI");
+            if(this._cardId != undefined){
+                cc.log("show_card_info");
+                topUI.showPokemonCardInfo(this._cardId, false);
+
+            }
+        }
+
         if (!this._isSelectable) return;
         this._isSelectable = true;
         this.onUnSelected();
