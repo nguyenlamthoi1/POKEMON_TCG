@@ -18,12 +18,21 @@ cc.Class({
     this.notifier = notifier;
     //Init player's active Battle Slot
     this.playerActiveSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.ACTIVE_TYPE);
-
+    this.opponentActiveSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.ACTIVE_TYPE);
     //Init Battle Slot on Bench
     for (var battleSlot of this.playerBench) {
       // var battleSlot = this.playerBench[i]; //Get battle slot to init
       battleSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.BENCH_TYPE);
     }
+    this._activeSlot = {
+      1: this.playerActiveSlot,
+      2: this.opponentActiveSlot
+    };
+   
+    cc.log("test_init_slot1", 1,this._activeSlot[1]);
+    cc.log("test_init_slot2", 2,this._activeSlot[2]);
+    
+    
     //Listeners
     this.cancelSelectBtn.node.on("click", this.onTouchCancel, this);
     this.selectBtn.node.on("click", this.onTouchSelect, this);
@@ -251,5 +260,19 @@ cc.Class({
     battleSlot.showAttachedEnergy(cardId);
     //Turn off selected
     this.hideSelectableUIs();
+  },
+  attackOppActive: function(){
+    var atkingSlot, atkedSlot;
+    
+   
+    if(this.gm.getCurrentPlayer().sameId(1)){//player attack
+      atkingSlot = this._activeSlot[1].getComponent("BattleSlot");
+      atkedSlot = this._activeSlot[2].getComponent("BattleSlot");
+    }else{ //Opponent attack
+      atkingSlot = this._activeSlot[2].getComponent("BattleSlot");
+      atkedSlot = this._activeSlot[1].getComponent("BattleSlot");
+    }
+    cc.log("test_atk_slot",atkingSlot, atkedSlot);
+    atkingSlot.attackOppActivePkm(atkedSlot, 20);
   }
 });

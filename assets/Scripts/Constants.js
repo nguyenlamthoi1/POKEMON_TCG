@@ -6,7 +6,9 @@ window.POKEMON = {
 }
 window.CONST = {
     EVENT: {
-      ON_TOUCH_HOLD: "ontouchhold"
+        TOUCH_HOLD: "ontouchhold",
+        DOUBLE_TOUCH: "ondoubletouch",
+        SHORT_CLICK: "shorclick"
     },
     GAME_PHASE: {
         SETUP: -1,
@@ -26,7 +28,7 @@ window.CONST = {
         ON_SLOT_SELECTED: "on-slot-selected"
     },
     CARD: {
-        CAT:{
+        CAT: {
             PKM: "Pokemon",
             ENERGY: "Energy",
             SPTER: "Supporter",
@@ -53,7 +55,7 @@ window.SELECTION = {
         PLAYER_ALL_PKM: 2,
         ALL_PKM_TO_EVOLVE: 3
     },
-    CB_TYPE:{
+    CB_TYPE: {
         SHOW_PKM: 0
     }
 };

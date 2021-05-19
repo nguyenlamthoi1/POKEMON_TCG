@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "BattleSlot",
+    "_name": "PlayerActiveSlot",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -43,16 +43,19 @@
       },
       {
         "__id__": 44
+      },
+      {
+        "__id__": 48
       }
     ],
     "_active": true,
     "_components": [
       {
-        "__id__": 48
+        "__id__": 51
       }
     ],
     "_prefab": {
-      "__id__": 49
+      "__id__": 52
     },
     "_opacity": 255,
     "_color": {
@@ -64,8 +67,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 96,
-      "height": 96
+      "width": 120,
+      "height": 120
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -76,8 +79,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -232.8,
         0,
+        -80,
         0,
         0,
         0,
@@ -131,8 +134,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 96,
-      "height": 96
+      "width": 120,
+      "height": 120
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -663,7 +666,7 @@
     "asset": {
       "__uuid__": "1e136c21-d427-423d-b09b-2eb1fd38cc1f"
     },
-    "fileId": "87WWCjP+hFQoLVTImbsena",
+    "fileId": "5e9CeDo6dN24+jq9xc+0SS",
     "sync": false
   },
   {
@@ -774,7 +777,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 52.5,
+      "width": 53,
       "height": 8
     },
     "_anchorPoint": {
@@ -841,7 +844,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 52.5,
+      "width": 53,
       "height": 8
     },
     "_anchorPoint": {
@@ -853,7 +856,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        26.25,
+        26.5,
         0.1379999999999999,
         0,
         0,
@@ -978,7 +981,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 49.34,
+      "width": 50.59,
       "height": 18.9
     },
     "_anchorPoint": {
@@ -990,7 +993,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        33.3955,
+        26.5,
         6.129,
         0,
         0,
@@ -1030,8 +1033,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "0/100",
-    "_N$string": "0/100",
+    "_string": "60/60",
+    "_N$string": "60/60",
     "_fontSize": 10,
     "_lineHeight": 15,
     "_enableWrapText": true,
@@ -1060,8 +1063,8 @@
     "_enabled": true,
     "alignMode": 1,
     "_target": null,
-    "_alignFlags": 8,
-    "_left": 0.1662,
+    "_alignFlags": 16,
+    "_left": 0.15440754716981128,
     "_right": -45.491,
     "_top": -25.051,
     "_bottom": -17.349,
@@ -1132,7 +1135,7 @@
     "_target": null,
     "_alignFlags": 45,
     "_left": 0.06,
-    "_right": 0.06500000000000006,
+    "_right": 0.05666666666666664,
     "_top": 0.1,
     "_bottom": 0.1,
     "_verticalCenter": 0,
@@ -1198,7 +1201,7 @@
       "__id__": 18
     },
     "_enabled": true,
-    "_N$totalLength": 70,
+    "_N$totalLength": 53,
     "_N$barSprite": {
       "__id__": 28
     },
@@ -1466,8 +1469,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 39.47,
-      "height": 54.4
+      "width": 42.47,
+      "height": 52.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1518,8 +1521,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "1",
-    "_N$string": "1",
+    "_string": "",
+    "_N$string": "",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -1553,7 +1556,7 @@
       "b": 0,
       "a": 255
     },
-    "_width": 2,
+    "_width": 1,
     "_id": ""
   },
   {
@@ -1693,7 +1696,117 @@
     "asset": {
       "__uuid__": "1e136c21-d427-423d-b09b-2eb1fd38cc1f"
     },
-    "fileId": "79hcAe09tI7YDJ18fO8bRG",
+    "fileId": "52gq8zEAdKMpR+CYu1Z0cd",
+    "sync": false
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "flyingText",
+    "_objFlags": 0,
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": false,
+    "_components": [
+      {
+        "__id__": 49
+      }
+    ],
+    "_prefab": {
+      "__id__": 50
+    },
+    "_opacity": 255,
+    "_color": {
+      "__type__": "cc.Color",
+      "r": 173,
+      "g": 2,
+      "b": 2,
+      "a": 255
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 34.92,
+      "height": 15.12
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "_trs": {
+      "__type__": "TypedArray",
+      "ctor": "Float64Array",
+      "array": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    "_eulerAngles": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_skewX": 0,
+    "_skewY": 0,
+    "_is3DNode": false,
+    "_groupIndex": 0,
+    "groupIndex": 0,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.Label",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 48
+    },
+    "_enabled": true,
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_string": "-50",
+    "_N$string": "-50",
+    "_fontSize": 12,
+    "_lineHeight": 12,
+    "_enableWrapText": true,
+    "_N$file": {
+      "__uuid__": "a4adcd25-64d7-4906-8f77-7e4c06467c2a"
+    },
+    "_isSystemFontUsed": false,
+    "_spacingX": 0,
+    "_batchAsBitmap": false,
+    "_styleFlags": 0,
+    "_underlineHeight": 0,
+    "_N$horizontalAlign": 1,
+    "_N$verticalAlign": 1,
+    "_N$fontFamily": "Arial",
+    "_N$overflow": 0,
+    "_N$cacheMode": 0,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 1
+    },
+    "asset": {
+      "__uuid__": "1e136c21-d427-423d-b09b-2eb1fd38cc1f"
+    },
+    "fileId": "c7+Yw7OsBOB4hcx4MSMTR2",
     "sync": false
   },
   {
@@ -1721,6 +1834,12 @@
     },
     "hpBar": {
       "__id__": 18
+    },
+    "flyingHpText": {
+      "__id__": 48
+    },
+    "hpText": {
+      "__id__": 25
     },
     "energyPanel": {
       "__id__": 34

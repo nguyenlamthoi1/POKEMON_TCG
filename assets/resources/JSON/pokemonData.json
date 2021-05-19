@@ -16,6 +16,12 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions":{
+          "A0":{
+            "valueType": 0,
+            "value": 20
+          }
+        },
         "name": "Leech Seed",
         "cost": {
           "grass": 2

@@ -25,6 +25,7 @@ var Player = cc.Class({
         this._id = id;
         this._canDropCard = false;
         this._droppedEnergy = false;
+        this._canUseMove = false;
     },
     getId: function(){return this._id},
     sameId: function(id){return this._id == id;},
@@ -40,6 +41,7 @@ var Player = cc.Class({
     //--
     //Set
     setDroppedEnergy: function(dropped){this._droppedEnergy = dropped;},
+    enableUseMove: function(enable){this._canUseMove = enable;},
     //Check
     isOpponent: function(){
         return !this.sameId(this._gm.controllingPlayerId);
@@ -47,6 +49,7 @@ var Player = cc.Class({
     droppedEnergy:function(){
         return this._droppedEnergy;
     },
+    canUseMove: function(){return this._canUseMove;}
 }
 );
 window.GM = null;
@@ -93,7 +96,7 @@ cc.Class({
         //Init UI
         this.handUI.getComponent("HandUI").init(this.player1Cards, this.player[1], this);
         this.processor = new Processor(); this.processor.init(this);
-        this.topUIScr = this.topUINode.getComponent("TopUI"); this.topUIScr.init(this);
+        this.topUIScr = this.topUINode.getComponent("TopUI"); this.topUIScr.init(this, this.player[1]);
 
         //Listen to events
         this.node.on(CONST.GAME_PHASE.ON_GAME_START, this.onGameStart, this);
@@ -125,12 +128,15 @@ cc.Class({
         this.currentTurnPlayer.setDroppedEnergy(false);
         //Player can drop
         this.player[1].enableDrop(this.player[1].sameId(this.currentTurnPlayer.getId())); //Player can drop or not
+        //Player can use move
+        this.player[1].enableUseMove(this.player[1].sameId(this.currentTurnPlayer.getId()));
+
         this.turnCount ++;
         //Start play phase if start phase is done
         cc.log("this.turnCount", this.turnCount);
         if(this.isPhase(CONST.GAME_PHASE.START) && this.turnCount == 2){//If we pass 2 set up active pkm turn then start play phase
             cc.log("START_PLAY_TURN", CONST.GAME_PHASE.PLAY);
-            this.turnCount == 0;
+            this.turnCount = 0;
             this.changePhase(CONST.GAME_PHASE.PLAY);
         }
         //--Done Set up 
@@ -177,6 +183,9 @@ cc.Class({
         cc.log("test_drop", idx);
         this.processor.onReceiveCard(idx, this.player1Id);
     },
+    onUsedMove: function(player, move, fromSlot){
+        this.processor.onUsedMove(player, move, fromSlot);
+    },
     //Get and Set
     getBattleArea: function(){return this.battleAreaNode;},
     getTopUI: function(){return this.topUINode;},
@@ -184,8 +193,12 @@ cc.Class({
     getPlayer: function(){return this.player[1];},
     getCurrentPlayer: function(){ return this.currentTurnPlayer;},
     getCurrentTurn: function(){return this.turnCount;},
+    getPlayers: function(){return this.player;},
     //Check
     isPlayerTurn: function(){return this.player[1].sameId(this.currentTurnPlayer.getId());},
     isStartPhase: function(){return this.currentPhase == CONST.GAME_PHASE.START;},
-    isTurnPhase: function(){return this.currentPhase == CONST.GAME_PHASE.PLAY;}
+    isPlayPhase: function(){return this.currentPhase == CONST.GAME_PHASE.PLAY;},
+    canUseMove: function(player, move, fromSlot){
+        return this.processor.checkOnUsingMove(player, move, fromSlot);
+    },
 });

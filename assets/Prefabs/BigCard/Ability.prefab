@@ -24,7 +24,7 @@
         "__id__": 13
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 17
@@ -59,7 +59,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        -25,
+        45,
         0,
         0,
         0,

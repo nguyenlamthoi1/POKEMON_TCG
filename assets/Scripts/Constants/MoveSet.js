@@ -6,7 +6,8 @@ window.GAME_ACTION = {
         DEAL_ACTIVE_OPP_PKM: 0
     },
     DEAL_ACTIVE_OPP_PKM: 0,
-    DRAW: 1
+    DRAW: 1,
+    ATTACK_OPP_ACTIVE_POKEMON: "A0",
 };
 window.COND = {
     NONE: 0

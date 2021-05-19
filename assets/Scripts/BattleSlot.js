@@ -33,6 +33,8 @@ cc.Class({
         pokemonSprite: cc.Sprite,
         evolutionPkmSprite: cc.Sprite,
         hpBar: cc.Node,
+        flyingHpText: cc.Node,
+        hpText: cc.Label,
         energyPanel: cc.Node,
         effect: cc.Node,
 
@@ -51,7 +53,11 @@ cc.Class({
         this._pkmData = null;
         this._inPlayTurn = -1;
         this._containedCardIds = [];
+        this._energy = {};
         this._selected = false;
+        this._counterDmg = 0;
+        this._hp = 100;
+        this.hpText = "100/100";
         //  Energy data
         this._energyIcons = []; this._energyIcons.push(this.energyPanel.getChildByName("EnergyIcon"));
 
@@ -75,11 +81,14 @@ cc.Class({
 
     },
     initActiveSlotUI: function () {
+        cc.log("INIT_ACTIVE_SLOT");
         this.node.size = BATTLE_SLOT.ACTIVE_SIZE;
         this.node.scale = 1;
         this.selectIndicator.active = false;
     },
     initBenchSlotUI: function () {
+        cc.log("INIT_BENCH_SLOT");
+
         this.node.size = BATTLE_SLOT.BENCH_SIZE;
         this.node.scale = 1;
         this.selectIndicator.active = false;
@@ -128,7 +137,12 @@ cc.Class({
         cc.tween(this.pokemonSprite.node)
             .to(1, { scale: endScale, opacity: 255 }).start();
         //Show Hp bar
+        this._hp = cardData.hp;
         this.hpBar.active = true;
+        this.hpText.string = (this._hp - this._counterDmg * 10) + "/" + this._hp;
+        var pg = (this._hp - this._counterDmg * 10) / this._hp;
+        cc.tween(this.hpBar.getComponent(cc.ProgressBar)).to(0.5, { progress: pg }).start();
+        //this.hpBar.progress = 1;
 
     },
     showAttachedEnergy: function (energyCardId) {
@@ -150,23 +164,29 @@ cc.Class({
         layout.updateLayout();
         foundEnergyIcon.active = true;
         foundEnergyIcon.getComponent(cc.Sprite).spriteFrame = RES_MGR.getRes(cardData.smallCardUrl);
-        var localCenterPoint = this.energyPanel.convertToNodeSpaceAR(cc.v2(cc.winSize.width / 2, cc.winSize.height /2));
-        var endPos = energyIcon.position;
-        var endScale = energyIcon.scale;
-        energyIcon.position = localCenterPoint;
-        energyIcon.scale =  energyIcon.scale * 4;
-        energyIcon.angle = 0;
-        cc.tween(energyIcon).
-            to(0.5, {position: endPos, scale: endScale, angle: 360})
+        var localCenterPoint = this.energyPanel.convertToNodeSpaceAR(cc.v2(cc.winSize.width / 2, cc.winSize.height / 2));
+        var endPos = foundEnergyIcon.position;
+        var endScale = foundEnergyIcon.scale;
+        foundEnergyIcon.position = localCenterPoint;
+        foundEnergyIcon.scale = foundEnergyIcon.scale * 4;
+        foundEnergyIcon.angle = 0;
+        cc.tween(foundEnergyIcon).
+            to(0.5, { position: endPos, scale: endScale, angle: 360 })
             .start();
 
     },
-
     showEvolution: function (cardEvolve, cardToEvolve) {
         this._hasPKM = true;
         // cc.log("showEvolution",cardEvolve,cardToEvolve, bigPkmUrl);
-        cardId = 1;
         var cardData = JARVIS.getCardData(cardToEvolve);
+        //Show Hp bar
+        this._hp = cardData.hp;
+        this.hpBar.active = true;
+        this.hpText.string = (this._hp - this._counterDmg * 10) + "/" + this._hp;
+        var pg = (this._hp - this._counterDmg * 10) / this._hp;
+        cc.log("test_hp", cardData.hp, this._hp, this._counterDmg, this._hp - this._counterDmg * 10);
+        cc.tween(this.hpBar.getComponent(cc.ProgressBar)).to(0.5, { progress: pg }).start();
+        //--
 
         var endScale = cardData.bigScale;
         //Load sprite frame for pokemon
@@ -199,20 +219,64 @@ cc.Class({
         this.effect.active = true;
         this.effect.getComponent(cc.Animation).play("evolutionEffect");
 
-        // //Show Hp bar
-        // this.hpBar.active = true;
 
+
+    },
+    attackOppActivePkm: function (oppSlot, dmg) {
+        cc.log("start_atk_opp", oppSlot);
+        var delta = oppSlot.node.position.sub(this.node.position);
+        cc.log("test_delta", JSON.stringify(delta));
+
+        //Switch parent and modify zOrder to show correctly
+        var fromPos = Utils.getLocalPosition(this.pokemonSprite.node, oppSlot.node);
+        this.pokemonSprite.node.removeFromParent();
+        oppSlot.node.addChild(this.pokemonSprite.node);
+        this.pokemonSprite.node.position = fromPos;
+        cc.tween(this.pokemonSprite.node)
+            .to(0.2, { position: cc.v2(0, 0) })
+            .to(0.3, { position: fromPos })
+            .call(function (oppSlot) {
+                //Restore parent and position
+                this.pokemonSprite.node.removeFromParent();
+                this.node.addChild(this.pokemonSprite.node);
+                this.pokemonSprite.node.position = cc.v2(0, 0);
+                oppSlot.reduceHp(dmg);
+            }.bind(this, oppSlot))
+            .start();
+        //---
+    },
+    reduceHp: function (hp) {
+        cc.log("TAKE_DMG1", hp, this._hp, this._counterDmg);
+        this._counterDmg += hp / 10;
+        var pg = (this._hp - hp) / this._hp;
+        this._hp -= this._counterDmg*10;
+        if(this._hp < 0) this._hp = 0;
+
+        this.flyingHpText.getComponent(cc.Label).string = "-" + hp;
+        this.flyingHpText.active = true;
+        this.flyingHpText.scale = 1;
+
+        cc.tween(this.flyingHpText)
+            .to(0.2, { position: cc.v2(0, 20), scale: 3 })
+            .delay(1)
+            .call(function () {
+                this.flyingHpText.active = false;
+            }.bind(this))
+            .start();
+        cc.log("TAKE_DMG2", hp, this._hp, this._counterDmg, pg);
+
+        cc.tween(this.hpBar.getComponent(cc.ProgressBar)).to(0.5, { progress: pg }).start();
     },
     //Listeners
     _onTouchStart: function () {
         cc.log("TOUCH_START_1");
-        
-        if(this._isInfoShowable) {
-            
+
+        if (this._isInfoShowable) {
+
             var topUI = GM.getTopUI().getComponent("TopUI");
-            if(this._cardId != undefined){
+            if (this._cardId != undefined) {
                 cc.log("show_card_info");
-                topUI.showPokemonCardInfo(this._cardId, true);
+                topUI.showPokemonCardtoAttack(this._cardId, this);
 
             }
         }
@@ -225,11 +289,11 @@ cc.Class({
     //_onTouchMove: function(){},
     _onTouchEnd: function () {
 
-        if(this._isInfoShowable) {
+        if (this._isInfoShowable) {
             var topUI = GM.getTopUI().getComponent("TopUI");
-            if(this._cardId != undefined){
+            if (this._cardId != undefined) {
                 cc.log("show_card_info");
-                topUI.showPokemonCardInfo(this._cardId, false);
+                topUI.showPokemonCardtoAttack(this._cardId, this);
 
             }
         }
@@ -248,11 +312,11 @@ cc.Class({
         //this._onSelectedCallBack && this._onSelectedCallBack();
     },
     _onTouchCancel: function () {
-        if(this._isInfoShowable) {
+        if (this._isInfoShowable) {
             var topUI = GM.getTopUI().getComponent("TopUI");
-            if(this._cardId != undefined){
+            if (this._cardId != undefined) {
                 cc.log("show_card_info");
-                topUI.showPokemonCardInfo(this._cardId, false);
+                topUI.showPokemonCardtoAttack(this._cardId, this);
 
             }
         }
@@ -291,7 +355,17 @@ cc.Class({
         cc.log("check_evolve", this._pkmData.pkdId, stageCardData.evolveFrom, turnDrop, this._inPlayTurn);
         return this._pkmData.pkdId == stageCardData.evolveFrom && turnDrop > this._inPlayTurn;
     },
+    isEnoughEnergy: function (moveIdx) {
+        var moveInfo = this._moveSet[moveIdx]; //Move idx in a card. usually = 0 or = 1
+        for (const costEnergy in moveInfo.cost) {
+            cc.log("test_cost", costEnergy, this._energy[costEnergy], moveInfo.cost[costEnergy], this._energy[costEnergy] < moveInfo.cost[costEnergy]);
+            if ((this._energy[costEnergy] | 0) < moveInfo.cost[costEnergy]) {
+                return false;
+            }
+        }
+        return true;
 
+    },
     //Set
     setHasPkm: function (has) {
         this._hasPKM = has;
@@ -304,16 +378,32 @@ cc.Class({
     setPkmCardId: function (cardId) {
         this._cardId = cardId;
         this._pkmData = JARVIS.getCardData(cardId);
-        cc.log(this.LOG_TAG, "CARD_POKEMON_ID", this._cardId);
+        this._moveSet = this._pkmData.moveInfo;
+        cc.log(this.LOG_TAG, "SET_CARD_POKEMON_ID", this._cardId, JSON.stringify(this._moveSet));
     },
     setNewCard: function (cardId) {
-        var cardData = JARVIS.getCardData();
-        if (cardData == CONST.CARD.CAT.PKM) {
+        var cardData = JARVIS.getCardData(cardId);
+        cc.log("test_new_card", JSON.stringify(cardData));
+        if (cardData.category == CONST.CARD.CAT.PKM) {
             this._containedCardIds.push(cardId);
             cc.log(this.LOG_TAG, "ADD_CARD_POKEMON_ID", this._containedCardIds);
+            this._hp = cardData.hp;
+            //this.hpBar.active = true;
+            this.hpText.string = (this._hp - this._counterDmg * 10) + "/" + cardData.hp;
+            var pg = (this._hp - this._counterDmg * 10) / this._hp;
+            cc.tween(this.hpBar.getComponent(cc.ProgressBar)).to(0.5, { progress: pg }).start();
         } else {
+            if (cardData.category == CONST.CARD.CAT.ENERGY) {
+                if (this._energy[cardData.energyType] == undefined) {
+                    this._energy[cardData.energyType] = cardData.quantity | 0 ? cardData.quantity : 1;
+                }
+                else {
+                    this._energy[cardData.energyType] += cardData.quantity | 0 ? cardData.quantity : 1;
+
+                }
+                cc.log(this.LOG_TAG, "ADD_ENERGY_CARD_POKEMON_ID", JSON.stringify(this._energy));
+            }
             this._containedCardIds.unshift(cardId);
-            cc.log(this.LOG_TAG, "ADD_OTHER_CARD_POKEMON_ID", this._containedCardIds);
         }
 
     },

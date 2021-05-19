@@ -37,8 +37,10 @@ cc.Class({
         //Set up move ui
         var i = 0;
         for (const move of this.moves){
+            move.off(CONST.EVENT.DOUBLE_TOUCH, this._doubleTouchMove, this);
             move.active = false;
         }
+        this.moveScr = [];
         for (const moveIdx in cardData.moveInfo) {
             if(i >= this.moves.length) {
                 cc.log("test_i", i , this.moves.length);
@@ -47,11 +49,17 @@ cc.Class({
             var moveUI = this.moves[i];
             moveUI.active = true;
             var moveData = cardData.moveInfo[moveIdx];
-            moveUI.getComponent("MoveInfo").init(moveData);
+            moveUI.getComponent("MoveInfo").init(moveIdx, moveData);
+            moveUI.on(CONST.EVENT.DOUBLE_TOUCH, this._doubleTouchMove, this);
+            this.moveScr.push(moveUI.getComponent("MoveInfo"));
             if(!moveUI.parent) this.moveLayout.addChild(moveUI);
             i++;
         }
 
+    },
+    _doubleTouchMove: function(event){
+        cc.log("used_move", event.component.moveData.name);
+        this.node.emit("onusedmove", {moveIdx: event.component.moveIdx ,move: event.component.moveData})
     },
     _getEnergySF: function (type) {
         cc.log("test_type", type);
@@ -85,5 +93,18 @@ cc.Class({
     },
     _onTouchMoveUI: function(){
 
+    },
+    onReadyUsed: function(){
+        for (const move of this.moves){
+            move.getComponent("MoveInfo").onReadyUsed();
+        }
+    },
+    onCancelUsed: function(){
+        for (const move of this.moves){
+            move.getComponent("MoveInfo").onCancelUsed();
+        }
+    },
+    getMoves: function(){
+        return this.moves;
     }
 });

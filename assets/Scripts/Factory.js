@@ -140,7 +140,7 @@ Processor = cc.Class({
                     }
                 };
             }
-            else{
+            else {
                 this.onCardCancel();
             }
 
@@ -167,6 +167,11 @@ Processor = cc.Class({
     onSelectDone: function (event) {
         cc.log("PROCESS_SELECTING", JSON.stringify(this.selectData), event.para.length);
         this.actionProc.process(this.selectData.action.actionType, this.droppedCardId, event.para);
+    },
+    onUsedMove: function (player, move, fromSlot) {
+        //var isMoveActive = this.checkOnUsingMove(player, move, fromSlot); //TODO: No need, cuz we have checked before
+        cc.log("test_on_used_move", JSON.stringify(move));
+        this.actionProc.processMove(player, move.moveData, fromSlot);
     },
 
     //Check
@@ -205,6 +210,22 @@ Processor = cc.Class({
             }
         }
 
+    },
+    checkOnUsingMove: function (player, move, fromSlot) {
+        cc.log("proc_Check_move", this.gm.getCurrentPlayer().getId(), player.getId());
+        if (this.gm.getCurrentPlayer().sameId(player.getId())) {
+            cc.log("proc_Check_move1", this.gm.isPlayPhase(), this.gm.getCurrentTurn());
+            if (this.gm.isPlayPhase() && this.gm.getCurrentTurn() > 0) {
+                this.a = player.canUseMove();
+                this.b = fromSlot.isEnoughEnergy(move.moveIdx);
+                cc.log("proc_Check_move2", this.a, this.b);
+                if (this.a && this.b) {
+                    return true;
+                }
+            }
+
+        }
+        return false;
     }
 });
 
@@ -242,6 +263,38 @@ var ActionProcessor = cc.Class({
                 }
                 break;
 
+        }
+    },
+    processMove: function (player, moveData, fromSlot) {
+        //{"moveId":"M0","actions":{"A0":{"valueType":0,"value":20}},"name":"Leech Seed","cost":{"grass":2},"value":"20","des":""}
+
+        cc.log("PROC_ON_USED_MOVE", JSON.stringify(moveData));
+        this._actionQueue = [];
+        for (const action in moveData.actions){
+            cc.log("TEST_ACTION", action);
+            this._actionQueue.push({id: action, data: moveData.actions[action]});
+            // switch (action){
+            //     case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON:{
+
+            //         break;
+            //     }
+            // }
+        }
+      
+        this._processActionInQueue(); //Start process from the first action and wait
+        
+    },
+    _processActionInQueue: function(){
+        if(this._actionQueue.length > 0){//If we still have action
+            var action = this._actionQueue.shift();
+            cc.log("START_PROCESS",JSON.stringify(action));
+            this._isProcActionFinished = false; //we start processing new action
+            switch(action.id){
+                case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON:{
+                    this.battleArea.attackOppActive();
+                    break;
+                }
+            }
         }
     }
 });
