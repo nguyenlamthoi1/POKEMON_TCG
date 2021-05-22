@@ -17,10 +17,11 @@ cc.Class({
          //Evolution UI
         evolutionIcon: cc.Sprite,
         evolutionTxt: cc.Label,
+        evolutionImg: cc.Sprite,
+        evolutionPanel: cc.Node,
         //PKM Type UI
         types: [cc.Node],
         typeFrames: [cc.SpriteFrame],
-
         cardFrames: [cc.SpriteFrame],
         colorTxt: [cc.Color],
         //Failed SF
@@ -60,18 +61,29 @@ cc.Class({
     _initPkmCard:function(data){
         //Card name
         this.cardTitleText.string = data.name;
-        this.cardTitleText.enabled = false;
-        this.cardTitleText.node.color = this._getColorTxt(data.type);
+        this.cardTitleText.enabled = true;
+
         //Card category title
-        this.cardTypeText.string = data.category;
+        //this.cardTypeText.string = data.category;
+
         //Card container
         this.cardContainer.spriteFrame = this._getCardFrame(data.type);
+
         //Load Pokemon
-        this.cardImg.node.scale = data.smallScale ? data.smallScale: 1;
+        this.cardImg.node.scale = data.cardInfo.small.imgScale ? data.cardInfo.small.imgScale : 1;
         this._loadSpriteFrameForCardImg(data.smallCardUrl, this.failedPkmSF); //Load dymanically
+
         //Evolution info
         this.evolutionIcon.node.active = data.stage > 1;
         this.evolutionTxt.string = data.stage - 1;
+        if(data.evolveImg)
+        {
+            this._loadSpriteFrameForEvolveCardImg(data.evolveImg, this.failedPkmSF);
+            this.evolutionPanel.active = true;
+        }
+        else{
+            this.evolutionPanel.active = false;
+        }
         //Type PKM info: fire, water,..
         for(var i = 0; i < this.types.length; i ++)  this.types[i].active = false;
         for (var typeKey in data.type) { 
@@ -188,12 +200,24 @@ cc.Class({
             }
         }.bind(this))
     },
+    _loadSpriteFrameForEvolveCardImg: function(smallCardUrl, failedSF){
+       
+        cc.resources.load(smallCardUrl, cc.SpriteFrame, function(err, loadedSpriteFrame){
+            if(!err){
+                this.evolutionImg.spriteFrame = loadedSpriteFrame;
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][SUCCESS]", smallCardUrl);
+            }else{
+                this.evolutionImg.spriteFrame = failedSF;
+                cc.log("[LOAD_IMG_FOR_SMALL_CARD][FAILED]", smallCardUrl);
+            }
+        }.bind(this))
+    },
     //Listeners
     onTouchCardStart: function(touchEvent){
-        cc.log("TOUCH_SMALL_CARD");
+        cc.log("TOUCH_SMALL_CARD", this.node.width, this.node.height);
         //cc.log("TOUCH_SMALL_CARD_START", this.idxInHand);
         //Show card name
-        this.cardTitleText.enabled = true;
+        //this.cardTitleText.enabled = true;
         this._oldPos = this.node.position;
         //var endPos = this.node.position.add(cc.v2(0, 1).mul(80));
         this.node.position =  this.node.parent.convertToNodeSpaceAR(touchEvent.getLocation());
@@ -213,7 +237,7 @@ cc.Class({
     },
     onTouchCardEnd: function(touchEvent){
         this._touchEnd = true;
-        this.cardTitleText.enabled = false;
+        //this.cardTitleText.enabled = false;
         if(!this._isDroppable){
             this.node.position = this._oldPos;
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();
@@ -238,7 +262,7 @@ cc.Class({
     },
     onTouchCardCancel: function(touchEvent){
         this._touchEnd = true;
-        this.cardTitleText.enabled = false;
+        //this.cardTitleText.enabled = false;
         if(!this._isDroppable){
             this.node.position = this._oldPos;
             this.dropChecker.getComponent("CardDropChecker").onNotSelected();

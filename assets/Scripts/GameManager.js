@@ -8,7 +8,7 @@ const GAME_PHASE = {
     ON_GAME_START: "ongamestart",
 }
 const GAMESTART_CONST = {
-    NUM_DRAW: 5,
+    NUM_DRAW: 1,
 };
 
 var fakeCard1 = [
@@ -80,7 +80,7 @@ cc.Class({
     onLoad () {
         const DELAY_VS = 2.5
         this.versusUI.getComponent("VersusUI").show(DELAY_VS);
-        this.schedule( this.start.bind(this),0,1,DELAY_VS);
+        this.schedule( this.startGame.bind(this), 0, 0, DELAY_VS);
         //Global var
         GM = this;
         //Init data
@@ -104,10 +104,8 @@ cc.Class({
         this.node.on(CONST.GAME_PHASE.ON_TURN_END, this.onTurnEnd, this);
        
     },
-    start () {
+    startGame () {
         this.changePhase(CONST.GAME_PHASE.START); //TODO: wait server notify START_GAME;
-        // cc.log("test_res", RES_MGR.getRes("SmallPokemon/002") );
-        //this.testNode.spriteFrame = RES_MGR.getRes("SmallPokemon/002");
     },
     changePhase: function(phase){
         this.currentPhase = phase;
@@ -145,6 +143,7 @@ cc.Class({
     },
     isPhase:function(phase){return this.currentPhase == phase;},
     onGameStart: function(){
+        cc.log("ON_GAME_START");
         //YOU ALWAYS GO FIRST
         //Set first turn
         this.turnCount = 0;

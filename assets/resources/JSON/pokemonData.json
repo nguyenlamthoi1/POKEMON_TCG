@@ -5,7 +5,7 @@
     "category": "Pokemon",
     "name": "Bulbasaur",
     "type": {
-      "0": "grass_type"
+      "0": "grass"
     },
     "hp": 60,
     "stage": 1,
@@ -29,6 +29,11 @@
         "value": "20",
         "des": ""
       }
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
     }
   },
   "2": {
@@ -37,11 +42,12 @@
     "category": "Pokemon",
     "name": "Ivysaur",
     "type": {
-      "0": "grass_type"
+      "0": "grass"
     },
     "hp": 90,
     "stage": 2,
     "evolveFrom": 1,
+    "evolveImg": "SmallPokemon/001",
     "smallCardUrl": "SmallPokemon/002",
     "bigPokemonUrl": "BigPokemon/002",
     "bigScale": 0.1,
@@ -65,6 +71,11 @@
         "value": "20",
         "des": ""
       }
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
     }
   },
   "3": {
@@ -73,11 +84,12 @@
     "category": "Pokemon",
     "name": "Venusaur",
     "type": {
-      "0": "grass_type"
+      "0": "grass"
     },
     "hp": 120,
     "stage": 3,
     "evolveFrom": 2,
+    "evolveImg": "SmallPokemon/002",
     "smallCardUrl": "SmallPokemon/003",
     "bigPokemonUrl": "BigPokemon/003",
     "bigScale": 0.2,
@@ -91,6 +103,11 @@
         "value": "60",
         "des": ""
       }
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1
+      }
     }
   },
   "4": {
@@ -99,7 +116,7 @@
     "category": "Pokemon",
     "name": "Charmander",
     "type": {
-      "0": "fire_type"
+      "0": "fire"
     },
     "hp": 60,
     "stage": 1,
@@ -137,6 +154,11 @@
       },
       "value": 10,
       "des": ""
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
     }
   },
   "5": {
@@ -145,11 +167,12 @@
     "category": "Pokemon",
     "name": "Charmeleon",
     "type": {
-      "0": "fire_type"
+      "0": "fire"
     },
     "hp": 90,
     "stage": 2,
     "evolveFrom": 4,
+    "evolveImg": "SmallPokemon/004",
     "smallCardUrl": "SmallPokemon/005",
     "bigPokemonUrl": "BigPokemon/005",
     "bigScale": 0.1,
@@ -173,6 +196,11 @@
         "value": "50",
         "des": ""
       }
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
     }
   },
   "6": {
@@ -181,11 +209,12 @@
     "category": "Pokemon",
     "name": "Charizard",
     "type": {
-      "0": "fire_type"
+      "0": "fire"
     },
     "hp": 120,
     "stage": 3,
     "evolveFrom": 5,
+    "evolveImg": "SmallPokemon/005",
     "smallCardUrl": "SmallPokemon/006",
     "bigPokemonUrl": "BigPokemon/006",
     "bigScale": 0.2,
@@ -199,6 +228,11 @@
         "value": "100",
         "des": ""
       }
+    },
+    "cardInfo":{
+      "small":{
+        "imgScale": 1
+      }
     }
   },
   "7": {
@@ -207,14 +241,20 @@
     "category": "Pokemon",
     "name": "Squirtle",
     "type": {
-      "0": "water_type"
+      "0": "water"
     },
     "hp": 60,
     "stage": 1,
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/007",
     "bigPokemonUrl": "BigPokemon/007",
-    "bigScale": 0.08
+    
+    "bigScale": 0.08,
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
+    }
   },
   "8": {
     "id": 8,
@@ -222,14 +262,20 @@
     "category": "Pokemon",
     "name": "Wartortle",
     "type": {
-      "0": "water_type"
+      "0": "water"
     },
     "hp": 90,
     "stage": 2,
     "evolveFrom": 7,
+    "evolveImg": "SmallPokemon/007",
     "smallCardUrl": "SmallPokemon/008",
     "bigPokemonUrl": "BigPokemon/008",
-    "bigScale": 0.1
+    "bigScale": 0.1,
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
+    }
   },
   "9": {
     "id": 9,
@@ -237,14 +283,20 @@
     "category": "Pokemon",
     "name": "Blastoise",
     "type": {
-      "0": "water_type"
+      "0": "water"
     },
     "hp": 120,
     "stage": 3,
     "evolveFrom": 8,
+    "evolveImg": "SmallPokemon/008",
     "smallCardUrl": "SmallPokemon/009",
-    "bigPokemonUrl": "BigPokemon/008",
-    "bigScale": 0.2
+    "bigPokemonUrl": "BigPokemon/009",
+    "bigScale": 0.2,
+    "cardInfo":{
+      "small":{
+        "imgScale": 1
+      }
+    }
   },
   "10": {
     "id": 9,
@@ -252,11 +304,16 @@
     "category": "Item",
     "name": "Blastoise",
     "type": {
-      "0": "water_type"
+      "0": "water"
     },
     "stage": 3,
     "evolveFrom": 8,
     "smallCardUrl": "SmallPokemon/009",
-    "bigScale": 0.2
+    "bigScale": 0.2,
+    "cardInfo":{
+      "small":{
+        "imgScale": 1.5
+      }
+    }
   }
 }

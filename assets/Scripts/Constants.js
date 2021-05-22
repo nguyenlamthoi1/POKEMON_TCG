@@ -1,8 +1,8 @@
 window.POKEMON = {
-    FIRE_TYPE: "fire_type",
-    GRASS_TYPE: "grass_type",
-    WATER_TYPE: "water_type",
-    ELECTRIC_TYPE: "elec_type"
+    FIRE_TYPE: "fire",
+    GRASS_TYPE: "grass",
+    WATER_TYPE: "water",
+    ELECTRIC_TYPE: "electric"
 }
 window.CONST = {
     EVENT: {
