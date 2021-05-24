@@ -45,6 +45,9 @@ DataManager = cc.Class({
         //cc.log(this.LOG_TAG, "[GET_CARD_DATA]", JSON.stringify(this.cardInfo));
         return this.cardInfo[cardId];
     },
+    getCardName: function(cardId){
+        return this.cardInfo[cardId].name;
+    },
     //Set
     //Check
     isBasicPokemonCard: function(cardId){

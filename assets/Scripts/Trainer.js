@@ -4,10 +4,8 @@ cc.Class({
 
     properties: {
        pokeball: cc.Node,
-       a: 123
     },
     throwBall: function(destPos, openBallCallback){
-        cc.log("throwBall");
         this.pokeball.position = cc.v2(0,0);
         this.pokeball.opacity = 255;
         var destPosition = destPos;

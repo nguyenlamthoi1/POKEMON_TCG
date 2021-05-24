@@ -40,12 +40,13 @@ cc.Class({
 
 
     },
-    init: function (typeSlot) {
+    init: function (typeSlot, player) {
         //Define misc
         this.LOG_TAG = "[BATTLE_SLOT]";
         this._onSelectedCallBack = function () { cc.log(this.LOG_TAG, "SELECTED_CALLBACK") };
         //Init data
         this.typeSlot = typeSlot;
+        this._player = player;
         this._isSelectable = false;
         this._isInfoShowable = true;
 
@@ -249,8 +250,8 @@ cc.Class({
         cc.log("TAKE_DMG1", hp, this._hp, this._counterDmg);
         this._counterDmg += hp / 10;
         var pg = (this._hp - hp) / this._hp;
-        this._hp -= this._counterDmg*10;
-        if(this._hp < 0) this._hp = 0;
+        this._hp -= this._counterDmg * 10;
+        if (this._hp < 0) this._hp = 0;
 
         this.flyingHpText.getComponent(cc.Label).string = "-" + hp;
         this.flyingHpText.active = true;
@@ -269,30 +270,25 @@ cc.Class({
     },
     //Listeners
     _onTouchStart: function () {
-        cc.log("TOUCH_START_1");
-
+        //cc.log("BATTLE_SLOT", "TOUCH_START");
         if (this._isInfoShowable) {
-
             var topUI = GM.getTopUI().getComponent("TopUI");
             if (this._cardId != undefined) {
-                cc.log("show_card_info");
+                //cc.log("show_card_info");
                 topUI.showPokemonCardtoAttack(this._cardId, this);
-
             }
         }
         if (!this._isSelectable) return;
-
         cc.tween(this.selectIndicator)
             .to(0.1, { width: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.width, height: BATTLE_SLOT[this.typeSlot].SELECTED_SIZE.height })
             .start();
     },
-    //_onTouchMove: function(){},
     _onTouchEnd: function () {
-
+        //cc.log("BATTLE_SLOT","TOUCH_END");
         if (this._isInfoShowable) {
             var topUI = GM.getTopUI().getComponent("TopUI");
             if (this._cardId != undefined) {
-                cc.log("show_card_info");
+                //cc.log("show_card_info");
                 topUI.showPokemonCardtoAttack(this._cardId, this);
 
             }
@@ -300,8 +296,6 @@ cc.Class({
         if (!this._isSelectable) return;
         ;
         this._isSelectable = true;
-
-        cc.log("ON_SLOT_TOUCH_END");
         this.node.emit(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, { selected: this._selected, battleSlot: this });
 
         // cc.tween(this.selectIndicator)
@@ -312,15 +306,15 @@ cc.Class({
         //this._onSelectedCallBack && this._onSelectedCallBack();
     },
     _onTouchCancel: function () {
+        //cc.log("BATTLE_SLOT","TOUCH_CANCEL");
         if (this._isInfoShowable) {
             var topUI = GM.getTopUI().getComponent("TopUI");
             if (this._cardId != undefined) {
-                cc.log("show_card_info");
+                //cc.log("show_card_info");
                 topUI.showPokemonCardtoAttack(this._cardId, this);
 
             }
         }
-
         if (!this._isSelectable) return;
         this._isSelectable = true;
         this.onUnSelected();
@@ -345,7 +339,8 @@ cc.Class({
     hideSelectedIndex: function () {
         this.selectedIndex.node.active = false;
     },
-    //Check
+
+    //--Check--
     hasPokemon: function () {
         //cc.log("_hasPKM", this._hasPKM);
         return this._hasPKM;
@@ -366,7 +361,9 @@ cc.Class({
         return true;
 
     },
-    //Set
+    //----
+
+    //--Set--
     setHasPkm: function (has) {
         this._hasPKM = has;
         cc.log(this.LOG_TAG, "HAS_POKEMON", this._hasPKM);
@@ -408,8 +405,11 @@ cc.Class({
 
     },
     setSelectedCallback: function (cb) { this._onSelectedCallBack = cb; },
-    //Get
+    //----
+
+    //--Get--
     getCardPokemonId: function () {
         return this._cardId;
     }
+    //----
 });

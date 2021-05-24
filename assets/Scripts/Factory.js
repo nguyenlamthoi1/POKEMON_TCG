@@ -16,55 +16,53 @@ Processor = cc.Class({
         this.gm = gameManager;
         //Get all UIs needed
         this.TopUI = gameManager.getTopUI();
-        this.battleArea = gameManager.getBattleArea(); this.battleArea.getComponent("BattleArea").init(this.gm, this.TopUI.getComponent("TopUI"));
+        this._battleArea = gameManager.get_BattleArea(); this._battleArea.getComponent("BattleArea").init(this.gm, this.TopUI.getComponent("TopUI"));
+        this.battleArea = gameManager.getBattleArea();
         this.notifier = this.TopUI.getComponent("TopUI");
         this.handUI = this.gm.handUI.getComponent("HandUI");
+
         //Get action processor
-        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gm, this, this.battleArea.getComponent("BattleArea"));
+        this.actionProc = new ActionProcessor(); this.actionProc.init(this.gm, this, this.battleArea);
     },
-    onReceiveCard: function (cardId, playerId) { //Xu ly khi nhan duoc the bai danh xuong tu nguoi choi co id = playerId
-        //Process card Id
+    onReceiveCard: function (cardId, player) { //Xu ly khi nhan duoc the bai danh xuong tu nguoi choi co id = playerId
+        cc.log("on_drop_card_0", JARVIS.getCardName(cardId), player.getId());
+        var hand = this.gm.getHandOfCurrentPlayer();
+        //Pre check
         var cardData = JARVIS.getCardData(cardId);
-        var canDrop = this.checkOnDrop(cardId, cardData); //Kiem tra co the drop the duoc khong
-        if (!canDrop) {
-            this.handUI.onDropCardCancel();
-            return;
+        var canDrop = this.checkOnDrop(cardId, cardData, player); //Kiem tra co the drop the duoc khong
+        if (!canDrop) { //failed to drop
+            hand.onDropCardCancel();
+            return false;
         }
-
-
-        if (cardData == undefined) { cc.log(this.LOG_TAG, this.LANG.CARD_ID_NOT_CORRECT); return false; }
-
-        this.DEBUG && cc.log(this.LOG_TAG, "[TEST_CARD_DATA]", JSON.stringify(cardData));
-
-        // var trainer =this.battleArea.getComponent("BattleArea").getPlayerTrainer().getComponent("Trainer");
-        // trainer.throwBall();
-        //cc.log("test_process", cardData.category, this.CONST.CAT.ENERGY);
+        if (cardData == undefined) { //Cannot retrieve data of card
+            cc.log(this.LOG_TAG, this.LANG.CARD_ID_NOT_CORRECT);
+            hand.onDropCardCancel();
+            return false;
+        }
+        this.DEBUG && cc.log(this.LOG_TAG, "[DROP_CARD_DATA]", JSON.stringify(cardData));
+        //--
         this.droppedCardId = cardId;
         switch (cardData.category) {
             case this.CONST.CAT.POKEMON:
-                this.processPKMCard(cardId);
+                this.processPKMCard(cardId, player);
                 break;
             case this.CONST.CAT.ENERGY:
-                this.processEnergyCard(cardId);
+                this.processEnergyCard(cardId, player);
                 break;
         }
 
     },
 
     //--------PROCESS_CARD--------------
-    processPKMCard: function (cardId) {
-
-        cc.log("Process_card_pkm");
+    processPKMCard: function (cardId, player) {
+        if (player == undefined) player = this.gm.getCurrentPlayer();
+        cc.log(this.LOG_TAG, "PROCESS_CARD_POKEMON", JARVIS.getCardName(cardId), player.getId());
         //Show Battle Slot avaiable
-        var notifier = this.TopUI.getComponent("TopUI");
-        // notifier.notify("SELECTING");
-        battleAreaScr = this.battleArea.getComponent("BattleArea");
+        var activeSlot = this.battleArea.getActiveSlotOf(player.getId());
         var selectData;
         if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
             //START_TURN
-            var playerActiveSlotScr = battleAreaScr.getPlayerActiveSlot().getComponent("BattleSlot");
-            if (!playerActiveSlotScr.hasPokemon()) { //Should select empty active slot
-                cc.log("SELEC_EMPTY_ACTIVE");
+            if (!activeSlot.hasPokemon()) { //Should select empty active slot
                 selectData = {
                     type: SELECTION.TYPE.PLAYER_EMPTY_ACTIVE,
                     selectNum: 1,
@@ -73,7 +71,7 @@ Processor = cc.Class({
                         actionType: GAME_ACTION.TYPE.SUMMON_A_POKEMON
                     }
                 };
-            } else {
+            } else { //Should select the first empty slot on Bench
                 selectData = {
                     type: SELECTION.TYPE.PLAYER_EMPTY_BENCH,
                     selectNum: 1,
@@ -86,7 +84,6 @@ Processor = cc.Class({
         } else {
             //PLAY_TURN
             if (JARVIS.isBasicPokemonCard(cardId)) {
-                cc.log("break1");
                 selectData = {
                     type: SELECTION.TYPE.PLAYER_EMPTY_BENCH,
                     selectNum: 1,
@@ -111,7 +108,7 @@ Processor = cc.Class({
             cc.log("ProcessPKMCard2", cardId);
             this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
             this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
-            battleAreaScr.showSelectabledUIs(cardId, selectData);
+            this.battleArea.showSelectabledUIs(selectData, cardId, player);
         }
         this.selectData = selectData;
     },
@@ -121,7 +118,7 @@ Processor = cc.Class({
         //Show Battle Slot avaiable
         var notifier = this.TopUI.getComponent("TopUI");
         notifier.notify("SELECTING..");
-        battleAreaScr = this.battleArea.getComponent("BattleArea");
+        battleAreaScr = this._battleArea.getComponent("BattleArea");
         var selectData;
         if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
 
@@ -156,13 +153,11 @@ Processor = cc.Class({
     },
     //--------END_PROCESS_CARD-----------
 
-    onCardCancel: function (cardId) {
-        cc.log("test_cancel_fact");
-        this.handUI.onDropCardCancel();
+    onCardCancel: function () {
+        this.gm.getHandOfCurrentPlayer().onDropCardCancel();
     },
     onCardApproved: function () {
-        //this.gm.node.off(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
-        this.handUI.onDropCardApproved();
+        this.gm.getHandOfCurrentPlayer().onDropCardApproved();
     },
     onSelectDone: function (event) {
         cc.log("PROCESS_SELECTING", JSON.stringify(this.selectData), event.para.length);
@@ -175,10 +170,8 @@ Processor = cc.Class({
     },
 
     //Check
-    checkOnDrop: function (cardId, cardData) {
+    checkOnDrop: function (cardId, cardData, player) {
         var notifier = this.TopUI.getComponent("TopUI");
-        var battleScr = this.battleArea.getComponent("BattleArea");
-        var playerActiveSlotScr = battleScr.getPlayerActiveSlot().getComponent("BattleSlot");
         if (cardData == undefined) cardData = JARVIS.getCardData(cardId);
         // cc.log("checK_on_drop1", cardData.evolution, CONST.CARD.EVOL.BASIC );
         // cc.log("checK_on_drop2", JSON.stringify(cardData));
@@ -197,15 +190,14 @@ Processor = cc.Class({
         }
         return true;
     },
-    checkEndTurn: function () {
-        var battleScr = this.battleArea.getComponent("BattleArea");
-        cc.log('test_end_turn', this.gm.isPhase(CONST.GAME_PHASE.START), battleScr.playerHasActivePkm());
+    checkEndTurn: function (player) {
+        cc.log(this.LOG_TAG, "CHECK_END_TURN", this.gm.isPhase(CONST.GAME_PHASE.START), this.battleArea.hasActivePkm(player));
         if (this.gm.isPhase(CONST.GAME_PHASE.START)) {
-            if (battleScr.playerHasActivePkm()) {
+            if (this.battleArea.hasActivePkm(player)) {
                 return true;
             }
             else {
-                this.notifier.notify("YOU SHOULD HAVE POKEMON\n AT ACTIVE SLOT", cc.Color.RED, 20, 3);
+                this.notifier.notify("YOU SHOULD HAVE A POKEMON\n AT ACTIVE SLOT", cc.Color.RED, 20, 3);
                 return false;
             }
         }
@@ -236,7 +228,7 @@ var ActionProcessor = cc.Class({
         this.battleArea = battleArea;
     },
     process: function (actionType, cardId, para) {
-        cc.log("actionType", actionType, GAME_ACTION.TYPE.SUMMON_A_POKEMON, para.length, cardId);
+        cc.log("PROCESS_ACTION_TYPE", actionType, GAME_ACTION.TYPE.SUMMON_A_POKEMON, para.length, cardId);
         switch (actionType) {
             case GAME_ACTION.TYPE.SUMMON_A_POKEMON:
                 {
@@ -270,9 +262,9 @@ var ActionProcessor = cc.Class({
 
         cc.log("PROC_ON_USED_MOVE", JSON.stringify(moveData));
         this._actionQueue = [];
-        for (const action in moveData.actions){
+        for (const action in moveData.actions) {
             cc.log("TEST_ACTION", action);
-            this._actionQueue.push({id: action, data: moveData.actions[action]});
+            this._actionQueue.push({ id: action, data: moveData.actions[action] });
             // switch (action){
             //     case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON:{
 
@@ -280,17 +272,17 @@ var ActionProcessor = cc.Class({
             //     }
             // }
         }
-      
+
         this._processActionInQueue(); //Start process from the first action and wait
-        
+
     },
-    _processActionInQueue: function(){
-        if(this._actionQueue.length > 0){//If we still have action
+    _processActionInQueue: function () {
+        if (this._actionQueue.length > 0) {//If we still have action
             var action = this._actionQueue.shift();
-            cc.log("START_PROCESS",JSON.stringify(action));
+            cc.log("START_PROCESS", JSON.stringify(action));
             this._isProcActionFinished = false; //we start processing new action
-            switch(action.id){
-                case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON:{
+            switch (action.id) {
+                case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON: {
                     this.battleArea.attackOppActive();
                     break;
                 }

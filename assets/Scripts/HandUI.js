@@ -28,13 +28,10 @@ cc.Class({
             //    "energy_2", "energy_2", "energy_2", "energy_2", "energy_2","energy_3"
             //    ,"energy_0","energy_4","energy_1"
         ];
-        //this.deck = FAKE_CARDS
-        // this.deck = [];
-        // for(var i=0;i<60;i++){
-        //     this.deck.push(1);
-        // }
         this.cardIdOnHand = [];
         this.cardUIOnHand = [];
+        this._movingCache = [];
+
         this.layoutComponent = this.node.getComponent(cc.Layout);
         this.smallCardInfo = {
             w: this.cardTemplate.data.width,
@@ -42,8 +39,7 @@ cc.Class({
         },
 
             //Private var
-            cc.log("test_var_hand", JSON.stringify(this.cardTemplate.data.width));
-        this._movingCache = [];
+        //cc.log("test_var_hand", JSON.stringify(this.cardTemplate.data.width));
         //Listeners
         this.drawBtn.node.on("click", this.onClickDrawBtn, this); //TODO: DELETE
 
@@ -183,7 +179,8 @@ cc.Class({
         this.dropCardId = cardId;
         this.idxDropCard = idx;
         //cc.log("HAND_DROP", idx, cardId, this.cardIdOnHand, this.cardUIOnHand);
-        this.gm.onDropCard(cardId);
+        cc.log("DROP_CARD_0", cardId, this.player.getId())
+        this.gm.onDropCard(cardId, this.player);
     },
     onDropCardCancel: function () {
         this.dropCardUI.active = true;

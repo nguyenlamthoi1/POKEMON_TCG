@@ -214,10 +214,7 @@ cc.Class({
     },
     //Listeners
     onTouchCardStart: function(touchEvent){
-        cc.log("TOUCH_SMALL_CARD", this.node.width, this.node.height);
-        //cc.log("TOUCH_SMALL_CARD_START", this.idxInHand);
-        //Show card name
-        //this.cardTitleText.enabled = true;
+        cc.log("TOUCH_SMALL_CARD", this.idxInHand);
         this._oldPos = this.node.position;
         //var endPos = this.node.position.add(cc.v2(0, 1).mul(80));
         this.node.position =  this.node.parent.convertToNodeSpaceAR(touchEvent.getLocation());

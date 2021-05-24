@@ -94,7 +94,7 @@ cc.Class({
     },
     onTouchEndTurnBtn: function(){
         cc.log("PLAYER_ID",this.player.getId(), "END_TURN");
-        this.gm.endTurn();
+        this.gm.endTurn(this.player);
     },
     onTouchCancelSelectBtn: function(){
         cc.log("CANCEL");
@@ -143,5 +143,21 @@ cc.Class({
             }.bind(this), 0.1)
         }
         
+    },
+    showUIonSelecting: function(){
+        this.cancelSelectBtn.node.active = true;
+        this.selectBtn.node.active = true;
+        this.endTurnBtn.node.active = false;
+        this.endEnemyTurnBtn.node.active = false;
+    },
+    hideUIonShowSelecting: function(){
+        this.cancelSelectBtn.node.active = false;
+        this.selectBtn.node.active = false;
+        if(this.gm.isPlayerTurn()){
+            //Show button
+            this.endTurnBtn.node.active = true;
+        }else{
+            this.endEnemyTurnBtn.node.active = true;  
+        }
     }
 });

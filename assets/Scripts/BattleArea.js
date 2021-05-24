@@ -6,6 +6,7 @@ cc.Class({
     cancelSelectBtn: cc.Button,
     selectBtn: cc.Button,
     endTurnBtn: cc.Button,
+    oppEndTurnBtn: cc.Button,
     playerBench: [cc.Node],
     playerActiveSlot: cc.Node,
     opponentBench: [cc.Node],
@@ -14,25 +15,39 @@ cc.Class({
     opponentTrainer: cc.Node
   },
   init: function (gameManager, notifier) {
+    this.LOG_TAG = "[BATTLE_AREA]";
     this.gm = gameManager;
     this.notifier = notifier;
+    this.topUI = this.gm.getTopUI().getComponent("TopUI");
+
+
+
     //Init player's active Battle Slot
     this.playerActiveSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.ACTIVE_TYPE);
     this.opponentActiveSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.ACTIVE_TYPE);
     //Init Battle Slot on Bench
-    for (var battleSlot of this.playerBench) {
-      // var battleSlot = this.playerBench[i]; //Get battle slot to init
-      battleSlot.getComponent("BattleSlot").init(CONST.BATTLE_SLOT.BENCH_TYPE);
+    const DEFAULT_NUM_BENCH = 5;
+    this._bench = {};
+    this._bench[PLAYER_ID] = [];
+    this._bench[OPPONENT_ID] = [];
+    for (var i = 0; i < DEFAULT_NUM_BENCH; i++) {
+      var playerBattleSlotComp = this.playerBench[i].getComponent("BattleSlot");
+      playerBattleSlotComp.init(CONST.BATTLE_SLOT.BENCH_TYPE, this.gm.getPlayers()[PLAYER_ID]);
+      var oppBattleSlotComp = this.opponentBench[i].getComponent("BattleSlot");
+      oppBattleSlotComp.init(CONST.BATTLE_SLOT.BENCH_TYPE, this.gm.getPlayers()[OPPONENT_ID]);
+      this._bench[PLAYER_ID].push(playerBattleSlotComp);
+      this._bench[OPPONENT_ID].push(oppBattleSlotComp);
     }
-    this._activeSlot = {
-      1: this.playerActiveSlot,
-      2: this.opponentActiveSlot
-    };
-   
-    cc.log("test_init_slot1", 1,this._activeSlot[1]);
-    cc.log("test_init_slot2", 2,this._activeSlot[2]);
-    
-    
+    //Init Active Slots
+    this._activeSlot = {};
+    this._activeSlot[PLAYER_ID] = this.playerActiveSlot.getComponent("BattleSlot");
+    this._activeSlot[OPPONENT_ID] = this.opponentActiveSlot.getComponent("BattleSlot");
+    //Init Trainer
+    this._trainer = {};
+    this._trainer[PLAYER_ID] = this.playerTrainer.getComponent("Trainer");
+    this._trainer[OPPONENT_ID] = this.opponentTrainer.getComponent("Trainer");
+
+
     //Listeners
     this.cancelSelectBtn.node.on("click", this.onTouchCancel, this);
     this.selectBtn.node.on("click", this.onTouchSelect, this);
@@ -42,7 +57,9 @@ cc.Class({
 
   },
   //Method
-  showSelectabledUIs: function (cardId, selectData) {
+  showSelectabledUIs: function (selectData, cardId, player) {//Opt: player
+    //Check player parameter
+    if (!player) player = this.gm.getCurrentPlayer();
     //On selecting
     this._onSelecting = true;
     this._needSelectedNum = selectData.selectNum | 0;
@@ -51,96 +68,90 @@ cc.Class({
     //Show notifier
     this.notifier.notify("SELECT ", this._needSelectedNum);
     //Enabled drop other cards
-    this.gm.getPlayer().enableDrop(false);
-    //Show cancel btn
-    this.cancelSelectBtn.node.active = true;
-    this.selectBtn.node.active = true;
-    this.endTurnBtn.node.active = false;
-    //cc.log("show_select",JSON.stringify(selectData));
+    this.gm.getPlayerWithId(player.getId()).enableDrop(false);
+    //Top UI show
+    this.topUI.showUIonSelecting()
+
+    //Log
+    cc.log(this.LOG_TAG, "SHOW_SELECTION", JSON.stringify(selectData));
+    //Process Select Data
     switch (selectData.type) {
-      case SELECTION.TYPE.PLAYER_EMPTY_ACTIVE: {//Find empty active slot
-        var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
+      //--DESCRIPTION: FIND ACTIVE SLOT OF PLAYER OR OPPONENT
+      case SELECTION.TYPE.PLAYER_EMPTY_ACTIVE: {
+        var battleSlot = this._activeSlot[player.getId()];
         //Listen to events
-        this.playerActiveSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-        battleSlotScr.showSelectableUI();
-        return true;
-      };
+        battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+        battleSlot.showSelectableUI();
         break;
-      case SELECTION.TYPE.PLAYER_EMPTY_BENCH: {  //Find n empty bench slot
+      };
+      //--END--
+      //--DESCRIPTION: FIND FIRST EMPTY SLOT ON BENCH
+      case SELECTION.TYPE.PLAYER_EMPTY_BENCH: {
         var numSlotNeedSelect = selectData.selectNum;
         if (numSlotNeedSelect < 1) return false;
         var numFound = 0;
-        for (var battleSlot of this.playerBench) {
+        for (var battleSlot of this._bench[player.getId()]) {
           //Listen to events
-          battleSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-          var battleSlotScr = battleSlot.getComponent("BattleSlot");
-          if (!battleSlotScr.hasPokemon()) {
-            battleSlotScr.showSelectableUI();
+          battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+          if (!battleSlot.hasPokemon()) {
+            battleSlot.showSelectableUI();
             numFound++;
             if (numFound == numSlotNeedSelect) return true;
           }
         }
-      };
         break;
+      };
       case SELECTION.TYPE.PLAYER_ALL_PKM: {
-        cc.log("show_select");
         //Active slot
-        var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
-        this.playerActiveSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-        battleSlotScr.showSelectableUI();
+        var battleSlot = this._activeSlot[player.getId()];
+        battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+        battleSlot.showSelectableUI();
         //Bench slots
-        for (var battleSlot of this.playerBench) {
-          var battleSlotScr = battleSlot.getComponent("BattleSlot");
-          if (battleSlotScr.hasPokemon()) {
-            battleSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-            battleSlotScr.showSelectableUI();
+        for (var battleSlot of this._bench[player.getId()]) {
+          if (battleSlot.hasPokemon()) {
+            battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+            battleSlot.showSelectableUI();
           }
         }
-        return true;
-      };
         break;
+      };
       case SELECTION.TYPE.ALL_PKM_TO_EVOLVE: {
-        cc.log("show_select");
         //Active slot
-        var battleSlotScr = this.playerActiveSlot.getComponent("BattleSlot");
-        if (battleSlotScr.hasPokemon() && battleSlotScr.hasPokemonToEvolve(cardId, this.gm.getCurrentTurn())) {
+        var battleSlot = this._activeSlot[player.getId()];
+        if (battleSlot.hasPokemon() && battleSlot.hasPokemonToEvolve(cardId, this.gm.getCurrentTurn())) {
           //Listen to events
-          this.playerActiveSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-          battleSlotScr.showSelectableUI();
+          battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+          battleSlot.showSelectableUI();
         }
         //Bench slots
-        for (var battleSlot of this.playerBench) {
-          var battleSlotScr = battleSlot.getComponent("BattleSlot");
-          if (battleSlotScr.hasPokemon() && battleSlotScr.hasPokemonToEvolve(cardId, this.gm.getCurrentTurn())) {
-            battleSlot.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-            battleSlotScr.showSelectableUI();
+        for (var battleSlot of this._bench[player.getId()]) {
+          if (battleSlot.hasPokemon() && battleSlot.hasPokemonToEvolve(cardId, this.gm.getCurrentTurn())) {
+            battleSlot.node.on(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+            battleSlot.showSelectableUI();
           }
         }
-      };
         break;
+      };
     }
 
   },
   hideSelectableUIs: function () {
     //On not selecting 
     this._onSelecting = false;
-    //Hide cancel btn
-    this.cancelSelectBtn.node.active = false;
-    this.selectBtn.node.active = false;
-    if (this.gm.isPlayerTurn()) {
-      this.endTurnBtn.node.active = true;
-      this.gm.getPlayer().enableDrop(true);
+    //TopUI hide
+    this.topUI.hideUIonShowSelecting();
+    //Enable Drop
+    this.gm.getCurrentPlayer().enableDrop(true); //Can drop after select
+    for (var i = PLAYER_ID; i <= OPPONENT_ID; i++) {
+      for (var battleSlot of this._bench[i]) {
+        battleSlot.node.off(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
+        battleSlot.hideSelectableUI();
+        battleSlot.hideSelectedIndex();
+      }
+      this._activeSlot[i].hideSelectableUI();
+      this._activeSlot[i].hideSelectedIndex();
+      this._activeSlot[i].node.off(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
     }
-    for (var battleSlot of this.playerBench) {
-      var battleSlotScr = battleSlot.getComponent("BattleSlot");
-      battleSlot.off(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-      battleSlotScr.hideSelectableUI();
-      battleSlotScr.hideSelectedIndex();
-    }
-    this.playerActiveSlot.getComponent("BattleSlot").hideSelectableUI();
-    this.playerActiveSlot.getComponent("BattleSlot").hideSelectedIndex();
-    this.playerActiveSlot.off(CONST.BATTLE_SLOT.ON_SLOT_SELECTED, this.onSlotSelected, this);
-
   },
   _getSelectedCallback: function (selectData, cardId, battleSlot) {
     var retCb;
@@ -215,18 +226,22 @@ cc.Class({
     }
   },
   //Check
-  playerHasActivePkm: function () {
-    return this.playerActiveSlot.getComponent("BattleSlot").hasPokemon();
+  hasActivePkm: function (player) {
+    return this._activeSlot[player.getId()].hasPokemon();
   },
   //Get and Set
   getPlayerTrainer: function () { return this.playerTrainer; },
   getPlayerBench: function () { },
   getPlayerActiveSlot: function () { return this.playerActiveSlot; },
+  getActiveSlotOf: function (id) { return this._activeSlot[id]; },
   //Actions
-  summonPokemon: function (battleSlot, cardId) {
-    cc.log("SUMMON_A_POKEMON");
-    var trainer = this.playerTrainer.getComponent("Trainer");
-     //Set up data
+  summonPokemon: function (battleSlot, cardId, player) { //Opt: player
+    //Check player parameter
+    if (!player) player = this.gm.getCurrentPlayer();
+    //Log
+    cc.log(this.LOG_TAG, player.getId(), "SUMMON_A_POKEMON", JARVIS.getCardName(cardId));
+    var trainer = this._trainer[player.getId()];
+    //Set up data
     battleSlot.setHasPkm(true);
     battleSlot.setInPlayTurn(this.gm.getCurrentTurn());
     battleSlot.setPkmCardId(cardId);
@@ -238,8 +253,10 @@ cc.Class({
     //Turn off selected
     this.hideSelectableUIs();
   },
-  evolvePokemon: function (battleSlot, cardId) {
+  evolvePokemon: function (battleSlot, cardId, player) {//Opt: player
     cc.log("EVOLVE_POKEMON");
+    //Check player parameter
+    if (!player) player = this.gm.getCurrentPlayer();
     var cardEvolved = cardId;
     var cardToEvolve = battleSlot.getCardPokemonId();
     //Set up data
@@ -251,7 +268,7 @@ cc.Class({
     //Turn off selected
     this.hideSelectableUIs();
   },
-  attachEnergy: function(battleSlot, cardId){
+  attachEnergy: function (battleSlot, cardId) {
     cc.log("ATTACH_ENERGY");
     //Set up data
     this.gm.getCurrentPlayer().setDroppedEnergy(true);
@@ -261,18 +278,15 @@ cc.Class({
     //Turn off selected
     this.hideSelectableUIs();
   },
-  attackOppActive: function(){
+  attackOppActive: function () {
     var atkingSlot, atkedSlot;
-    
-   
-    if(this.gm.getCurrentPlayer().sameId(1)){//player attack
-      atkingSlot = this._activeSlot[1].getComponent("BattleSlot");
-      atkedSlot = this._activeSlot[2].getComponent("BattleSlot");
-    }else{ //Opponent attack
-      atkingSlot = this._activeSlot[2].getComponent("BattleSlot");
-      atkedSlot = this._activeSlot[1].getComponent("BattleSlot");
+    if (this.gm.getCurrentPlayer().sameId(1)) {//player attack
+      atkingSlot = this._activeSlot[PLAYER_ID];
+      atkedSlot = this._activeSlot[OPPONENT_ID];
+    } else { //Opponent attack
+      atkingSlot = this._activeSlot[OPPONENT_ID];
+      atkedSlot = this._activeSlot[PLAYER_ID];
     }
-    cc.log("test_atk_slot",atkingSlot, atkedSlot);
     atkingSlot.attackOppActivePkm(atkedSlot, 20);
   }
 });
