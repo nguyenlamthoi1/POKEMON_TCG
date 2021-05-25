@@ -3,40 +3,55 @@
     "id": "energy_0",
     "category": "Energy",
     "energyType": "fire",
-    "name": "Energy",
-    "smallCardUrl": "SmallEnergy/fireEnergy",
-    "smallScale": 0.5
+    "name": "Fire Energy",
+    "smallCardUrl": "BetterEnergy/fire_energy_icon",
+    "smallScale": 0.5,
+    "energy":{
+      "fire" : 1
+    }
   },
   "energy_1":{
     "id": "energy_1",
     "category": "Energy",
     "energyType": "water",
-    "name": "Energy",
-    "smallCardUrl": "SmallEnergy/waterEnergy",
-    "smallScale": 0.5
+    "name": "Water Energy",
+    "smallCardUrl":  "BetterEnergy/water_energy_icon",
+    "smallScale": 0.5,
+    "energy":{
+      "water" : 1
+    }
   },
   "energy_2":{
     "id": "energy_2",
     "category": "Energy",
     "energyType": "grass",
-    "name": "Energy",
-    "smallCardUrl": "SmallEnergy/grassEnergy",
-    "smallScale": 0.5
+    "name": "Grass Energy",
+    "smallCardUrl": "BetterEnergy/grass_energy_icon",
+    "smallScale": 0.5,
+    "energy":{
+      "grass" : 1
+    }
   },
   "energy_3":{
     "id": "energy_3",
     "category": "Energy",
     "energyType": "electric",
-    "name": "Energy",
-    "smallCardUrl": "SmallEnergy/electricEnergy",
-    "smallScale": 0.5
+    "name": "Electric Energy",
+    "smallCardUrl": "BetterEnergy/electric_energy_icon",
+    "smallScale": 0.5,
+    "energy":{
+      "electric": 1
+    }
   },
   "energy_4":{
     "id": "energy_4",
     "category": "Energy",
     "energyType": "normal",
-    "name": "Energy",
-    "smallCardUrl": "SmallEnergy/normalEnergy",
-    "smallScale": 0.5
+    "name": "Normal Energy",
+    "smallCardUrl": "BetterEnergy/normal_energy_icon",
+    "smallScale": 0.5,
+    "energy":{
+      "normal" : 1
+    }
   }
 }

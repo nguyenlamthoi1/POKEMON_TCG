@@ -16,8 +16,8 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
-        "actions":{
-          "A0":{
+        "actions": {
+          "A0": {
             "valueType": 0,
             "value": 20
           }
@@ -30,8 +30,8 @@
         "des": ""
       }
     },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
       }
     }
@@ -54,6 +54,12 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 30
+          }
+        },
         "name": "Vine Whip",
         "cost": {
           "grass": 1,
@@ -66,14 +72,14 @@
         "moveId": "M0",
         "name": "Poison Powder",
         "cost": {
-         "grass": 3
+          "grass": 3
         },
         "value": "20",
         "des": ""
       }
     },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
       }
     }
@@ -96,16 +102,22 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 80
+          }
+        },
         "name": "Solar Beam",
         "cost": {
           "grass": 4
         },
-        "value": "60",
+        "value": "80",
         "des": ""
       }
     },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1
       }
     }
@@ -127,6 +139,12 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 10
+          }
+        },
         "name": "Scratch",
         "cost": {
           "normal": 1
@@ -136,6 +154,12 @@
       },
       "1": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 20
+          }
+        },
         "name": "Ember",
         "cost": {
           "fire": 1,
@@ -145,18 +169,8 @@
         "des": ""
       }
     },
-    "1": {
-      "moveId": "M0",
-      "name": "Ember",
-      "cost": {
-        "fire": 1,
-        "normal": 1
-      },
-      "value": 10,
-      "des": ""
-    },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
       }
     }
@@ -179,6 +193,12 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 30
+          }
+        },
         "name": "Slash",
         "cost": {
           "fire": 1,
@@ -189,16 +209,22 @@
       },
       "1": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 40
+          }
+        },
         "name": "Flame Thrower",
         "cost": {
           "fire": 3
         },
-        "value": "50",
+        "value": "40",
         "des": ""
       }
     },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
       }
     }
@@ -221,6 +247,12 @@
     "moveInfo": {
       "0": {
         "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 100
+          }
+        },
         "name": "Fire Spin",
         "cost": {
           "fire": 4
@@ -229,8 +261,8 @@
         "des": ""
       }
     },
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1
       }
     }
@@ -248,11 +280,27 @@
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/007",
     "bigPokemonUrl": "BigPokemon/007",
-    
     "bigScale": 0.08,
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
+      }
+    },
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 10
+          }
+        },
+        "name": "Bubble",
+        "cost": {
+          "water": 1
+        },
+        "value": "10",
+        "des": ""
       }
     }
   },
@@ -271,9 +319,27 @@
     "smallCardUrl": "SmallPokemon/008",
     "bigPokemonUrl": "BigPokemon/008",
     "bigScale": 0.1,
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1.5
+      }
+    },
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 40
+          }
+        },
+        "name": "Bite",
+        "cost": {
+          "water": 1,
+          "normal": 2
+        },
+        "value": "40",
+        "des": ""
       }
     }
   },
@@ -292,27 +358,26 @@
     "smallCardUrl": "SmallPokemon/009",
     "bigPokemonUrl": "BigPokemon/009",
     "bigScale": 0.2,
-    "cardInfo":{
-      "small":{
+    "cardInfo": {
+      "small": {
         "imgScale": 1
       }
-    }
-  },
-  "10": {
-    "id": 9,
-    "pkdId": 9,
-    "category": "Item",
-    "name": "Blastoise",
-    "type": {
-      "0": "water"
     },
-    "stage": 3,
-    "evolveFrom": 8,
-    "smallCardUrl": "SmallPokemon/009",
-    "bigScale": 0.2,
-    "cardInfo":{
-      "small":{
-        "imgScale": 1.5
+    "moveInfo": {
+      "0": {
+        "moveId": "M0",
+        "actions": {
+          "A0": {
+            "valueType": 0,
+            "value": 80
+          }
+        },
+        "name": "Hydro Pump",
+        "cost": {
+          "water": 1
+        },
+        "value": "80",
+        "des": ""
       }
     }
   }

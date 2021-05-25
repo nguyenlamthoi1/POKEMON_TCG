@@ -133,7 +133,7 @@ cc.Class({
     },
     _onUsedMove: function(event){
         if(this._isShowInfo) return;
-        //if(!this.gm.canUseMove(this.player, {moveIdx: event.moveIdx, moveData: event.move}, this._fromSlot)) return;
+        if(!this.gm.canUseMove(this.player, {moveIdx: event.moveIdx, moveData: event.move}, this._fromSlot)) return;
 
         if(this._isCanUseMove){
             cc.log("top_ui_process_move",JSON.stringify(event.move));

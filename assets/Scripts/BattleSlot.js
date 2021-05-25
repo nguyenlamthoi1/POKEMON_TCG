@@ -57,8 +57,7 @@ cc.Class({
         this._energy = {};
         this._selected = false;
         this._counterDmg = 0;
-        this._hp = 100;
-        this.hpText = "100/100";
+        this._hp = 0;
         //  Energy data
         this._energyIcons = []; this._energyIcons.push(this.energyPanel.getChildByName("EnergyIcon"));
 
@@ -226,7 +225,6 @@ cc.Class({
     attackOppActivePkm: function (oppSlot, dmg) {
         cc.log("start_atk_opp", oppSlot);
         var delta = oppSlot.node.position.sub(this.node.position);
-        cc.log("test_delta", JSON.stringify(delta));
 
         //Switch parent and modify zOrder to show correctly
         var fromPos = Utils.getLocalPosition(this.pokemonSprite.node, oppSlot.node);
@@ -380,15 +378,15 @@ cc.Class({
     },
     setNewCard: function (cardId) {
         var cardData = JARVIS.getCardData(cardId);
-        cc.log("test_new_card", JSON.stringify(cardData));
+        cc.log(this.LOG_TAG, "SET_NEW_CARD", JSON.stringify(cardData));
         if (cardData.category == CONST.CARD.CAT.PKM) {
             this._containedCardIds.push(cardId);
-            cc.log(this.LOG_TAG, "ADD_CARD_POKEMON_ID", this._containedCardIds);
             this._hp = cardData.hp;
-            //this.hpBar.active = true;
-            this.hpText.string = (this._hp - this._counterDmg * 10) + "/" + cardData.hp;
+            this.hpText.string = (this._hp - this._counterDmg * 10) + "/" + this._hp;
             var pg = (this._hp - this._counterDmg * 10) / this._hp;
             cc.tween(this.hpBar.getComponent(cc.ProgressBar)).to(0.5, { progress: pg }).start();
+            //cc.log(this.LOG_TAG, "ADD_CARD_POKEMON_ID",this._hp , this._counterDmg, JARVIS.getCardName(cardId),(this._hp - this._counterDmg * 10) + "/" + this._hp);
+
         } else {
             if (cardData.category == CONST.CARD.CAT.ENERGY) {
                 if (this._energy[cardData.energyType] == undefined) {

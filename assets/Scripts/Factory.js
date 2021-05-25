@@ -146,7 +146,7 @@ Processor = cc.Class({
             cc.log("listen_event", cardId);
             this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_CANCEL, this.onCardCancel, this);
             this.gm.node.once(CONST.GAME_PHASE.ON_SELECT_DONE, this.onSelectDone, this);
-            battleAreaScr.showSelectabledUIs(cardId, selectData);
+            battleAreaScr.showSelectabledUIs(selectData,cardId);
         }
         this.selectData = selectData;
 
@@ -272,7 +272,6 @@ var ActionProcessor = cc.Class({
             //     }
             // }
         }
-
         this._processActionInQueue(); //Start process from the first action and wait
 
     },
@@ -283,7 +282,7 @@ var ActionProcessor = cc.Class({
             this._isProcActionFinished = false; //we start processing new action
             switch (action.id) {
                 case GAME_ACTION.ATTACK_OPP_ACTIVE_POKEMON: {
-                    this.battleArea.attackOppActive();
+                    this.battleArea.attackOppActive(action.data);
                     break;
                 }
             }

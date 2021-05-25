@@ -278,15 +278,17 @@ cc.Class({
     //Turn off selected
     this.hideSelectableUIs();
   },
-  attackOppActive: function () {
+  attackOppActive: function (moveData) {
+    cc.log("ATK_ACTIVE", JSON.stringify(moveData));
     var atkingSlot, atkedSlot;
-    if (this.gm.getCurrentPlayer().sameId(1)) {//player attack
+    this.gm.getCurrentPlayer().enableUseMove(false);
+    if (this.gm.getCurrentPlayer().sameId(PLAYER_ID)) {//player attack
       atkingSlot = this._activeSlot[PLAYER_ID];
       atkedSlot = this._activeSlot[OPPONENT_ID];
     } else { //Opponent attack
       atkingSlot = this._activeSlot[OPPONENT_ID];
       atkedSlot = this._activeSlot[PLAYER_ID];
     }
-    atkingSlot.attackOppActivePkm(atkedSlot, 20);
+    atkingSlot.attackOppActivePkm(atkedSlot, moveData.value);
   }
 });

@@ -149,14 +149,17 @@ cc.Class({
         this.turnCount++;
 
         //Set up data for current player
-        //this.currentTurnPlayer.setDroppedEnergy(false);
+        this.currentTurnPlayer.setDroppedEnergy(false);
+        this.nextTurnPlayer.setDroppedEnergy(true);
 
         //Player can drop
         this.player[PLAYER_ID].enableDrop(this.player[PLAYER_ID].sameId(this.currentTurnPlayer.getId())); //Player can drop or not
         this.player[OPPONENT_ID].enableDrop(this.player[OPPONENT_ID].sameId(this.currentTurnPlayer.getId()));
         
         //Player can use move
-        //this.player[1].enableUseMove(this.player[1].sameId(this.currentTurnPlayer.getId()));
+        this.player[PLAYER_ID].enableUseMove(this.player[PLAYER_ID].sameId(this.currentTurnPlayer.getId()));
+        this.player[OPPONENT_ID].enableUseMove(this.player[OPPONENT_ID].sameId(this.currentTurnPlayer.getId()));
+
 
         //Start play phase if start phase is done
         if (this.isPhase(CONST.GAME_PHASE.START) && this.turnCount == 2) {//If we pass 2 set up active pkm turn then start play phase
