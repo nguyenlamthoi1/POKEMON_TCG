@@ -61,3 +61,6 @@ window.SELECTION = {
     }
 };
 
+window.RULES = {
+    NUM_CARD_IN_DECK: 10
+}

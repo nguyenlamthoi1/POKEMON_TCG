@@ -13,6 +13,7 @@ cc.Class({
         cardImg: cc.Sprite,
         cardTitleText: cc.Label,
         cardTypeText: cc.Label,
+        stackNum: cc.Label,
         cardContainer: cc.Sprite,
          //Evolution UI
         evolutionIcon: cc.Sprite,
@@ -29,11 +30,14 @@ cc.Class({
         failedEnergySF: cc.SpriteFrame
        
     },
-    init: function(data, idxInHand, dropChecker, handUI, cardId){
+    init: function(data, idxInHand, dropChecker, handUI, cardId, haveListeners){
         cc.log("INIT_CARD", idxInHand, cardId, JSON.stringify(data));
         this.cardId = cardId;
-        this.handUI = handUI;
-        this.owner = handUI.player;
+        if(handUI){
+            this.handUI = handUI;
+            this.owner = handUI.player;
+        }
+       
         this.dropChecker = dropChecker;
         this.idxInHand = idxInHand;
         this.data = data;
@@ -50,13 +54,15 @@ cc.Class({
         
         
         //Listeners
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
-        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
-        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
-        //this.node.on(CONST.EVENT.ON_TOUCH_HOLD, this.onTouchHold, this);
-        this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
-        this._isDroppable = this.handUI.player.isDropEnabled();
+        if(haveListeners){
+            this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
+            this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
+            this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
+            this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
+            //this.node.on(CONST.EVENT.ON_TOUCH_HOLD, this.onTouchHold, this);
+            this.handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
+            this._isDroppable = this.handUI.player.isDropEnabled();
+        }
     },
     _initPkmCard:function(data){
         //Card name
@@ -90,7 +96,7 @@ cc.Class({
             this.types[typeKey].active = true;
             this.types[typeKey].getComponent(cc.Sprite).spriteFrame = this._getTypeFrame(data.type[typeKey]);
         }
-        
+        this.stackNum.string = 1;
     },
     _initEnergyCard: function(data){
         //Card name
@@ -306,6 +312,9 @@ cc.Class({
     },
     backOldPosition: function(){
         this.node.position = this._oldPos;
-    }
-    
+    },
+    getId: function(){return this._cardId;},
+
+    setStackNumber: function(num){this.stackNum.string = num;},
+    setStackNumberEnabled: function(enabled){this.stackNum.node.active = enabled;}
 });

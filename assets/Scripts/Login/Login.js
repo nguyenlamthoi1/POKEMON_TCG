@@ -9,14 +9,22 @@ cc.Class({
 
     properties: {
         startGameBtn: cc.Button,
+        deckBtn: cc.Button,
+
         loadingUI: cc.Node,
+        deckUI: cc.Node
     },
     onLoad () {
         this.LOG_TAG = "LOGIN_SCENE";
-        this.startGameBtn.node.on("click", this.onTouchStartBtn, this);
         this.loadingBall = this.loadingUI.getChildByName("LoadingBall");
         this.showLoading();
         this.init();
+        //Turn off UI
+        this.deck = this.deckUI.getComponent("DeckUI"); this.deck.init();
+        this.deckUI.active = false;
+        //Listeners
+        this.startGameBtn.node.on("click", this.onTouchStartBtn, this);
+        this.deckBtn.node.on("click", this.onTouchDeckBtn, this);
     },
     init: function(){
         //Create Global variables
@@ -89,6 +97,11 @@ cc.Class({
        };
        this.schedule(checkAllLoaded, interval);
     //    this.schedule(function(){cc.log("SCHEDULE_2")}, interval);
+    },
+    onTouchDeckBtn: function(){
+        cc.log(this.LOG_TAG, "select_deck");
+        this.deckUI.active = true;
+        this.deck.showUI();
     },
     showLoading: function(){
         this.loadingUI.active = true;

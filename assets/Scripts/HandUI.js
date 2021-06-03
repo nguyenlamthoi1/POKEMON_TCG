@@ -139,7 +139,7 @@ cc.Class({
             case CONST.CARD.CAT.PKM: {
                 cc.log("TEST_INIT_CARD_PKM");
                 cardUI = cc.instantiate(this.cardTemplate);
-                cardUI.getComponent("SmallPokemonCard").init(cardData, this.cardIdOnHand.length, this.dropChecker, this, cardId);
+                cardUI.getComponent("SmallPokemonCard").init(cardData, this.cardIdOnHand.length, this.dropChecker, this, cardId, true);
 
                 break;
             }
@@ -147,7 +147,7 @@ cc.Class({
             case CONST.CARD.CAT.ENERGY: {
                 cc.log("TEST_INIT_CARD_ENERGY");
                 cardUI = cc.instantiate(this.energyCardTemplate);
-                cardUI.getComponent("SmallEnergyCard").init(cardData, this.cardIdOnHand.length, this.dropChecker, this, cardId);
+                cardUI.getComponent("SmallEnergyCard").init(cardData, this.cardIdOnHand.length, this.dropChecker, this, cardId, true);
                 break;
             }
                 break;

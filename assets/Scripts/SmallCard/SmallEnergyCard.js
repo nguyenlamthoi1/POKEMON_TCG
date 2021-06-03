@@ -8,6 +8,7 @@ cc.Class({
         cardImg: cc.Sprite,
         //Labels
         cardTitle: cc.Label,
+        stackNum: cc.Label,
         //Other
         energyPanel: cc.Node,
         energyIcon: [cc.Sprite],
@@ -16,11 +17,14 @@ cc.Class({
         cardSmallBgSF: [cc.SpriteFrame],
         cardImgSF: [cc.SpriteFrame],
     },
-    init: function (data, idxInHand, dropChecker, handUI, cardId) {
+    init: function (data, idxInHand, dropChecker, handUI, cardId, haveListeners) {
         cc.log("INIT_CARD_ENERGY", idxInHand, cardId, this.idxInHand,JSON.stringify(data));
         this._cardId = cardId;
-        this._handUI = handUI;
-        this._owner = handUI.player;
+        if(this.handUI){
+            this._handUI = handUI;
+            this._owner = handUI.player;
+        }
+       
         this._data = data;
         this._category = data.category;
 
@@ -30,13 +34,15 @@ cc.Class({
         this._initEnergyCard(data);
 
         //Listeners
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
-        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
-        this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
-        //this.node.on(CONST.EVENT.ON_TOUCH_HOLD, this.onTouchHold, this);
-        this._handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
-        this._isDroppable = this._handUI.player.isDropEnabled();
+        if(haveListeners){
+            this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchCardStart, this);
+            this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchCardEnd, this);
+            this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCardCancel, this);
+            this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchCardMove, this);
+            //this.node.on(CONST.EVENT.ON_TOUCH_HOLD, this.onTouchHold, this);
+            this._handUI.player.registerEvent("droppable-changed", this.onCanDropChanged, this);
+            this._isDroppable = this._handUI.player.isDropEnabled();
+        }
     },
     _initEnergyCard: function (data) {
         cc.log("INIT_ENERGY_CARD", JSON.stringify(data));
@@ -70,6 +76,7 @@ cc.Class({
                 foundEnergySprite.spriteFrame = this._getCardImgSF(energyKey);
             } 
         }
+        this.stackNum.string = 1;
     },
     _getCardImgSF:  function (type) {
         switch (type) {
@@ -211,6 +218,8 @@ cc.Class({
     },
     backOldPosition: function () {
         this.node.position = this._oldPos;
-    }
-
+    },
+    getId: function(){return this._cardId;},
+    setStackNumber: function(num){this.stackNum.string = num;},
+    setStackNumberEnabled: function(enabled){this.stackNum.node.active = enabled;}
 });
