@@ -1,13 +1,24 @@
 window.SERVER = {
-    Data: null
+    CARD_MGR: null,
+    PLAYER_MGR: null,
+    GATE: null,
 };
+window.LOCAL_SERVER = null;
+
 cc.Class({
     extends: cc.Component,
     properties: {
         loadingTxt: cc.Label,
         loadingUI: cc.Node,
+        //Server Gate
+        serverConntectionGate: cc.Node
     },
     onLoad: function(){
+
+        //Keep this node after scene switching
+        cc.game.addPersistRootNode(this.node);
+
+        LOCAL_SERVER = this;
         //variables
         this.LOG_TAG = "[SV]";
         //--
@@ -17,11 +28,13 @@ cc.Class({
         //  -   Data Manager
         SERVER.CARD_MGR = new CardDataManager(); SERVER.CARD_MGR.init();
         SERVER.PLAYER_MGR = new PlayerDataManager(); SERVER.PLAYER_MGR.init();
+        SERVER.GATE = this.node.getChildByName("ServerGate").getComponent("ServerGate"); SERVER.GATE.init();
         //--
   
         //Load Data
         this.showLoadingUI();
         this.loadData();
+
         
     },
     loadData: function(){
@@ -35,7 +48,7 @@ cc.Class({
                //End Loading UI
                this.hideLoadingUI();
                //New Scene
-               //cc.director.loadScene("Login");
+               cc.director.loadScene("Login");
             }.bind(this)
         );
     },
@@ -80,5 +93,5 @@ cc.Class({
     },
     hideLoadingUI: function(){
         this.loadingUI.active = false;
-    }
+    },
 });

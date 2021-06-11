@@ -7,6 +7,9 @@ window.POKEMON = {
 }
 window.CONST = {
     EVENT: {
+        //Network
+        ON_CONNECT: "onconnect",
+        //UI
         TOUCH_HOLD: "ontouchhold",
         DOUBLE_TOUCH: "ondoubletouch",
         SHORT_CLICK: "shorclick"
@@ -64,3 +67,4 @@ window.SELECTION = {
 window.RULES = {
     NUM_CARD_IN_DECK: 10
 }
+

@@ -4,6 +4,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        clientId: "client_1",
         svAll: cc.Node,
         svSelected: cc.Node,
         touchArea: cc.Node,
@@ -14,10 +15,13 @@ cc.Class({
         smallEnergyCardTemplate: cc.Prefab,
         //Label
         numCardInDeck: cc.Label,
+        notiText: cc.Label,
+        //Button
+        saveBtn: cc.Button
     },
     init: function () {
         this.LOG_TAG = "[DECK]";
-
+        this._client = CLIENT_MGR.getClient(this.clientId);
         this._cardUI = [];
         this._selectedCard = {}; //your Deck
         this._selectedCardNum = 0; //num card in deck
@@ -27,24 +31,27 @@ cc.Class({
         this._initScrollView(this.svAll);
         this._initScrollView(this.svSelected);
         this.background.on(cc.Node.EventType.TOUCH_START, this._onTouchExit, this);
+        //Init Event
+        this.saveBtn.node.on("click", this._onTouchSaveBtn, this);
     },
-    showUI: function () {
-        this.deckList = {
-            "1": 9,
-            "2": 9,
-            "3": 9,
-            "4": 9,
-            "5": 9,
-            "6": 9,
-            "7": 9,
-            "8": 9,
-            "9": 9,
-            "energy_0": 9,
-            "energy_1": 9,
-            "energy_2": 9,
-            "energy_3": 9,
-            "energy_4": 9
-        };
+    showUI: function (deckList) {
+        this.deckList = deckList;
+        // this.deckList = {
+        //     "1": 9,
+        //     "2": 9,
+        //     "3": 9,
+        //     "4": 9,
+        //     "5": 9,
+        //     "6": 9,
+        //     "7": 9,
+        //     "8": 9,
+        //     "9": 9,
+        //     "energy_0": 9,
+        //     "energy_1": 9,
+        //     "energy_2": 9,
+        //     "energy_3": 9,
+        //     "energy_4": 9
+        // };
         this._loadAllScrollView(this.deckList);
     },
     _loadAllScrollView: function (deckList) {
@@ -229,6 +236,20 @@ cc.Class({
         if (this.viewW * (this.idxAllScrolling) < scrollView.getMaxScrollOffset().x) this.idxAllScrolling++;
         scrollView.scrollToOffset(cc.v2(this.viewW * this.idxAllScrolling, 0), 2);
     },
+    _onTouchSaveBtn: function(){
+        if (this._checkSave()){
+            cc.log("JSON_test",JSON.stringify(this.deckList));
+            this._client.sendPackage(NW_REQUEST.CMD_SAVE_DECK, {deck: JSON.parse(JSON.stringify(this.deckList))});
+        }
+    },
+    _checkSave: function(){
+        if (this._selectedCardNum <RULES.NUM_CARD_IN_DECK){
+            this.notify("NOT ENOUGH CARD", 0, false);
+            return false;
+        }
+        return true;
+    },
+
     //--
     //Callbacks For Small Card
     _onTouchSmallCard: function (cardUI, touchEvent) {
@@ -291,5 +312,12 @@ cc.Class({
         }
 
         this.node.active = false;
-    }
+    },
+    //Utils
+    notify: function(text, delay, turnOff){
+        this.notiText.node.active = true;
+        this.notiText.string = text;
+        if(turnOff)
+            this.scheduleOnce(function(){this.notiText.node.active = false;}.bind(this), delay);
+    },
 });

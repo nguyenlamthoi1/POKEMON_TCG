@@ -55,6 +55,7 @@ CardDataManager = cc.Class({
     //Set
     //Check
     isBasicPokemonCard: function (cardId) {
-        return this.cardInfo[cardId].category == CONST.CARD.CAT.PKM && this.cardInfo[cardId].stage == CONST.CARD.STAGE.BASIC;
-    }
+       return this.cardInfo[cardId].category == CONST.CARD.CAT.PKM && this.cardInfo[cardId].stage == CONST.CARD.STAGE.BASIC;
+    },
+    
 });

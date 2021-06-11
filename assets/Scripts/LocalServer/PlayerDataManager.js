@@ -3,7 +3,26 @@ SvPlayer = cc.Class({
         this._id = id;
         this._playerInfo = playerInfo;
     },
-    getId: function(){return this._id;}
+    //Get
+    getId: function(){return this._id;},
+    getPlayerInfoClone: function(){return JSON.parse(JSON.stringify(this._playerInfo));},
+    //Check
+    isRightLogin: function(username, password){
+        if (this._playerInfo.username != username) return ERROR_TYPE.LOGIN.WRONG_USERNAME;
+        else if(this._playerInfo.password != password) return ERROR_TYPE.LOGIN.WRONG_PASSWORD;
+        return ERROR_TYPE.SUCCESS;
+    },
+    
+    login: function(clientGate){
+        this._online = true;
+        this._inGame = false;
+        this._clientGate = clientGate;
+    },
+    //Save
+    saveDeck: function(deck){
+        this._deck = deck;
+    }
+    
 });
 PlayerDataManager = cc.Class({
     ctor: function () {
@@ -46,5 +65,7 @@ PlayerDataManager = cc.Class({
         }
 
     },
-    
+    getPlayer: function(id){
+        return this._player[id];
+    }
 });
