@@ -57,7 +57,7 @@ cc.Class({
 
   },
   //Method
-  showSelectabledUIs: function (selectData, cardId, player) {//Opt: player
+  v: function (selectData, cardId, player) {//Opt: player
     //Check player parameter
     if (!player) player = this.gm.getCurrentPlayer();
     //On selecting

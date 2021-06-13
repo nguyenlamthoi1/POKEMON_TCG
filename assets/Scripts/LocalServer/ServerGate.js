@@ -32,7 +32,7 @@ cc.Class({
         this.node.emit(NW_REQUEST.CONNECT_TO_SERVER, pkg)
     },
     _onRecvPackageFromClient: function(pkg){
-        cc.log(this.LOG_TAG, "[RECV_PACKAGE]", JSON.stringify(pkg.data));
+        cc.log(this.LOG_TAG, "[RECV_PACKAGE]", JSON.stringify(pkg.cmd), JSON.stringify(pkg.data));
         //Parse to command
         //Package is object {cmd: 1000, data: {}}
         var cmdId = pkg.cmd;
@@ -41,6 +41,7 @@ cc.Class({
                 {
                     var player = SERVER.PLAYER_MGR.getPlayer(pkg.client.username);
                     var client =pkg.client.client;
+                    player.setClient(client);
                     var clientPkg = {
                         cmd: cmdId,
                         data: {
@@ -67,6 +68,14 @@ cc.Class({
                         client.onReceivePackageFromServer(clientPkg);
                     }
                     break;
+                case NW_REQUEST.CMD_FIND_GAME:
+                    {
+                        var player = SERVER.PLAYER_MGR.getPlayer(pkg.client.username);
+                        SERVER.ROOM_MGR.findPlayRoom(player);
+                        
+                    }
+                    break;
+                
             
         }
 

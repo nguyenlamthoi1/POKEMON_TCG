@@ -2,22 +2,31 @@ SvPlayer = cc.Class({
     init: function(id, playerInfo){
         this._id = id;
         this._playerInfo = playerInfo;
+        this._room = null;
     },
     //Get
     getId: function(){return this._id;},
     getPlayerInfoClone: function(){return JSON.parse(JSON.stringify(this._playerInfo));},
+    getClient: function(){return this._client;},
     //Check
     isRightLogin: function(username, password){
         if (this._playerInfo.username != username) return ERROR_TYPE.LOGIN.WRONG_USERNAME;
         else if(this._playerInfo.password != password) return ERROR_TYPE.LOGIN.WRONG_PASSWORD;
         return ERROR_TYPE.SUCCESS;
     },
-    
+    isInRoom: function(){return this._room != undefined;},
+    //Set
+    setRoom: function(room){
+        this._room = room;
+    },
+    setClient: function(client){ this._client = client;},
+    //Network
     login: function(clientGate){
         this._online = true;
         this._inGame = false;
         this._clientGate = clientGate;
     },
+
     //Save
     saveDeck: function(deck){
         this._deck = deck;

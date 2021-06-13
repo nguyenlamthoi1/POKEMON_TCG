@@ -11,7 +11,9 @@ window.NW_REQUEST = {
     SERVER_SEND_PACKAGE: "serversendpackage",
     //CMD
     CMD_GET_PLAYER_DATA: "GET_USER_DATA",
-    CMD_SAVE_DECK: "SAVE_DECK"
+    CMD_SAVE_DECK: "SAVE_DECK",
+    CMD_FIND_GAME: "FIND_GAME",
+    CMD_FOUND_GAME: "FOUND_GAME"
     //--
 }
 window.NETWORK = {

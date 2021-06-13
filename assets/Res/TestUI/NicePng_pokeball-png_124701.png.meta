@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "8e33894e-cea6-44bb-a32c-38d49560dbeb",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 2000,
+  "height": 1991,
+  "platformSettings": {},
+  "subMetas": {
+    "NicePng_pokeball-png_124701": {
+      "ver": "1.0.4",
+      "uuid": "a934e8fd-244a-4e43-b9d0-6c99a451578c",
+      "rawTextureUuid": "8e33894e-cea6-44bb-a32c-38d49560dbeb",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 2000,
+      "height": 1991,
+      "rawWidth": 2000,
+      "rawHeight": 1991,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

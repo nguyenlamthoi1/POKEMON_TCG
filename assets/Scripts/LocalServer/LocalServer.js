@@ -28,6 +28,7 @@ cc.Class({
         //  -   Data Manager
         SERVER.CARD_MGR = new CardDataManager(); SERVER.CARD_MGR.init();
         SERVER.PLAYER_MGR = new PlayerDataManager(); SERVER.PLAYER_MGR.init();
+        SERVER.ROOM_MGR = new RoomManager(); SERVER.ROOM_MGR.init();
         SERVER.GATE = this.node.getChildByName("ServerGate").getComponent("ServerGate"); SERVER.GATE.init();
         //--
   

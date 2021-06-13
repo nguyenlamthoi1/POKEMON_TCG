@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "3d3ab6bb-8f9f-429f-9426-90a8dfe623c9",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 512,
+  "height": 512,
+  "platformSettings": {},
+  "subMetas": {
+    "New Piskel-4.png": {
+      "ver": "1.0.4",
+      "uuid": "8d14f502-d933-4b07-b2e0-5aa892615b45",
+      "rawTextureUuid": "3d3ab6bb-8f9f-429f-9426-90a8dfe623c9",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 512,
+      "height": 512,
+      "rawWidth": 512,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

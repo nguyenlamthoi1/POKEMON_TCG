@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "34d7a1d5-fe44-4392-a1ba-8c676aba2f3a",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 979,
+  "height": 979,
+  "platformSettings": {},
+  "subMetas": {
+    "vippng.com-pokemon-logo-png-397476": {
+      "ver": "1.0.4",
+      "uuid": "afaccd0f-30d3-4892-8d5c-cb4aace66f50",
+      "rawTextureUuid": "34d7a1d5-fe44-4392-a1ba-8c676aba2f3a",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0.5,
+      "offsetY": -0.5,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 978,
+      "height": 978,
+      "rawWidth": 979,
+      "rawHeight": 979,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

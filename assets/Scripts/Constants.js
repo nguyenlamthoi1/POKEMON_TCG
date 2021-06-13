@@ -9,6 +9,7 @@ window.CONST = {
     EVENT: {
         //Network
         ON_CONNECT: "onconnect",
+        ON_FOUND_GAME: "on_found_game",
         //UI
         TOUCH_HOLD: "ontouchhold",
         DOUBLE_TOUCH: "ondoubletouch",

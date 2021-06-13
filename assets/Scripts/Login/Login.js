@@ -42,7 +42,7 @@ cc.Class({
         //Turn on UI
         this.loginUI.active = true;
         //Listeners
-        this.startGameBtn.node.on("click", this.onTouchStartBtn, this);
+        this.startGameBtn.node.on("click", this.findGame, this);
         this.deckBtn.node.on("click", this.onTouchDeckBtn, this);
         this.loginBtn.node.on("click", this.startLogin, this);
         
@@ -50,9 +50,17 @@ cc.Class({
         this.deck = this.deckUI.getComponent("DeckUI"); this.deck.init();
 
     },
- 
+    //Start the game
+    findGame: function(){
+        //Show loading UI
+        this.showLoading();
+        this.notify("FINDING OPPONENT..", 0, false);
+        this._client.node.once(CONST.EVENT.ON_FOUND_GAME, this.startGame, this);
+        this._client.sendPackage(NW_REQUEST.CMD_FIND_GAME, {});
+    },
+    startGame: function () {
+        cc.log(this.LOG_TAG, this.clientId, "[FOUND_GAME]");
 
-    onTouchStartBtn: function () {
         const interval = 1;
         this._isGameSceneReady = false;
         //Preload scene
@@ -76,15 +84,17 @@ cc.Class({
             //this.startGame.bind(this)
         );
         var checkAllLoaded = function () {
-            //cc.log("load_scene_main",RES_MGR.finishLoaded,this._isGameSceneReady);
+            cc.log("load_scene_main",RES_MGR.finishLoaded,this._isGameSceneReady);
             if (RES_MGR.finishLoaded && this._isGameSceneReady) {
                 cc.log(this.LOG_TAG, "[MOVE_MAIN_SCENE]");
-                cc.director.loadScene("Main");
+                cc.director.loadScene("Battle");
             }
         };
         this.schedule(checkAllLoaded, interval);
         //    this.schedule(function(){cc.log("SCHEDULE_2")}, interval);
     },
+    //--
+
     onTouchDeckBtn: function () {
         cc.log(this.LOG_TAG, "select_deck");
         this.deckUI.active = true;
@@ -166,6 +176,7 @@ cc.Class({
                 this.unschedule(this._checkLoadCallback);
             }
             for (var loadingObject of this._loadingObjects) {
+                //cc.log("check_load",loadingObject.obj.LoadedStepCount,loadingObject.obj.totalStep);
                 if (!loadingObject.obj.finishLoaded && loadingObject.obj.LoadedStepCount == loadingObject.obj.totalStep) {
                     this._errorLoadedStep += loadingObject.obj.totalLoadErr;
                     this._totalLoadedStep += loadingObject.obj.totalStep;
