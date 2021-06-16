@@ -15,25 +15,25 @@ cc.Class({
         frameSF: [cc.SpriteFrame],
         typeSF: [cc.SpriteFrame],
     },
-    init: function (cardData) {
+    init: function (clientId, cardData) {
         cc.log("READ_DATA", JSON.stringify(cardData));
 
         this.type.spriteFrame = this._getTypeSF(cardData.type); //LOAD TYPE
         this.evolutionIcon.active = cardData.stage > 0; //LOAD EVOLUTION
         this.stageTxt.string = cardData.stage;
         //Set image
-        this.img.spriteFrame = RES_MGR.getRes(cardData.card.image.url);
+        this.img.spriteFrame = RES_MGR[clientId].getRes(cardData.card.image.url);
         this.img.node.x = cardData.card.image.transform.x;
         this.img.node.y = cardData.card.image.transform.y;
         this.img.node.scale = cardData.card.image.transform.scale;
         //Set background
-        this.background.spriteFrame = RES_MGR.getRes(cardData.card.background.url);
+        this.background.spriteFrame = RES_MGR[clientId].getRes(cardData.card.background.url);
         this.background.node.x = cardData.card.background.transform.x;
         this.background.node.y = cardData.card.background.transform.y;
         this.background.node.scale = cardData.card.background.transform.scale;
         //Set frame
         //this.frame.spriteFrame = this._getFrameSF(cardData); //LOAD FRAME
-        this.frame.spriteFrame = RES_MGR.getRes(cardData.card.frame.url);
+        this.frame.spriteFrame = RES_MGR[clientId].getRes(cardData.card.frame.url);
         this.frame.node.x = cardData.card.frame.transform.x;
         this.frame.node.y = cardData.card.frame.transform.y;
         this.frame.node.scale = cardData.card.frame.transform.scale;

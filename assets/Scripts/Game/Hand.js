@@ -91,10 +91,10 @@ cc.Class({
             var movingData = {};
             if (i >= totalLen - numDrawCard) {
                 if(!blind){
-                    cardId = this.drawList.shift();
+                    cardId = drawList.shift();
                     cardData = JARVIS.getCardData(cardId);
                     cardUI = cc.instantiate(this.cardTemplate);
-                    cardUI.getComponent("BasicCard").init(cardData);
+                    cardUI.getComponent("BasicCard").init(this.gm.getClientId(), cardData);
                     this.cardIdOnHand.push(cardId);
                     this.cardUIOnHand.push(cardUI);
                 }

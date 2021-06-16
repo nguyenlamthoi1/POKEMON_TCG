@@ -123,6 +123,7 @@ cc.Class({
         var data = pkg.data;
         switch (cmdId) {
             case NW_REQUEST.CMD_ROOM_START_PHASE: {
+                cc.log("CMD_ROOM_START_PHASE");
                 //Set up data
                 this.playerId = data.player.playerId;
                 this.oppId = data.player.oppId;
@@ -143,14 +144,14 @@ cc.Class({
                 // actions: [
                 //     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },
                 //     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },]
-
+                this.versusUI.getComponent("VersusUI").hide();
             }
                 break;
         }
     },
     //PROCESS ACTION
     isPlayerAction: function(action){
-        return this.playerId == actionData.data.player;
+        return this.playerId == action.data.player;
     },
     getPIDOfAction: function(action){
         if(this.playerId == actionData.data.player)
@@ -159,12 +160,12 @@ cc.Class({
             return OPPONENT_ID;
     },
     addAction: function(actions){
-        while (actions.len > 0){
+        while (actions.length > 0){
             this._actionQ.push(actions.pop());
         }
     },
     processActionQ: function(){
-        if (this._actionQ.len > 0){
+        if (this._actionQ.length > 0){
             var action = this._actionQ.pop();
             switch(action.type){
                 case CONST.ACTION.TYPE.DRAW:{
@@ -180,5 +181,5 @@ cc.Class({
         }
     },
     //Get
-    
+    getClientId: function(){return this.clientId;}
 });
