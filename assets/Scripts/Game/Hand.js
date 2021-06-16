@@ -9,6 +9,7 @@ cc.Class({
     properties: {
         //Template
         cardTemplate: cc.Prefab,
+        sleeveTemplate: cc.Prefab,
 
         //Btn for test
         drawBtn: cc.Button,
@@ -75,25 +76,35 @@ cc.Class({
         return false;
 
     },
-    draw: function (numDrawCard) {
-        numDrawCard = numDrawCard > this.deck.length ? this.deck.length : numDrawCard;
+    draw: function (drawList, blind) {
+        
+        //numDrawCard = numDrawCard > this.deck.length ? this.deck.length : numDrawCard;
+        var numDrawCard = drawList.length;
+
         this._movingCache = [];
         this._modifySpacingX(numDrawCard);
         this.layoutComponent.type = DRAW_CONST.HORIZONTAL; //Should replace with cc.Layout.Horizontal but cc.Layout.Horizontal = undefined
         var totalLen = this.cardIdOnHand.length + numDrawCard;
         //Init new cards and attach them to hand
+        var cardId, cardData, cardUI;
         for (var i = 0; i < totalLen; i++) {
             var movingData = {};
             if (i >= totalLen - numDrawCard) {
-                var cardId = this.deck.shift();
-                var cardData = JARVIS.getCardData(cardId);
-
-                var cardUI = cc.instantiate(this.cardTemplate);
-                cardUI.getComponent("BasicCard").init(cardData);
+                if(!blind){
+                    cardId = this.drawList.shift();
+                    cardData = JARVIS.getCardData(cardId);
+                    cardUI = cc.instantiate(this.cardTemplate);
+                    cardUI.getComponent("BasicCard").init(cardData);
+                    this.cardIdOnHand.push(cardId);
+                    this.cardUIOnHand.push(cardUI);
+                }
+                else{
+                    cardUI = cc.instantiate(this.sleeveTemplate);
+                    this.cardUIOnHand.push(cardUI);
+                }
 
                 this.node.addChild(cardUI);
-                this.cardIdOnHand.push(cardId);
-                this.cardUIOnHand.push(cardUI);
+              
 
                 movingData.start = Utils.getLocalPosition(this.deckIcon, this.node); //Start moving point
                 const delay = 0.1;
@@ -131,7 +142,7 @@ cc.Class({
 
     //Listeners
     onClickDrawBtn: function () {
-        this.draw(7);
+        this.draw(["1","2","3"], false);
     }
 
 });

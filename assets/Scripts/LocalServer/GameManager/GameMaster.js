@@ -12,8 +12,6 @@ GamePlayer = cc.Class({ // Player in a Game
     setDropCardEnabled: function (enabled) { this._enabledDropCard = enabled; },
     setUseEnergyEnabled: function (enabled) { this._enabledUseEnergy = enabled; },
     setUseMoveEnabled: function (enabled) { this._enabledUseMove = enabled; },
-
-
 });
 PLAYER_1 = 0;
 PLAYER_2 = 1;
@@ -81,6 +79,7 @@ GameMaster = cc.Class({
         this.gamePlayer[this.nextTurnPlayer.getId()].setUseMoveEnabled(false);
 
         //SEND CMD
+        var firstHandList = this.hand[this.currentTurnPlayer.getId()].drawTop(GameMaster.FIRST_DRAW);
         this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_START_PHASE,
             {
                 goFirst: true,
@@ -89,11 +88,12 @@ GameMaster = cc.Class({
                     oppId: this.nextTurnPlayer.getId()
                 },
                 actions: [
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },]
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list: firstHandList } },
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW }, list:[] },]
 
             }
         );
+        firstHandList = this.hand[this.nextTurnPlayer.getId()].drawTop(GameMaster.FIRST_DRAW);
         this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_START_PHASE,
             {
                 goFirst: true,
@@ -102,8 +102,8 @@ GameMaster = cc.Class({
                     oppId: this.currentTurnPlayer.getId()
                 },
                 actions: [
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },]
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list:[] } },
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list: firstHandList } },]
             }
         );
     },
@@ -181,6 +181,8 @@ SvHand = cc.Class({
         this._cards = [];
     },
     drawTop: function (numDraw) {
-        this._cards.concat(this._deck.drawTop(numDraw));
+        var cardList = this._deck.drawTop(numDraw);
+        this._cards.concat(cardList);
+        return cardList;
     }
 });
