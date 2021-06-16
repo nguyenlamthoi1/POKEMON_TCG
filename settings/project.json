@@ -32,5 +32,6 @@
     "live": {
       "enable": false
     }
-  }
+  },
+  "start-scene": "2941af45-f00f-4205-9793-25dc30ef8114"
 }

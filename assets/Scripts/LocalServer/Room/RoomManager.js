@@ -1,6 +1,4 @@
-GamePlayer = cc.Class({
 
-});
 Room = cc.Class({
     statics: {
         LOG_TAG: "[SERVER_ROOM]",
@@ -11,9 +9,10 @@ Room = cc.Class({
     init: function (roomId, maxPlayer) {
         this._roomId = roomId; //Room Id
         this.numPlayer = 0; //So luong nguoi choi hien co
+        this.numReady = 0; //So luong nguoi choi dang Ready, neu du 2 nguoi ready -> Game START
         this.maxPlayer = maxPlayer; //So luong nguoi choi toi da
         this.player = {};
-        this.gm = new GameMaster; this.gm.init(); //Game Manager - quan ly Logic
+        this.gm = new GameMaster; this.gm.init(this); //Game Manager - quan ly Logic
     },
     //On
     onFull: function () {
@@ -35,6 +34,13 @@ Room = cc.Class({
         this.player[this.numPlayer] = player;
         this.numPlayer += 1;
         if(this.isFull()){this.onFull();}
+    },
+    addReadyPlayer: function(){
+        this.numReady ++;
+        if (this.numReady == Room.MAX_PLAYER){
+            //Start GAME
+            this.gm.initGame(this.player[Room.PLAYER_1], this.player[Room.PLAYER_2]);
+        }
     },
     //Get
     getId: function () { return this._roomId; },

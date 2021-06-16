@@ -1,9 +1,6 @@
 
-window.FAKE_CARDS = [
-    1, 2, 3, 4, 5, 6
-];
 window.JARVIS = null;
-window.RES_MGR = null;
+window.RES_MGR = {};
 cc.Class({
     extends: cc.Component,
 
@@ -31,7 +28,7 @@ cc.Class({
         this.loadingBall = this.loadingUI.getChildByName("LoadingBall");
         //Create Global variables
         JARVIS = new DataManager(); JARVIS.init()//Data Manager
-        RES_MGR = new ResourcesManager(); RES_MGR.init()//Resource Manager
+        RES_MGR[this.clientId] = new ResourcesManager(); RES_MGR[this.clientId].init()//Resource Manager
 
         //this.init();
 
@@ -77,16 +74,15 @@ cc.Class({
         this.loadData(
             [
                 {
-                    obj: RES_MGR, para: [1, 2, 3, 4, 5, 6, 7, 8, 9, "energy_2", "energy_3"
-                        , "energy_0", "energy_4", "energy_1"]
+                    obj: RES_MGR[this.clientId], para: [1, 2, 3, 4, 5, 6, 7, 8, 9]
                 }
             ],
             //this.startGame.bind(this)
         );
         var checkAllLoaded = function () {
-            cc.log("load_scene_main",RES_MGR.finishLoaded,this._isGameSceneReady);
-            if (RES_MGR.finishLoaded && this._isGameSceneReady) {
-                cc.log(this.LOG_TAG, "[MOVE_MAIN_SCENE]");
+            cc.log("load_scene_main",RES_MGR[this.clientId].finishLoaded,this._isGameSceneReady);
+            if (RES_MGR[this.clientId].finishLoaded && this._isGameSceneReady) {
+                cc.log(this.LOG_TAG, this.clientId, "[MOVE_MAIN_SCENE]");
                 cc.director.loadScene("Battle");
             }
         };
@@ -142,6 +138,9 @@ cc.Class({
                 case ERROR_TYPE.LOGIN.WRONG_PASSWORD:
                     this.notify("Wrong password. Try again", 0, false);
                     break;
+                case ERROR_TYPE.LOGIN.ALREADY_LOGIN:
+                    this.notify("Your account have already logined", 0, false);
+                    break;
             }
         }
     },
@@ -176,7 +175,7 @@ cc.Class({
                 this.unschedule(this._checkLoadCallback);
             }
             for (var loadingObject of this._loadingObjects) {
-                //cc.log("check_load",loadingObject.obj.LoadedStepCount,loadingObject.obj.totalStep);
+                cc.log("check_load",loadingObject.obj.LoadedStepCount,loadingObject.obj.totalStep);
                 if (!loadingObject.obj.finishLoaded && loadingObject.obj.LoadedStepCount == loadingObject.obj.totalStep) {
                     this._errorLoadedStep += loadingObject.obj.totalLoadErr;
                     this._totalLoadedStep += loadingObject.obj.totalStep;

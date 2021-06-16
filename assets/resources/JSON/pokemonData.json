@@ -8,7 +8,7 @@
       "0": "grass"
     },
     "hp": 60,
-    "stage": 1,
+    "stage": 0,
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/001",
     "bigPokemonUrl": "BigPokemon/001",
@@ -30,57 +30,88 @@
         "des": ""
       }
     },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/001",
+        "transform": {
+          "x": 20,
+          "y": 5,
+          "scale": 0.18
+        }
+      },
+      "background": {
+        "url": "Card/Background/green_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/green_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
   "2": {
     "id": 2,
-    "pkdId": 2,
+    "pkdId": 1,
     "category": "Pokemon",
     "name": "Ivysaur",
     "type": {
       "0": "grass"
     },
     "hp": 90,
-    "stage": 2,
+    "stage": 1,
     "evolveFrom": 1,
-    "evolveImg": "SmallPokemon/001",
-    "smallCardUrl": "SmallPokemon/002",
-    "bigPokemonUrl": "BigPokemon/002",
-    "bigScale": 0.1,
+    "smallCardUrl": "SmallPokemon/001",
+    "bigPokemonUrl": "BigPokemon/001",
+    "bigScale": 0.08,
     "moveInfo": {
       "0": {
         "moveId": "M0",
         "actions": {
           "A0": {
             "valueType": 0,
-            "value": 30
+            "value": 20
           }
         },
-        "name": "Vine Whip",
+        "name": "Leech Seed",
         "cost": {
-          "grass": 1,
-          "normal": 2
-        },
-        "value": "30",
-        "des": ""
-      },
-      "1": {
-        "moveId": "M0",
-        "name": "Poison Powder",
-        "cost": {
-          "grass": 3
+          "grass": 2
         },
         "value": "20",
         "des": ""
       }
     },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/002",
+        "transform": {
+          "x": 15,
+          "y": 0,
+          "scale": 0.2
+        }
+      },
+      "background": {
+        "url": "Card/Background/green_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/green_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
@@ -92,33 +123,35 @@
     "type": {
       "0": "grass"
     },
-    "hp": 120,
-    "stage": 3,
+    "hp": 90,
+    "stage": 2,
     "evolveFrom": 2,
-    "evolveImg": "SmallPokemon/002",
     "smallCardUrl": "SmallPokemon/003",
     "bigPokemonUrl": "BigPokemon/003",
-    "bigScale": 0.2,
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 80
-          }
-        },
-        "name": "Solar Beam",
-        "cost": {
-          "grass": 4
-        },
-        "value": "80",
-        "des": ""
-      }
-    },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/003",
+        "transform": {
+          "x": 7,
+          "y": 15,
+          "scale": 0.2
+        }
+      },
+      "background": {
+        "url": "Card/Background/green_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/green_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
@@ -130,48 +163,35 @@
     "type": {
       "0": "fire"
     },
-    "hp": 60,
-    "stage": 1,
+    "hp": 90,
+    "stage": 0,
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/004",
     "bigPokemonUrl": "BigPokemon/004",
-    "bigScale": 0.08,
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 10
-          }
-        },
-        "name": "Scratch",
-        "cost": {
-          "normal": 1
-        },
-        "value": "10",
-        "des": ""
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/004",
+        "transform": {
+          "x": -15,
+          "y": -30,
+          "scale": 0.25
+        }
       },
-      "1": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 20
-          }
-        },
-        "name": "Ember",
-        "cost": {
-          "fire": 1,
-          "normal": 1
-        },
-        "value": "20",
-        "des": ""
-      }
-    },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
+      "background": {
+        "url": "Card/Background/red_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/red_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
@@ -184,86 +204,74 @@
       "0": "fire"
     },
     "hp": 90,
-    "stage": 2,
+    "stage": 1,
     "evolveFrom": 4,
-    "evolveImg": "SmallPokemon/004",
     "smallCardUrl": "SmallPokemon/005",
     "bigPokemonUrl": "BigPokemon/005",
-    "bigScale": 0.1,
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 30
-          }
-        },
-        "name": "Slash",
-        "cost": {
-          "fire": 1,
-          "normal": 2
-        },
-        "value": "30",
-        "des": ""
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/005",
+        "transform": {
+          "x": 40,
+          "y": -30,
+          "scale": 0.25
+        }
       },
-      "1": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 40
-          }
-        },
-        "name": "Flame Thrower",
-        "cost": {
-          "fire": 3
-        },
-        "value": "40",
-        "des": ""
-      }
-    },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
+      "background": {
+        "url": "Card/Background/red_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/red_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
   "6": {
-    "id": 6,
-    "pkdId": 6,
+    "id": 5,
+    "pkdId": 5,
     "category": "Pokemon",
     "name": "Charizard",
     "type": {
       "0": "fire"
     },
-    "hp": 120,
-    "stage": 3,
+    "hp": 170,
+    "stage": 2,
     "evolveFrom": 5,
-    "evolveImg": "SmallPokemon/005",
     "smallCardUrl": "SmallPokemon/006",
     "bigPokemonUrl": "BigPokemon/006",
-    "bigScale": 0.2,
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 100
-          }
-        },
-        "name": "Fire Spin",
-        "cost": {
-          "fire": 4
-        },
-        "value": "100",
-        "des": ""
-      }
-    },
-    "cardInfo": {
-      "small": {
-        "imgScale": 1
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/006",
+        "transform": {
+          "x": 13,
+          "y": -40,
+          "scale": 0.3
+        }
+      },
+      "background": {
+        "url": "Card/Background/red_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/red_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
@@ -275,109 +283,115 @@
     "type": {
       "0": "water"
     },
-    "hp": 60,
-    "stage": 1,
+    "hp": 90,
+    "stage": 0,
     "evolveFrom": 0,
     "smallCardUrl": "SmallPokemon/007",
     "bigPokemonUrl": "BigPokemon/007",
-    "bigScale": 0.08,
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
-      }
-    },
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 10
-          }
-        },
-        "name": "Bubble",
-        "cost": {
-          "water": 1
-        },
-        "value": "10",
-        "des": ""
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/007",
+        "transform": {
+          "x": -10,
+          "y": -30,
+          "scale": 0.25
+        }
+      },
+      "background": {
+        "url": "Card/Background/blue_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/blue_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
   "8": {
-    "id": 8,
-    "pkdId": 8,
+    "id": 5,
+    "pkdId": 5,
     "category": "Pokemon",
-    "name": "Wartortle",
+    "name": "Warturtle ",
     "type": {
       "0": "water"
     },
     "hp": 90,
-    "stage": 2,
+    "stage": 1,
     "evolveFrom": 7,
-    "evolveImg": "SmallPokemon/007",
     "smallCardUrl": "SmallPokemon/008",
     "bigPokemonUrl": "BigPokemon/008",
-    "bigScale": 0.1,
-    "cardInfo": {
-      "small": {
-        "imgScale": 1.5
-      }
-    },
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 40
-          }
-        },
-        "name": "Bite",
-        "cost": {
-          "water": 1,
-          "normal": 2
-        },
-        "value": "40",
-        "des": ""
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/008",
+        "transform": {
+          "x": 40,
+          "y": -30,
+          "scale": 0.25
+        }
+      },
+      "background": {
+        "url": "Card/Background/blue_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/blue_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   },
   "9": {
-    "id": 9,
-    "pkdId": 9,
+    "id": 5,
+    "pkdId": 5,
     "category": "Pokemon",
-    "name": "Blastoise",
+    "name": "Charizard",
     "type": {
-      "0": "water"
+      "0": "fire"
     },
-    "hp": 120,
-    "stage": 3,
+    "hp": 170,
+    "stage": 2,
     "evolveFrom": 8,
-    "evolveImg": "SmallPokemon/008",
     "smallCardUrl": "SmallPokemon/009",
     "bigPokemonUrl": "BigPokemon/009",
-    "bigScale": 0.2,
-    "cardInfo": {
-      "small": {
-        "imgScale": 1
-      }
-    },
-    "moveInfo": {
-      "0": {
-        "moveId": "M0",
-        "actions": {
-          "A0": {
-            "valueType": 0,
-            "value": 80
-          }
-        },
-        "name": "Hydro Pump",
-        "cost": {
-          "water": 1
-        },
-        "value": "80",
-        "des": ""
+    "card": {
+      "image": {
+        "url": "Card/Pokemon/009",
+        "transform": {
+          "x": 18,
+          "y": -40,
+          "scale": 0.3
+        }
+      },
+      "background": {
+        "url": "Card/Background/blue_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/blue_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
       }
     }
   }

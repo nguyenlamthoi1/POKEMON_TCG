@@ -16,45 +16,31 @@ ResourcesManager = cc.Class({
             var cardData = JARVIS.getCardData(cardId);
 
             //Load small card pokemon SF
-            var smallCardUrl = cardData.smallCardUrl;
-            if (smallCardUrl != undefined && !this._SF[smallCardUrl]) {
-                this.totalStep += 1;
-                cc.resources.load(smallCardUrl, cc.SpriteFrame, function (url, err, loadedSpriteFrame) {
-                    if(!this._SF[url])this.LoadedStepCount += 1;
-                    if (!err) {
-                        cc.log(this.LOG_TAG, "[LOAD_SUCCESS]", url);
-                        this._SF[url] = loadedSpriteFrame;
-                        //this._smallPkmSF = loadedSpriteFrame;
+            var resUrl = cardData.card.image.url;
+            this._load(resUrl);
+            resUrl = cardData.card.background.url;
+            this._load(resUrl);
+            resUrl = cardData.card.frame.url;
+            this._load(resUrl);
+        }
+    },
+    _load: function(resUrl){
+        if (resUrl != undefined && !this._SF[resUrl]) {
+            this.totalStep += 1;
+            cc.resources.load(resUrl, cc.SpriteFrame, function (url, err, loadedSpriteFrame) {
+                if (!this._SF[url]) {this.LoadedStepCount += 1;}
+                else {this.totalStep -= 1;}
+                if (!err) {
+                    cc.log(this.LOG_TAG, "[LOAD_SUCCESS]", url);
+                    this._SF[url] = loadedSpriteFrame;
+                    //this._smallPkmSF = loadedSpriteFrame;
 
-                    } else {
-                        //this.cardImg.spriteFrame = failedSF;
-                        cc.log(this.LOG_TAG, "[LOAD_FAILED]", url);
-                        this.totalLoadErr += 1;
-                    }
-                }.bind(this, smallCardUrl))
-            }
-            //Load big pokemon SF
-
-            var cardData = JARVIS.getCardData(cardId);
-
-            //Load small pokemon SF
-            var bigCardUrl = cardData.bigPokemonUrl;
-            if (bigCardUrl != undefined) {
-                this.totalStep += 1;
-                cc.resources.load(bigCardUrl, cc.SpriteFrame, function (url, err, loadedSpriteFrame) {
-                    if(!this._SF[url])this.LoadedStepCount += 1;
-                    if (!err) {
-                        cc.log(this.LOG_TAG, "[LOAD_SUCCESS]", url);
-                        this._SF[url] = loadedSpriteFrame;
-                        this._bigPkmSF = loadedSpriteFrame;
-
-                    } else {
-                        //this.cardImg.spriteFrame = failedSF;
-                        cc.log(this.LOG_TAG, "[LOAD_FAILED]", url);
-                        this.totalLoadErr += 1;
-                    }
-                }.bind(this, bigCardUrl))
-            }            
+                } else {
+                    //this.cardImg.spriteFrame = failedSF;
+                    cc.log(this.LOG_TAG, "[LOAD_FAILED]", url);
+                    this.totalLoadErr += 1;
+                }
+            }.bind(this, resUrl));
         }
     },
     getRes: function (url) {

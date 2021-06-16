@@ -65,7 +65,6 @@ cc.Class({
             loadingObject.obj.load(loadingObject.para); //Thuc hien load function cua moi object
 
         this._checkLoadCallback = function(){ //Check load callback
-            //cc.log("CHECK_LOAD_CB");
             if(this._totalLoadedObj == this._loadingObjects.length) {
                 cc.log(this.LOG_TAG, "[FINISH_LOAD_DATA]","[TOTAL]", this._totalLoadedStep, "[ERR_TOTAL]", this._errorLoadedStep);
                 this._finishCb != undefined &&  this._finishCb();

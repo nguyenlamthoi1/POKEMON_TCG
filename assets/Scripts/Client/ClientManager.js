@@ -8,6 +8,8 @@ cc.Class({
         clientIds: [String],
     },
     onLoad: function () {
+        cc.game.addPersistRootNode(this.node);
+        
         this._clients = {};
         for (var i = 0; i < this.clients.length; i++) {
             var client = this.clients[i];

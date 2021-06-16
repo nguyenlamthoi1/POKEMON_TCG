@@ -51,6 +51,11 @@ window.CONST = {
         GRASS: "grass",
         ELECTRIC: "electric",
         NORMAL: "normal"
+    },
+    ACTION:{
+        TYPE:{
+            DRAW: 0
+        }
     }
 }
 window.SELECTION = {

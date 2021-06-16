@@ -4,9 +4,11 @@ cc.Class({
     extends: cc.Component,
 
     init(id) {
-        this.LOG_TAG = "[CLIENT]"
+        this.LOG_TAG = "[CLIENT]";
         this._id = id;
         this._haveUpdatedPlayerData = false;
+         //Keep this node after scene switching
+         cc.game.addPersistRootNode(this.node);
     },
     //Network
     connectToServer: function (username, password) {
@@ -24,6 +26,9 @@ cc.Class({
     },
     sendPackage: function (cmd, data) {
         this.node.emit(NW_REQUEST.CLIENT_SEND_PACKAGE, { cmd: cmd, data: data, client: { username: this._username, client: this } });
+    },
+    sendRoomPackage: function(roomCmd, data){
+        this.node.emit(NW_REQUEST.CLIENT_SEND_PACKAGE, { cmd: NW_REQUEST.CMD_ROOM, subCmd: roomCmd, data: data, client: { username: this._username, client: this } });
     },
     onReceivePackageFromServer: function (pkg) {
         cc.log(this.LOG_TAG, this._id, "[RECV_PACKAGE]", JSON.stringify(pkg));
@@ -47,13 +52,18 @@ cc.Class({
                 this.node.emit(CONST.EVENT.ON_FOUND_GAME);
             }
                 break;
+            case NW_REQUEST.CMD_ROOM: {
+                this._gm.processRoomCMD(pkg);
+            }
+            break;
         }
     },
-
+    
     //--
     //Data
     isHaveNewestPlayerData: function () { return this._haveUpdatedPlayerData;},
-    getPlayerCardS: function () { return this._playerInfo.card; }
+    getPlayerCardS: function () { return this._playerInfo.card; },
     //--
-
+    //Set
+    setGameManager: function(gm){this._gm = gm;}
 });
