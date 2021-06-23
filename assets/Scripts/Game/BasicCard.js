@@ -15,6 +15,7 @@ cc.Class({
         frameSF: [cc.SpriteFrame],
         typeSF: [cc.SpriteFrame],
     },
+    //Init
     init: function (clientId, cardData) {
         cc.log("READ_DATA", JSON.stringify(cardData));
 
@@ -78,5 +79,13 @@ cc.Class({
                 return this.typeSF[this.typeSF.length - 1];
         }
     },
+    //Set
+    setIdx: function(idx){
+        this._idx = idx;
+    },
+    //Get
+    getIdx: function(){
+        return this._idx;
+    }
 
 });

@@ -17,6 +17,9 @@ cc.Class({
         //Deck
         deckIcon: cc.Node,
         remainCardTxt: cc.Label,
+
+        //Drop checker
+        dropChecker: cc.Node
     },
     init: function (player, gameManager) {
         //External ref
@@ -60,14 +63,14 @@ cc.Class({
     },
     _modifySpacingX: function (numDrawCard) {
         //Dieu chinh spacing X neu kich thuoc HandUI vuot qua screen width
-        if(numDrawCard == undefined) numDrawCard = 0;
+        if (numDrawCard == undefined) numDrawCard = 0;
         if (numDrawCard > this.deck.length) numDrawCard = this.deck.length;
         var cardW = this.smallCardInfo.w;
         var numCard = this.cardIdOnHand.length + numDrawCard;
         var spacingX = 0;
-        var delta = ((cardW + spacingX) * numCard - spacingX) - (cc.winSize.width/2 - 20); //TODO: REPLACE: (cc.winSize.width/2 - 20) -> (cc.winSize.width - 20)
+        var delta = ((cardW + spacingX) * numCard - spacingX) - (cc.winSize.width / 2 - 20); //TODO: REPLACE: (cc.winSize.width/2 - 20) -> (cc.winSize.width - 20)
         if (delta > 0) {//Neu size Hand khong chua du bai
-            this.layoutComponent.spacingX = (cc.winSize.width/2 - 20 - cardW * numCard) / (numCard - 1); //TODO: cc.winSize.width/2 -20  -> cc.winSize.width -20
+            this.layoutComponent.spacingX = (cc.winSize.width / 2 - 20 - cardW * numCard) / (numCard - 1); //TODO: cc.winSize.width/2 -20  -> cc.winSize.width -20
             return true;
         }
         else {
@@ -76,10 +79,10 @@ cc.Class({
         return false;
 
     },
-    draw: function (drawList, blind) {
-        
+    draw: function (drawList, blind, numDraw) {
+        cc.log("DRAW_CLIENT", this.gm.clientId, blind);
         //numDrawCard = numDrawCard > this.deck.length ? this.deck.length : numDrawCard;
-        var numDrawCard = drawList.length;
+        var numDrawCard = numDraw == undefined ? drawList.length : numDraw;
 
         this._movingCache = [];
         this._modifySpacingX(numDrawCard);
@@ -90,21 +93,26 @@ cc.Class({
         for (var i = 0; i < totalLen; i++) {
             var movingData = {};
             if (i >= totalLen - numDrawCard) {
-                if(!blind){
+                if (!blind) {
                     cardId = drawList.shift();
                     cardData = JARVIS.getCardData(cardId);
                     cardUI = cc.instantiate(this.cardTemplate);
-                    cardUI.getComponent("BasicCard").init(this.gm.getClientId(), cardData);
+
+                    var card = cardUI.getComponent("BasicCard");
+                    card.setIdx(this.cardIdOnHand.length);
+                    card.init(this.gm.getClientId(), cardData);
+                    this.addDragAndDrop(card);
+
                     this.cardIdOnHand.push(cardId);
                     this.cardUIOnHand.push(cardUI);
                 }
-                else{
+                else {
                     cardUI = cc.instantiate(this.sleeveTemplate);
                     this.cardUIOnHand.push(cardUI);
                 }
 
                 this.node.addChild(cardUI);
-              
+
 
                 movingData.start = Utils.getLocalPosition(this.deckIcon, this.node); //Start moving point
                 const delay = 0.1;
@@ -130,19 +138,68 @@ cc.Class({
             endPosition.y = 0;
             cardUI.position = movingData.start;
 
-            cc.tween(cardUI)
+            t1 = cc.tween(cardUI)
                 .delay(movingData.delay)
-                .to(DRAW_CONST.TIME_TO_HAND, { position: endPosition }).start();
+                .to(DRAW_CONST.TIME_TO_HAND, { position: endPosition });
+            if (i == totalLen - 1) {
+                t1.call(this.onActionFinish.bind(this)).start();
+            }
+            else {
+                t1.start();
+            }
         }
 
         this.layoutComponent.type = cc.Layout.NONE;
         this.remainCardTxt.string = this.deck.length;
     },
-
+    onDroppingCard: function () {
+        this.gm
+    },
+    onDropCardCancel: function () {
+        this._dropCard.node.position = this._dropCard.oldPos;
+    },
 
     //Listeners
+    addDragAndDrop: function (card) {
+        var collider = card.node.getComponent(cc.BoxCollider);
+        collider.tag = COLLIDER_TAG.CARD;
+        card.node.on(cc.Node.EventType.TOUCH_START, this.onCardTouchStart.bind(card, this));
+        card.node.on(cc.Node.EventType.TOUCH_MOVE, this.onCardTouchMove.bind(card, this));
+        card.node.on(cc.Node.EventType.TOUCH_END, this.onCardTouchEnded.bind(card, this));
+        card.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onCardTouchEnded.bind(card, this));
+    },
+    onCardTouchStart: function (hand, touchEvent) { //This == basic card component
+        cc.log("TOUCH_START", this.getIdx());
+        this.isTouched = true;
+        this.oldPos = this.node.position;
+        hand._dropCard = this;
+    },
+    onCardTouchMove: function (hand, touchEvent) { //This == basic card component
+        //cc.log("TOUCH_MOVE", this.getIdx());
+        if (!this.isTouched) return;
+        var delta = touchEvent.getDelta();
+        this.node.x = this.node.x + delta.x;
+        this.node.y = this.node.y + delta.y;
+    },
+    onCardTouchEnded: function (hand, touchEvent) {
+        // var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
+
+        // if (localPosOfTouch > this.dropChecker.x && localPosOfTouch.y < this.dropChecker.y + this.dropChecker.height) {
+        //     this.dropChecker.getComponent("CardDropChecker").onNotSelected();
+        //     this.onDrop();
+        // }
+        // else {
+
+        // }
+    },
+
+
+    onActionFinish: function () {
+        cc.log(this.gm.clientId, "onDrawFinish");
+        this.gm.node.emit(CONST.ACTION.EVENT.ON_FINISH);
+    },
     onClickDrawBtn: function () {
-        this.draw(["1","2","3"], false);
+        this.draw(["1", "2", "3"], false);
     }
 
 });

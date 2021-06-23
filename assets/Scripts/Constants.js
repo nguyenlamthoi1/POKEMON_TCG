@@ -1,3 +1,7 @@
+window.COLLIDER_TAG = {
+    CARD: 0,
+    CARD_CHECKER: 1,
+}
 window.POKEMON = {
     FIRE_TYPE: "fire",
     GRASS_TYPE: "grass",
@@ -14,6 +18,8 @@ window.CONST = {
         TOUCH_HOLD: "ontouchhold",
         DOUBLE_TOUCH: "ondoubletouch",
         SHORT_CLICK: "shorclick"
+        //COLLIDER
+        
     },
     GAME_PHASE: {
         SETUP: -1,
@@ -53,6 +59,9 @@ window.CONST = {
         NORMAL: "normal"
     },
     ACTION:{
+        EVENT:{
+            ON_FINISH: 0
+        },
         TYPE:{
             DRAW: 0
         }

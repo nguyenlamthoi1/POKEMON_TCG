@@ -66,8 +66,8 @@ GameMaster = cc.Class({
     },
     onStartPhase: function () {
         this.turnCount = 0;
-        this.currentTurnPlayer = this.gamePlayer[PLAYER_1];
-        this.nextTurnPlayer = this.gamePlayer[PLAYER_2];
+        this.currentTurnPlayer = this.gamePlayer[PLAYER_2];
+        this.nextTurnPlayer = this.gamePlayer[PLAYER_1];
 
         this.gamePlayer[this.currentTurnPlayer.getId()].setDropCardEnabled(true); //Player can drop
         this.gamePlayer[this.currentTurnPlayer.getId()].setUseEnergyEnabled(false);
@@ -96,7 +96,7 @@ GameMaster = cc.Class({
         firstHandList = this.hand[this.nextTurnPlayer.getId()].drawTop(GameMaster.FIRST_DRAW);
         this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_START_PHASE,
             {
-                goFirst: true,
+                goFirst: false,
                 player: {
                     playerId: this.nextTurnPlayer.getId(),
                     oppId: this.currentTurnPlayer.getId()
