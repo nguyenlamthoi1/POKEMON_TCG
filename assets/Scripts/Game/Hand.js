@@ -26,6 +26,7 @@ cc.Class({
 
 
         this.gm = gameManager;
+        this.board = this.gm.getBoard();
         this.player = player;
         //Variables
         this.LOG_TAG = "[HAND_UI]";
@@ -152,8 +153,10 @@ cc.Class({
         this.layoutComponent.type = cc.Layout.NONE;
         this.remainCardTxt.string = this.deck.length;
     },
-    onDroppingCard: function () {
-        this.gm
+    onDropCardStart: function () {
+
+        this._dropCard.node.getComponent(cc.BoxCollider).enabled = false;
+        this.board.playerDropCard(this._dropCard.getCardId(), this._dropCard.node);
     },
     onDropCardCancel: function () {
         this._dropCard.node.position = this._dropCard.oldPos;
@@ -171,8 +174,11 @@ cc.Class({
     onCardTouchStart: function (hand, touchEvent) { //This == basic card component
         cc.log("TOUCH_START", this.getIdx());
         this.isTouched = true;
+        this.canDrop = false;
         this.oldPos = this.node.position;
         hand._dropCard = this;
+        hand.gm.showSelectable(this.getCardId());
+
     },
     onCardTouchMove: function (hand, touchEvent) { //This == basic card component
         //cc.log("TOUCH_MOVE", this.getIdx());
@@ -183,14 +189,12 @@ cc.Class({
     },
     onCardTouchEnded: function (hand, touchEvent) {
         // var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
-
-        // if (localPosOfTouch > this.dropChecker.x && localPosOfTouch.y < this.dropChecker.y + this.dropChecker.height) {
-        //     this.dropChecker.getComponent("CardDropChecker").onNotSelected();
-        //     this.onDrop();
-        // }
-        // else {
-
-        // }
+        if (this.canDrop) {
+            hand.onDropCardStart();
+        }
+        else {
+            hand.onDropCardCancel();
+        }
     },
 
 

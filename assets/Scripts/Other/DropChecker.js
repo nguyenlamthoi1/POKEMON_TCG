@@ -12,6 +12,7 @@ cc.Class({
         this.collisionSprite = this.node.getComponent(cc.Sprite);
         this.collisionSprite.enabled = false;
         this.collider = this.node.getComponent(cc.BoxCollider);
+        this.collider.enabled = false;
     },
     setOtherTag(tag) {
         this._otherTag = tag;
@@ -33,11 +34,15 @@ cc.Class({
         this._exitCb = exitCb;
         this._stayCb = stayCb;
     },
+    resetCb: function(){
+        this._enterCb = this._exitCb  =  this._stayCb = undefined;
+    },
     setCheckPointInColliderEnabled(enabled) { this._checkPointInCollider = enabled; },
     onCollisionEnter: function (other, self) {
         if (other.tag != this._otherTag) return;
         if (!this._checkPointInCollider) {
             cc.log("ENTER_NO_CHECK");
+            this._enterCb && this._enterCb(other.node);
             this.showArea();
         } else {
             this._stayed = false;
@@ -47,21 +52,25 @@ cc.Class({
         if (other.tag != this._otherTag) return;
         if (!this._checkPointInCollider) {
             cc.log("EXIT_NO_CHECK");
+            this._exitCb && this._exitCb(other.node);
         }
         else {
             var otherWorldPosition = Utils.getWordPosition(other.node);
             if (cc.Intersection.pointInPolygon(otherWorldPosition, self.world.points)) {
                 if (!this._stayed) {
                     cc.log("ENTER_WITH_CHECK");
+                    this._enterCb && this._enterCb(other.node);
                     this.showArea();
                     this._stayed = true;
                 }
                 else {
-                    cc.log("STAY_WITH_CHECK");
+                    //cc.log("STAY_WITH_CHECK");
+                    this._stayCb && this._stayCb(other.node);
                 }
             }
             else if (this._stayed) {
                 cc.log("EXIT_WITH_CHECK");
+                this._exitCb && this._exitCb(other.node);
                 this._stayed = false;
                 this.hideArea();
             }
@@ -70,7 +79,8 @@ cc.Class({
     onCollisionExit: function (other, self) {
         if (other.tag != this._otherTag) return;
         if (!this._checkPointInCollider) {
-            cc.log("STAY_NO_CHECK");
+            //cc.log("STAY_NO_CHECK");
+            this._stayCb && this._stayCb(other.node);
             this.hideArea();
         }
     },
@@ -80,6 +90,9 @@ cc.Class({
     hideArea: function(){
         this.collisionSprite.enabled =false;
 
+    },
+    enabledCheckCollision: function(enabled){
+        //this.collisionSprite.enabled = enabled;
+        this.collider.enabled = enabled;
     }
-
 });

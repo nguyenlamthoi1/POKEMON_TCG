@@ -18,7 +18,7 @@ cc.Class({
     //Init
     init: function (clientId, cardData) {
         cc.log("READ_DATA", JSON.stringify(cardData));
-
+        this.cardData = cardData;
         this.type.spriteFrame = this._getTypeSF(cardData.type); //LOAD TYPE
         this.evolutionIcon.active = cardData.stage > 0; //LOAD EVOLUTION
         this.stageTxt.string = cardData.stage;
@@ -86,6 +86,7 @@ cc.Class({
     //Get
     getIdx: function(){
         return this._idx;
-    }
+    },
+    getCardId: function(){return this.cardData.id;}
 
 });

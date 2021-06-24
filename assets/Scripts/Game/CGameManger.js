@@ -91,17 +91,18 @@ cc.Class({
 
         //this.controllingPlayerId = this.player[1].getId(); //TODO: delete
         //Init UI
+        // -Init Board
+        if(this.clientId == "client_1"){
+            this.board = this.boardUI.getComponent("Board");
+            this.board.init(this);
+        }
         //-Init hands       
         this.hand = {};
         this.hand[PLAYER_ID] = this.handUI.getComponent("Hand");
         this.hand[PLAYER_ID].init(this.player[PLAYER_ID], this);
         this.hand[OPPONENT_ID] = this.oppHandUI.getComponent("Hand");
         this.hand[OPPONENT_ID].init(this.player[OPPONENT_ID], this);
-        // -Init Board
-        if(this.clientId == "client_1"){
-            this.board = this.boardUI.getComponent("Board");
-            this.board.init(this);
-        }
+        
        
 
         //Collider
@@ -201,52 +202,47 @@ cc.Class({
     },
     //--------------
     //Drag and Drop Card
+    onDropCard: function(cardId){
+        cc.log("receiveCard", JARVIS.getCardName(cardId), cardId);
+        //this.board.receiveCard(cardId);
+    },
     showSelectable: function (cardId) {
         cc.log(this.LOG_TAG, "SHOW_SELECTABLE", JARVIS.getCardName(cardId));
-        var hand = this.gm.getHandOfCurrentPlayer();
-        //Pre check
+        var hand = this.hand[PLAYER_ID];
         var cardData = JARVIS.getCardData(cardId);
-        var canDrop = this.isCardCanDrop(cardId, cardData, player); //Kiem tra co the drop the duoc khong
-        if (!canDrop) { //failed to drop
-            hand.onDropCardCancel();
-            return false;
-        }
-        if (cardData == undefined) { //Cannot retrieve data of card
-            cc.log(this.LOG_TAG, "CARD_ID_WRONG", cardId);
-            hand.onDropCardCancel();
-            return false;
-        }
-        this.DEBUG && cc.log(this.LOG_TAG, "[DROP_CARD_DATA]", JSON.stringify(cardData));
-        //--
-        this.droppedCardId = cardId;
+        var ret = false;;
         switch (cardData.category) {
-            case this.CONST.CAT.POKEMON:
-                this.processPKMCard(cardId, player);
+            case CONST.CARD.CAT.PKM:
+                ret = this.processPKMCard(cardId);
                 break;
-            case this.CONST.CAT.ENERGY:
-                this.processEnergyCard(cardId, player);
+            case CONST.CARD.CAT.ENERGY:
+                ret = this.processEnergyCard(cardId);
                 break;
         }
+        return ret;
 
     },
-    processDropPokemonCard: function (cardId) {
+    processPKMCard : function (cardId) {
         cc.log(this.LOG_TAG, "PROCESS_CARD_POKEMON", JARVIS.getCardName(cardId));
         //Show Battle Slot avaiable
-        
         if (this.isPhase(CONST.GAME_PHASE.START)) {//IF CURRENT PHASE IS START PHASE
-            if (this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
-               this.board
+            if (!this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
+               this.board.enabledSelectActive(true);
+               return true;
             } 
             else { //Should select the first empty slot on Bench
-                
+                this.board.enabledSelectActive(true);
+                return false;
             }
         } else {
-           
+            return false;
         }
+        return false;
     },
     //-------------
     //Get
     getClientId: function () { return this.clientId; },
+    getBoard: function(){return this.board;},
     //Check
     isPhase: function (phase) { return this.currentPhase == phase; },
 });
