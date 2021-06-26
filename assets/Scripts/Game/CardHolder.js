@@ -22,27 +22,37 @@ cc.Class({
     doShowDropPokemonCard: function (cardId, cardNode) {
         cc.log("DO_SHOW_DROP");
         const moving_time = 0.5;
-        const size = { w: 225, h: 225 }
+        var cardData = JARVIS.getCardData(cardId);
         cardNode.position = Utils.getLocalPosition(cardNode, this.holderNode);
         cardNode.removeFromParent();
         this.holderNode.addChild(cardNode);
-        var cardData = JARVIS.getCardData(cardId);
-        cc.tween(cardNode)
-            .to(moving_time,
-                {
-                    position: cc.v2(0, 0),
-                    scale: 2.25
-                }).start();
-        cc.tween(cc.find("Mask/Img", cardNode))
-        .to(moving_time,
-            {
-                scale: cardData.card.image.transformActive.scale,
-                x: cardData.card.image.transformActive.x,
-                y: cardData.card.image.transformActive.y,
+        if (this._type == BOARD.ACTIVE_PLACE) {
+            cc.tween(cardNode)
+                .to(moving_time,
+                    {
+                        position: cc.v2(0, 0),
+                        scale: 2.25
+                    }).start();
+            cc.tween(cc.find("Mask/Img", cardNode))
+                .to(moving_time,
+                    {
+                        scale: cardData.card.image.transformActive.scale,
+                        x: cardData.card.image.transformActive.x,
+                        y: cardData.card.image.transformActive.y,
 
-            }).start();
-        cardNode.getChildByName("EvolutionIcon").scale = 0.7;
-        cardNode.getChildByName("Type").scale = 0.7;
+                    }).start();
+            cardNode.getChildByName("EvolutionIcon").scale = 0.7;
+            cardNode.getChildByName("Type").scale = 0.7;
+
+        }
+        else if (this._type == BOARD.BENCH) {
+            cc.tween(cardNode)
+                .to(moving_time,
+                    {
+                        position: cc.v2(0, 0),
+                        scale: 1
+                    }).start();
+        }
 
         //cc.tween(cardNode.getChildByName("EvolutionIcon")).to(moving_time,{scale: 0.7}).start();
         //cc.tween(cardNode.getChildByName("Type")).to(moving_time,{scale: 0.7}).start();

@@ -59,6 +59,9 @@ Room = cc.Class({
             }
         }
         client.onReceivePackageFromServer(clientPkg);
+    },
+    processCMD: function(cmdId, data){
+        this.gm.processCMD(cmdId, data);
     }
 });
 RoomManager = cc.Class({

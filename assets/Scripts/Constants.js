@@ -2,6 +2,11 @@ window.COLLIDER_TAG = {
     CARD: 0,
     CARD_CHECKER: 1,
 }
+window.BOARD = {
+    ACTIVE_PLACE: "active",
+    BENCH: "bench",
+    MAX_BENCH: 5
+},
 window.POKEMON = {
     FIRE_TYPE: "fire",
     GRASS_TYPE: "grass",
@@ -63,7 +68,8 @@ window.CONST = {
             ON_FINISH: 0
         },
         TYPE:{
-            DRAW: 0
+            DRAW: 0,
+            PLAY_CARD: 1
         }
     }
 }

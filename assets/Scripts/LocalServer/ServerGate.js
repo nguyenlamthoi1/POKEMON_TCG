@@ -96,6 +96,10 @@ cc.Class({
                 room.addReadyPlayer();
             }
             break;
+            case NW_REQUEST.CMD_ROOM_DROP_CARD:{
+                cc.log(this.LOG_TAG, "CMD_ROOM_DROP_CARD", cmdId);
+                room.processCMD(cmdId, pkg.data);
+            }
         }
     }
 

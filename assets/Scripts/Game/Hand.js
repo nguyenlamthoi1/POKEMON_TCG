@@ -154,18 +154,42 @@ cc.Class({
         this.remainCardTxt.string = this.deck.length;
     },
     onDropCardStart: function () {
-
         this._dropCard.node.getComponent(cc.BoxCollider).enabled = false;
-        this.board.playerDropCard(this._dropCard.getCardId(), this._dropCard.node);
+        this.board.playerDropCard(this._dropCard.getCardId(), this._dropCard.node, this._dropCard.dropPlace);
+        this.cardIdOnHand.splice(this._dropCard.getIdx(), 1);
+        this.cardUIOnHand.splice(this._dropCard.getIdx(), 1);
+        this.resetCardPosOnDrop(this._dropCard.getIdx());
     },
     onDropCardCancel: function () {
+        this.board.enableSelect(false);
         this._dropCard.node.position = this._dropCard.oldPos;
+        this._dropCard.node.getComponent(cc.BoxCollider).enabled = false; //Enabled Collider
+    },
+    //Reset position when drop 1 card
+    resetCardPosOnDrop: function (droppedCardIdx) {
+        // if(DroppedCardIdx == undefined){
+        //     DroppedCardIdx = this.cardUIOnHand.length;
+        // }
+        this._modifySpacingX();
+        this.layoutComponent.type = DRAW_CONST.HORIZONTAL; //Should replace with cc.Layout.Horizontal but cc.Layout.Horizontal = undefined
+        this.layoutComponent.updateLayout(); //TODO: should use new position of layout updated
+
+        for (var i = droppedCardIdx; i < this.cardUIOnHand.length; i++) {
+            var cardUI = this.cardUIOnHand[i];
+            
+            var card = cardUI.getComponent("BasicCard");
+            card.setIdx(i);
+
+        }
+        this.layoutComponent.type = cc.Layout.NONE;
+
     },
 
     //Listeners
     addDragAndDrop: function (card) {
         var collider = card.node.getComponent(cc.BoxCollider);
         collider.tag = COLLIDER_TAG.CARD;
+        collider.enabled = false;
         card.node.on(cc.Node.EventType.TOUCH_START, this.onCardTouchStart.bind(card, this));
         card.node.on(cc.Node.EventType.TOUCH_MOVE, this.onCardTouchMove.bind(card, this));
         card.node.on(cc.Node.EventType.TOUCH_END, this.onCardTouchEnded.bind(card, this));
@@ -176,8 +200,11 @@ cc.Class({
         this.isTouched = true;
         this.canDrop = false;
         this.oldPos = this.node.position;
+        this.node.getComponent(cc.BoxCollider).enabled = true; //Enabled Collider
+
         hand._dropCard = this;
         hand.gm.showSelectable(this.getCardId());
+        
 
     },
     onCardTouchMove: function (hand, touchEvent) { //This == basic card component
@@ -189,6 +216,8 @@ cc.Class({
     },
     onCardTouchEnded: function (hand, touchEvent) {
         // var localPosOfTouch = this.dropChecker.convertToNodeSpaceAR(touchEvent.getLocation());
+        cc.log("TOUCH_END",this.canDrop);
+
         if (this.canDrop) {
             hand.onDropCardStart();
         }

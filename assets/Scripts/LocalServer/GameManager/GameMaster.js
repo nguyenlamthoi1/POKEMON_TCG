@@ -12,6 +12,10 @@ GamePlayer = cc.Class({ // Player in a Game
     setDropCardEnabled: function (enabled) { this._enabledDropCard = enabled; },
     setUseEnergyEnabled: function (enabled) { this._enabledUseEnergy = enabled; },
     setUseMoveEnabled: function (enabled) { this._enabledUseMove = enabled; },
+    //Check
+    canDropCard: function () {
+        return this._enabledDropCard;
+    }
 });
 PLAYER_1 = 0;
 PLAYER_2 = 1;
@@ -50,13 +54,15 @@ GameMaster = cc.Class({
         this.hand[PLAYER_1].init(PLAYER_1, this.gamePlayer[PLAYER_1], this); //Init hand and deck
         this.hand[PLAYER_2] = new SvHand();
         this.hand[PLAYER_2].init(PLAYER_2, this.gamePlayer[PLAYER_2], this); //Init hand and deck
-
+        //Init Board
+        this.board = new SvBoard(this, PLAYER_1, PLAYER_2);
+        this.board.init(this);
         //Set phase
         this.setPhase(GameMaster.PHASE.START);
     },
     //TURN and PHASE
     setPhase: function (phase) {
-        this._phase = phase
+        this._phase = phase;
         if (this._phase == GameMaster.PHASE.START) {
             this.onStartPhase();
         }
@@ -66,8 +72,8 @@ GameMaster = cc.Class({
     },
     onStartPhase: function () {
         this.turnCount = 0;
-        this.currentTurnPlayer = this.gamePlayer[PLAYER_2];
-        this.nextTurnPlayer = this.gamePlayer[PLAYER_1];
+        this.currentTurnPlayer = this.gamePlayer[PLAYER_1];
+        this.nextTurnPlayer = this.gamePlayer[PLAYER_2];
 
         this.gamePlayer[this.currentTurnPlayer.getId()].setDropCardEnabled(true); //Player can drop
         this.gamePlayer[this.currentTurnPlayer.getId()].setUseEnergyEnabled(false);
@@ -89,7 +95,7 @@ GameMaster = cc.Class({
                 },
                 actions: [
                     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list: firstHandList } },
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW }, list:[] },]
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW }, list: [] },]
 
             }
         );
@@ -102,16 +108,57 @@ GameMaster = cc.Class({
                     oppId: this.currentTurnPlayer.getId()
                 },
                 actions: [
-                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list:[] } },
+                    { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list: [] } },
                     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW, list: firstHandList } },]
             }
         );
+    },
+    onPlayerDropCard: function (playerId, cardId, dropPlace) {
+        if (!this.gamePlayer[playerId].canDropCard()) return false;
+        var cardData = SERVER.CARD_MGR.getCardData(cardId);
+        switch (cardData.category) {
+            case CONST.CARD.CAT.PKM: {
+                cc.log("  ", GameMaster.LOG_TAG, "PROCESS_CARD_POKEMON", SERVER.CARD_MGR.getCardName(cardId));
+                this.processPKMCard(playerId, cardId, dropPlace);
+                break;
+            }
+        }
+        this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,
+            {
+                actions: [
+                    { type: CONST.ACTION.TYPE.PLAY_CARD, data: { player: this.currentTurnPlayer.getId(), cardId: cardId, dropPlace: dropPlace } }]
+            }
+        );
+    },
+    processPKMCard: function (playerId, cardId, dropPlace) {
+        //Show Battle Slot avaiable
+        cc.log("   ", GameMaster.LOG_TAG, "RESULT_PROCESS_PKM", this.isPhase(GameMaster.PHASE.START), this.board.playerHasActivePKM(playerId), this.board.playerHasFullBench(playerId));
+        if (this.isPhase(GameMaster.PHASE.START)) {//IF CURRENT PHASE IS START PHASE
+            if (!this.board.playerHasActivePKM(playerId)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
+                this.board.playerAddPokemon(playerId, cardId, dropPlace);
+                return true;
+            }
+            else { //Should select the first empty slot on Bench
+                if (!this.board.playerHasFullBench(playerId)) {
+                    this.board.playerAddPokemon(playerId, cardId, dropPlace);
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+        else {
+            return false;
+        }
+        return false;
     },
     //--
     //Get
     getPlayer: function (id) { return this.player[id]; },
     getGamePlayer: function (id) { return this.gamePlayer[id]; },
     getDeck: function (id) { return this.deck[id]; },
+    //Check
+    isPhase: function (phase) { return this._phase == phase; },
     //Network
     sendCMD: function (playerId, cmdId, cmdData) {
         var player = this.player[playerId];
@@ -122,7 +169,20 @@ GameMaster = cc.Class({
             data: cmdData
         }
         client.onReceivePackageFromServer(clientPkg);
-    }
+    },
+    processCMD: function (cmdId, data) {
+        cc.log(" ", GameMaster.LOG_TAG, cmdId, JSON.stringify(data));
+        switch (cmdId) {
+            case NW_REQUEST.CMD_ROOM_DROP_CARD: {
+                this.onPlayerDropCard(data.playerId, data.cardId, data.dropPlace);
+                this.board.showBoard();
+                this.
+                    break;
+            }
+        }
+    },
+    //---
+
 
 });
 SvDeck = cc.Class({

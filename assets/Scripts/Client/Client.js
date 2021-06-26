@@ -28,6 +28,7 @@ cc.Class({
         this.node.emit(NW_REQUEST.CLIENT_SEND_PACKAGE, { cmd: cmd, data: data, client: { username: this._username, client: this } });
     },
     sendRoomPackage: function(roomCmd, data){
+        data.playerId =  this._playerId;
         this.node.emit(NW_REQUEST.CLIENT_SEND_PACKAGE, { cmd: NW_REQUEST.CMD_ROOM, subCmd: roomCmd, data: data, client: { username: this._username, client: this } });
     },
     onReceivePackageFromServer: function (pkg) {
@@ -65,5 +66,6 @@ cc.Class({
     getPlayerCardS: function () { return this._playerInfo.card; },
     //--
     //Set
-    setGameManager: function(gm){this._gm = gm;}
+    setGameManager: function(gm){this._gm = gm;},
+    setPlayerId(id){this._playerId = id;}
 });

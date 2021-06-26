@@ -6,6 +6,7 @@ cc.Class({
 
     },
     onLoad: function () {
+        //cc.log("INIT_DROP_cHECKER1");
         this.init();
     },
     init: function () {
@@ -13,6 +14,11 @@ cc.Class({
         this.collisionSprite.enabled = false;
         this.collider = this.node.getComponent(cc.BoxCollider);
         this.collider.enabled = false;
+        //cc.log("INIT_DROP_cHECKER2", this.collider);
+
+    },
+    setTag(tag){
+        this._tag = tag;
     },
     setOtherTag(tag) {
         this._otherTag = tag;
@@ -49,12 +55,14 @@ cc.Class({
         }
     },
     onCollisionStay: function (other, self) {
+        //cc.log("STAY_", this._c);
         if (other.tag != this._otherTag) return;
         if (!this._checkPointInCollider) {
             cc.log("EXIT_NO_CHECK");
             this._exitCb && this._exitCb(other.node);
         }
         else {
+
             var otherWorldPosition = Utils.getWordPosition(other.node);
             if (cc.Intersection.pointInPolygon(otherWorldPosition, self.world.points)) {
                 if (!this._stayed) {

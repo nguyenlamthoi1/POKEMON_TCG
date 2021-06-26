@@ -139,6 +139,7 @@ cc.Class({
             case NW_REQUEST.CMD_ROOM_START_PHASE: {
                 cc.log("CMD_ROOM_START_PHASE", this.clientId, JSON.stringify(data));
                 //Set up data
+                this._client.setPlayerId(data.player.playerId);
                 this.playerId = data.player.playerId;
                 this.oppId = data.player.oppId;
 
@@ -227,12 +228,19 @@ cc.Class({
         //Show Battle Slot avaiable
         if (this.isPhase(CONST.GAME_PHASE.START)) {//IF CURRENT PHASE IS START PHASE
             if (!this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
-               this.board.enabledSelectActive(true);
+               this.board.enableSelectActive(true);
+               this.board.enableSelectBench(false);
+
                return true;
             } 
             else { //Should select the first empty slot on Bench
-                this.board.enabledSelectActive(true);
-                return false;
+                if(!this.board.playerHasFullBench()){
+                    this.board.enableSelectActive(false);
+                    this.board.enableSelectBench(true);
+                    return true;
+                }
+                else
+                    return false;
             }
         } else {
             return false;
@@ -243,6 +251,7 @@ cc.Class({
     //Get
     getClientId: function () { return this.clientId; },
     getBoard: function(){return this.board;},
+    getClient: function(){return this._client;},
     //Check
     isPhase: function (phase) { return this.currentPhase == phase; },
 });
