@@ -52,6 +52,7 @@ cc.Class({
         //nodes in Top UI
         handUI: cc.Node,
         oppHandUI: cc.Node,
+        notify: cc.Label,
         //nodes in Board UI
         boardUI: cc.Node,
 
@@ -92,24 +93,34 @@ cc.Class({
         //this.controllingPlayerId = this.player[1].getId(); //TODO: delete
         //Init UI
         // -Init Board
-        if(this.clientId == "client_1"){
-            this.board = this.boardUI.getComponent("Board");
-            this.board.init(this);
-        }
+
+        this.board = this.boardUI.getComponent("Board");
+        this.board.init(this);
+
         //-Init hands       
         this.hand = {};
         this.hand[PLAYER_ID] = this.handUI.getComponent("Hand");
         this.hand[PLAYER_ID].init(this.player[PLAYER_ID], this);
         this.hand[OPPONENT_ID] = this.oppHandUI.getComponent("Hand");
         this.hand[OPPONENT_ID].init(this.player[OPPONENT_ID], this);
-        
-       
+
+
 
         //Collider
         this._colliderMgr = cc.director.getCollisionManager();
         this._colliderMgr.enabled = true;
         this._colliderMgr.enabledDebugDraw = true;
+        
+        //Notify
+       
 
+    },
+    noti(text, delay){
+        this.notify.string = text;
+        
+        Utils.doPop(this.notify.node.parent.parent, 0.5, 0.2, 1);
+        if(delay != undefined)
+            this.scheduleOnce(function(){Utils.doUnPop(this.notify.node.parent.parent, 0.5, 1, 0.2)}.bind(this), delay);
     },
     ready: function () {
         cc.log(this.clientId, "[ready]");
@@ -135,6 +146,9 @@ cc.Class({
 
         var cmdId = pkg.subCmd;
         var data = pkg.data;
+        //Process match data
+
+
         switch (cmdId) {
             case NW_REQUEST.CMD_ROOM_START_PHASE: {
                 cc.log("CMD_ROOM_START_PHASE", this.clientId, JSON.stringify(data));
@@ -145,6 +159,14 @@ cc.Class({
 
                 this.player[PLAYER_ID].setFirstPlay(data.goFirst);
                 this.player[OPPONENT_ID].setFirstPlay(!data.goFirst);
+                
+                if(data.goFirst){
+                    this.currentPlayer = this.player[PLAYER_ID];
+                    this.nextPlayer = this.player[OPPONENT_ID];
+                }else{
+                    this.currentPlayer = this.player[OPPONENT_ID];
+                    this.nextPlayer = this.player[PLAYER_ID];
+                }
 
                 this.changePhase(CONST.GAME_PHASE.START);
                 this.turnCount = 0;
@@ -160,8 +182,13 @@ cc.Class({
                 //     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.currentTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },
                 //     { type: CONST.ACTION.TYPE.DRAW, data: { player: this.nextTurnPlayer.getId(), numDraw: GameMaster.FIRST_DRAW } },]
                 this.versusUI.getComponent("VersusUI").hide();
-            }
                 break;
+            }
+            case NW_REQUEST.CMD_ROOM_DO_ACTION: {
+                this.addAction(data.actions);
+                this.processActionQ();
+                break;
+            }
         }
     },
     //--------------
@@ -181,6 +208,7 @@ cc.Class({
         }
     },
     processActionQ: function () {
+        
         if (this._actionQ.length > 0) {
             var action = this._actionQ.pop();
             switch (action.type) {
@@ -191,8 +219,20 @@ cc.Class({
                     } else {
                         this.hand[OPPONENT_ID].draw(action.data.list, true, action.data.numDraw);
                     }
-                }
                     break;
+                }
+                case CONST.ACTION.TYPE.PLAY_CARD: {
+                    if (this.isPlayerAction(action)) {
+                        //this.board[PLAYER_ID].playerDropCard(action.data.idxHand, action.data.cardId, action.data.dropPlace);
+                    } else {
+                        this.board.oppDropCard(action.data.idxHand, action.data.cardId, action.data.dropPlace);
+                    }
+                    break;
+                }
+                case CONST.ACTION.TYPE.END_TURN: {
+                    this.endTurn();
+                    break;
+                }
             }
             this.node.once(CONST.ACTION.EVENT.ON_FINISH, this.on1ActionFinish.bind(this));
         }
@@ -202,8 +242,7 @@ cc.Class({
         this.processActionQ(); //When an UI action finish then keep do next action
     },
     //--------------
-    //Drag and Drop Card
-    onDropCard: function(cardId){
+    onDropCard: function (cardId) {
         cc.log("receiveCard", JARVIS.getCardName(cardId), cardId);
         //this.board.receiveCard(cardId);
     },
@@ -223,18 +262,18 @@ cc.Class({
         return ret;
 
     },
-    processPKMCard : function (cardId) {
-        cc.log(this.LOG_TAG, "PROCESS_CARD_POKEMON", JARVIS.getCardName(cardId));
+    processPKMCard: function (cardId) {
+        
         //Show Battle Slot avaiable
         if (this.isPhase(CONST.GAME_PHASE.START)) {//IF CURRENT PHASE IS START PHASE
+            if(!JARVIS.isBasicPokemonCard(cardId)) return false;
             if (!this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
-               this.board.enableSelectActive(true);
-               this.board.enableSelectBench(false);
-
-               return true;
-            } 
+                this.board.enableSelectActive(true);
+                this.board.enableSelectBench(false);
+                return true;
+            }
             else { //Should select the first empty slot on Bench
-                if(!this.board.playerHasFullBench()){
+                if (!this.board.playerHasFullBench()) {
                     this.board.enableSelectActive(false);
                     this.board.enableSelectBench(true);
                     return true;
@@ -248,10 +287,21 @@ cc.Class({
         return false;
     },
     //-------------
+    //ACTION
+    endTurn: function(){
+       if(this.isPlayerTurn()){
+           this.notify("YOUR TURN", 1);
+       }else{
+            this.notify("OPPONENT'S TURN", 1);
+       }
+    },
+    //----
     //Get
     getClientId: function () { return this.clientId; },
-    getBoard: function(){return this.board;},
-    getClient: function(){return this._client;},
+    getBoard: function () { return this.board; },
+    getClient: function () { return this._client; },
+    getHand: function (id) { return this.hand[id]; },
     //Check
     isPhase: function (phase) { return this.currentPhase == phase; },
+    isPlayerTurn: function(){return this.currentPlayer.getId() == this.player[PLAYER_ID]},
 });

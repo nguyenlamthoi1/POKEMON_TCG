@@ -53,7 +53,7 @@ SvBoard = cc.Class({
         return this._activeHolder[playerId].hasPokemon();
     },
     playerHasFullBench(playerId){
-        return this._bench[playerId].length >= this._maxBench[playerId];
+        return this._numBench[playerId] >= this._maxBench[playerId];
 
     },
     showBoard(){
@@ -81,11 +81,13 @@ SvHolder = cc.Class({
         this._card = {};
         this._card[CONST.CARD.CAT.PKM] = [];
         this._card[CONST.CARD.CAT.ENERGY] = [];
+        this._playTurn = -1;
         this.dmgCounter = 0;
     },
     //Action
-    addPokemonCard(cardId){
+    addPokemonCard(cardId){//A pokemon comes in play
         this._card[CONST.CARD.CAT.PKM].push(cardId);
+        this._playTurn = this.gm.getCurrentTurn(); 
     },
     //--
     //Check
@@ -98,5 +100,6 @@ SvHolder = cc.Class({
     },
     getCurPkmId: function(){
         return this._card[CONST.CARD.CAT.PKM][this._card[CONST.CARD.CAT.PKM].length - 1];
-    }
+    },
+    getPlayTurn: function(){return this._playTurn;}
 });

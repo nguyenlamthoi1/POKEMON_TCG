@@ -178,7 +178,7 @@ cc.Class({
             var cardUI = this.cardUIOnHand[i];
             
             var card = cardUI.getComponent("BasicCard");
-            card.setIdx(i);
+            if(card) card.setIdx(i);
 
         }
         this.layoutComponent.type = cc.Layout.NONE;
@@ -232,7 +232,37 @@ cc.Class({
         this.gm.node.emit(CONST.ACTION.EVENT.ON_FINISH);
     },
     onClickDrawBtn: function () {
-        this.draw(["1", "2", "3"], false);
-    }
-
+        cc.log("DRAW");
+        this.gm.noti("HELLO WORLD 123", 2);
+        //this.draw(["1", "2", "3"], false);
+    },
+    //UTILS
+    createNewNode: function(cardId){
+        cardUI = cc.instantiate(this.cardTemplate);
+        var card = cardUI.getComponent("BasicCard");
+        card.init(this.gm.getClientId(), JARVIS.getCardData(cardId));
+        return cardUI;
+    },
+    replaceCard: function(cardId, idx){
+        this.cardIdOnHand.splice(idx , 1);
+        var removedCard = this.cardUIOnHand.splice(idx , 1)[0];
+        var newCardNode = this.createNewNode(cardId);
+        
+        this.node.addChild(newCardNode);
+        newCardNode.position = removedCard.position;
+        newCardNode.zIndex = removedCard.zIndex;
+        this.node.removeChild(removedCard);
+        removedCard.destroy();
+        this.layoutComponent.updateLayout();
+        return newCardNode;
+    },
+    removeCardNode: function(idx){
+        this.cardIdOnHand.splice(idx , 1);
+        return this.cardUIOnHand.splice(idx , 1);
+    },
+    //GET
+    getCardNode: function(idx){
+        return this.cardUIOnHand[idx];
+    },
+    
 });

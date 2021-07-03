@@ -8,6 +8,14 @@ GamePlayer = cc.Class({ // Player in a Game
     },
     //Get
     getId: function () { return this._id; },
+    getEnableData: function () {
+        var data = {
+            dropCard: this._enabledDropCard,
+            useEnergy: this._enabledUseEnergy,
+            useMove: this._enableUseMove
+        }
+        return data;
+    },
     //Set
     setDropCardEnabled: function (enabled) { this._enabledDropCard = enabled; },
     setUseEnergyEnabled: function (enabled) { this._enabledUseEnergy = enabled; },
@@ -63,13 +71,27 @@ GameMaster = cc.Class({
     //TURN and PHASE
     setPhase: function (phase) {
         this._phase = phase;
-        if (this._phase == GameMaster.PHASE.START) {
+        if (this.isPhase(GameMaster.PHASE.START)) {
             this.onStartPhase();
+        } else if (this.isPhase(GameMaster.PHASE.PLAY)) {
+            this.onPlayPhase();
         }
     },
-    setNewTurn: function () {
-
+    switchTurn: function () {
+        this.onBetweenTurn();
+        this.turnCount++;
+        //Switch turn
+        var temp = this.currentTurnPlayer;
+        this.currentTurnPlayer = this.nextTurnPlayer;
+        this.nextTurnPlayer = temp;
+        if (this.isPhase(GameMaster.PHASE.START) && this.turnCount == 2) {
+            this.onPlayPhase(); //Modify Data and send CMD
+        } else {
+            this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,{actions: [{ type: CONST.ACTION.TYPE.END_TURN }]})
+            this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,{actions: [{ type: CONST.ACTION.TYPE.END_TURN }]})
+        }
     },
+    onBetweenTurn: function () { },
     onStartPhase: function () {
         this.turnCount = 0;
         this.currentTurnPlayer = this.gamePlayer[PLAYER_1];
@@ -113,7 +135,24 @@ GameMaster = cc.Class({
             }
         );
     },
-    onPlayerDropCard: function (playerId, cardId, dropPlace) {
+    onPlayPhase: function () {
+
+        //Set up data
+        this.turnCount = 0;
+        //Set up data for current player
+        this.currentTurnPlayer.setDropCardEnabled(true);
+        this.currentTurnPlayer.setUseEnergyEnabled(false);
+        this.currentTurnPlayer.setUseMoveEnabled(false);
+        this.nextTurnPlayer.setDropCardEnabled(false);
+        this.nextTurnPlayer.setUseEnergyEnabled(false);
+        this.nextTurnPlayer.setUseMoveEnabled(false);
+        //Send CMD
+        this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, {});
+        this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, {});
+
+    },
+    //Process Card Dropping
+    onPlayerDropCard: function (playerId, cardId, idxHand, dropPlace) {
         if (!this.gamePlayer[playerId].canDropCard()) return false;
         var cardData = SERVER.CARD_MGR.getCardData(cardId);
         switch (cardData.category) {
@@ -123,10 +162,10 @@ GameMaster = cc.Class({
                 break;
             }
         }
-        this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,
+        this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,
             {
                 actions: [
-                    { type: CONST.ACTION.TYPE.PLAY_CARD, data: { player: this.currentTurnPlayer.getId(), cardId: cardId, dropPlace: dropPlace } }]
+                    { type: CONST.ACTION.TYPE.PLAY_CARD, data: { player: this.currentTurnPlayer.getId(), cardId: cardId, idxHand: idxHand, dropPlace: dropPlace } }]
             }
         );
     },
@@ -134,6 +173,8 @@ GameMaster = cc.Class({
         //Show Battle Slot avaiable
         cc.log("   ", GameMaster.LOG_TAG, "RESULT_PROCESS_PKM", this.isPhase(GameMaster.PHASE.START), this.board.playerHasActivePKM(playerId), this.board.playerHasFullBench(playerId));
         if (this.isPhase(GameMaster.PHASE.START)) {//IF CURRENT PHASE IS START PHASE
+            if(!SERVER.CARD_MGR.isBasicPokemonCard(cardId)) return false;
+           
             if (!this.board.playerHasActivePKM(playerId)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
                 this.board.playerAddPokemon(playerId, cardId, dropPlace);
                 return true;
@@ -157,12 +198,19 @@ GameMaster = cc.Class({
     getPlayer: function (id) { return this.player[id]; },
     getGamePlayer: function (id) { return this.gamePlayer[id]; },
     getDeck: function (id) { return this.deck[id]; },
+    getCurrentTurn: function () { return this.turnCount; },
+    getCurrentPhase: function () { return this.phase; },
+    getCurrentMatchInfo: function () {
+        return { phase: this._phase, turn: this.turnCount };
+    },
     //Check
     isPhase: function (phase) { return this._phase == phase; },
     //Network
     sendCMD: function (playerId, cmdId, cmdData) {
         var player = this.player[playerId];
         var client = player.getClient();
+        cmdData.enabled = JSON.parse(JSON.stringify(this.gamePlayer[playerId].getEnableData()));
+        cmdData.match = JSON.parse(JSON.stringify(this.getCurrentMatchInfo()));
         var clientPkg = {
             cmd: NW_REQUEST.CMD_ROOM,
             subCmd: cmdId,
@@ -174,10 +222,10 @@ GameMaster = cc.Class({
         cc.log(" ", GameMaster.LOG_TAG, cmdId, JSON.stringify(data));
         switch (cmdId) {
             case NW_REQUEST.CMD_ROOM_DROP_CARD: {
-                this.onPlayerDropCard(data.playerId, data.cardId, data.dropPlace);
+                this.onPlayerDropCard(data.playerId, data.cardId, data.idxHand, data.dropPlace);
                 this.board.showBoard();
-                this.
-                    break;
+
+                break;
             }
         }
     },

@@ -51,9 +51,9 @@ window.CONST = {
             Item: "Item"
         },
         STAGE: {
-            BASIC: 1,
-            STAGE_1: 2,
-            STAGE_2: 3
+            BASIC: 0,
+            STAGE_1: 1,
+            STAGE_2: 2
         }
     },
     ENERGY: {
@@ -69,7 +69,8 @@ window.CONST = {
         },
         TYPE:{
             DRAW: 0,
-            PLAY_CARD: 1
+            PLAY_CARD: 1,
+            END_TURN: 2,
         }
     }
 }
