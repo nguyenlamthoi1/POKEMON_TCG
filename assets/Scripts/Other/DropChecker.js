@@ -5,17 +5,16 @@ cc.Class({
     properties: {
 
     },
-    onLoad: function () {
-        //cc.log("INIT_DROP_cHECKER1");
+    onLoad(){
         this.init();
     },
     init: function () {
         this.collisionSprite = this.node.getComponent(cc.Sprite);
         this.collisionSprite.enabled = false;
         this.collider = this.node.getComponent(cc.BoxCollider);
-        this.collider.enabled = false;
-        //cc.log("INIT_DROP_cHECKER2", this.collider);
 
+        this.collider.enabled = false;
+        cc.log("TEST_LOAD", this.i);
     },
     setTag(tag){
         this._tag = tag;
@@ -58,7 +57,7 @@ cc.Class({
         //cc.log("STAY_", this._c);
         if (other.tag != this._otherTag) return;
         if (!this._checkPointInCollider) {
-            cc.log("EXIT_NO_CHECK");
+            cc.log("EXIT_NO_CHECK", this._checkPointInCollider, this.i);
             this._exitCb && this._exitCb(other.node);
         }
         else {

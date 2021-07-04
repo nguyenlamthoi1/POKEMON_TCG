@@ -19,7 +19,7 @@ window.Utils = {
             .start();
 
     },
-    doPop: function (node, time, fromScale, toScale) {
+    doPop(node, time, fromScale, toScale) {
         node.active = true;
         node.scale = fromScale ? fromScale : node.scale;
         toScale = toScale ? toScale : 1;
@@ -28,7 +28,7 @@ window.Utils = {
             .to(time, { scale: toScale, opacity: 255}, { easing: 'quartInOut' })
             .start();
     },
-    doUnPop: function (node, time, fromScale, toScale) {
+    doUnPop(node, time, fromScale, toScale) {
         node.scale = fromScale ? fromScale : node.scale;
         toScale = toScale ? toScale : 0.2;
         node.opacity = 255;

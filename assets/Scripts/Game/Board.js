@@ -26,10 +26,21 @@ cc.Class({
     this._numBench[PLAYER_ID] = 0;
     this._maxBench[PLAYER_ID] = BOARD.MAX_BENCH;
     this._benchHolder[PLAYER_ID] = [];
+    var benchIdx = 0;
     for (var benchHolderNode of this.playerBenchSlotNode) {
       var cardHolder = benchHolderNode.getComponent("CardHolder");
       cardHolder.init(this.gm, BOARD.BENCH);
       this._benchHolder[PLAYER_ID].push(cardHolder);
+      //Set drop checker
+      var dropChecker = cardHolder.getDropChecker();
+      if (dropChecker) {
+        dropChecker.setOtherTag(COLLIDER_TAG.CARD);
+        dropChecker.setEnterCb(this.onColEnterBecnhSlot.bind(this, BOARD.BENCH_SLOT, benchIdx));
+        dropChecker.setExitCb(this.onColExit.bind(this));
+        dropChecker.setCheckPointInColliderEnabled(true);
+        dropChecker.i = "bench_slot";
+        benchIdx++;
+      }
     }
     //OPPONENT_SIDE
     this._activeHolder[OPPONENT_ID] = this.oppActiveSlotNode.getComponent("CardHolder"); this._activeHolder[OPPONENT_ID].init(this.gm, BOARD.ACTIVE_PLACE);
@@ -40,6 +51,7 @@ cc.Class({
       var cardHolder = benchHolderNode.getComponent("CardHolder");
       cardHolder.init(this.gm, BOARD.BENCH);
       this._benchHolder[OPPONENT_ID].push(cardHolder);
+
     }
 
 
@@ -51,7 +63,7 @@ cc.Class({
     this.activeChecker.setEnterCb(this.onColEnter.bind(this, BOARD.ACTIVE_PLACE));
     this.activeChecker.setExitCb(this.onColExit.bind(this));
     this.activeChecker.setCheckPointInColliderEnabled(true);
-
+    this.activeChecker.i = "active_slot";
     //--Bench
     this.benchChecker = this.benchDropChecker.getComponent("DropChecker");
     this.benchChecker.setOtherTag(COLLIDER_TAG.CARD);
@@ -59,9 +71,17 @@ cc.Class({
     this.benchChecker.setEnterCb(this.onColEnter.bind(this, BOARD.BENCH));
     this.benchChecker.setExitCb(this.onColExit.bind(this));
     this.benchChecker.setCheckPointInColliderEnabled(true);
+    this.benchChecker.i = "whole_bench";
+
 
   },
   //For drop checker
+  onColEnterBecnhSlot: function (dropPlace, i, dropCardNode) {//Detecting dropped Card from user
+    var card = dropCardNode.getComponent("BasicCard");
+    card.canDrop = true;
+    card.dropPlace = dropPlace;
+    card.benchIdx = i;
+  },
   onColEnter: function (dropPlace, dropCardNode) {//Detecting dropped Card from user
     var card = dropCardNode.getComponent("BasicCard");
     card.canDrop = true;
@@ -71,19 +91,17 @@ cc.Class({
     var card = dropCardNode.getComponent("BasicCard");
     card.canDrop = false;
     card.dropPlace = undefined;
-    cc.log("ON_EXIT", card.canDrop);
 
   },
 
   //ACTIONS LIST
-  playerDropCard: function (cardId, cardNode, dropPlace) { //Action
+  playerDropCard: function (cardId, cardNode, dropPlace, benchIdx) { //Action
     if (dropPlace == BOARD.ACTIVE_PLACE) {
       cc.log("PLAYER_DROP_CARD", cardId, "AT_ACTIVE_PLACE");
       this._activeHolder[PLAYER_ID].addCard(cardId);
       this._activeHolder[PLAYER_ID].doShowDropPokemonCard(cardId, cardNode);
-      this.activeChecker.enabledCheckCollision(false);
+      //this.activeChecker.enabledCheckCollision(false);
       this.activeChecker.hideArea();
-
     }
     else if (dropPlace == BOARD.BENCH) {
       cc.log("PLAYER_DROP_CARD", cardId, "AT_BENCH_PLACE");
@@ -95,9 +113,22 @@ cc.Class({
           break;
         }
       }
-      this.benchChecker.enabledCheckCollision(false);
+      //this.benchChecker.enabledCheckCollision(false);
       this.benchChecker.hideArea();
     }
+    else if (dropPlace == BOARD.BENCH_SLOT) {
+      var cardData = JARVIS.getCardData(cardId);
+      if(cardData.category == CONST.CARD.CAT.PKM){ //Evolution
+        cc.log("PLAYER_DROP_CARD", cardId, "AT_CARD_HOLDER");
+        var benchHolder = this._benchHolder[PLAYER_ID][benchIdx];
+        benchHolder.addCard(cardId);
+        benchHolder.doShowDropPokemonCard(cardId, cardNode);
+      }
+      
+    }
+
+    this.enableSelect(false);
+
     var client = this.gm.getClient();
     var card = cardNode.getComponent("BasicCard")
     data = {
@@ -107,7 +138,7 @@ cc.Class({
     };
     client.sendRoomPackage(NW_REQUEST.CMD_ROOM_DROP_CARD, data)
   },
-  oppDropCard: function (idx, cardId, dropPlace) { //Action
+  oppDropCard: function (idx, cardId, dropPlace, benchIdx) { //Action
     var oppHand = this.gm.getHand(OPPONENT_ID);
     var cardNode = oppHand.replaceCard(cardId, idx);
     if (dropPlace == BOARD.ACTIVE_PLACE) {
@@ -128,6 +159,7 @@ cc.Class({
         }
       }
     }
+
   },
 
   //---
@@ -140,9 +172,24 @@ cc.Class({
   enableSelectBench(enabled) {
     this.benchChecker.enabledCheckCollision(enabled);
   },
+  enabledEvolvable(enabled) {
+    if (this._activeHolder[PLAYER_ID].hasPokemon() && this._activeHolder[PLAYER_ID].isEvolvable()) {
+      this.activeChecker.enabledCheckCollision(enabled);
+    }
+    for (const benchHolder of this._benchHolder[PLAYER_ID]) {
+      if (benchHolder.hasPokemon() && benchHolder.isEvolvable()) {
+        var dropChecker = benchHolder.getDropChecker();
+        dropChecker.enabledCheckCollision(enabled);
+      }
+    }
+  },
   enableSelect(enabled) {
     this.activeChecker.enabledCheckCollision(enabled);
     this.benchChecker.enabledCheckCollision(enabled);
+    for (const benchHolder of this._benchHolder[PLAYER_ID]) {
+      var dropChecker = benchHolder.getDropChecker();
+      if(dropChecker) dropChecker.enabledCheckCollision(enabled);
+    }
   },
   //--
   //Check

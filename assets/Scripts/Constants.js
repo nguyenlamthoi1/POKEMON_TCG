@@ -5,6 +5,7 @@ window.COLLIDER_TAG = {
 window.BOARD = {
     ACTIVE_PLACE: "active",
     BENCH: "bench",
+    BENCH_SLOT: "bench_slot",
     MAX_BENCH: 5
 },
 window.POKEMON = {

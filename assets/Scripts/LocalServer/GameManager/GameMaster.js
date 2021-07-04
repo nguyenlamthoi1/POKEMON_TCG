@@ -3,27 +3,27 @@ GamePlayer = cc.Class({ // Player in a Game
         this._gm = gm;
         this._id = id;
         this._enabledDropCard = false; //Co kha nang drop card hay khong
-        this._enabledUseEnergy = false; //Co kha nang drop energy card hay khong
+        this._enabledAttachEnergy = false; //Co kha nang drop energy card hay khong
         this._enabledUseMove = false; //Co kha nang su dung move hay khong
     },
     //Get
-    getId: function () { return this._id; },
-    getEnableData: function () {
+    getId() { return this._id; },
+    getEnableData() {
         var data = {
             dropCard: this._enabledDropCard,
-            useEnergy: this._enabledUseEnergy,
+            useEnergy: this._enabledAttachEnergy,
             useMove: this._enableUseMove
         }
         return data;
     },
     //Set
-    setDropCardEnabled: function (enabled) { this._enabledDropCard = enabled; },
-    setUseEnergyEnabled: function (enabled) { this._enabledUseEnergy = enabled; },
-    setUseMoveEnabled: function (enabled) { this._enabledUseMove = enabled; },
+    setDropCardEnabled(enabled) { this._enabledDropCard = enabled; },
+    setAttachEnergyEnabled(enabled) { this._enabledAttachEnergy = enabled; },
+    setUseMoveEnabled(enabled) { this._enabledUseMove = enabled; },
     //Check
-    canDropCard: function () {
-        return this._enabledDropCard;
-    }
+    canDropCard() { return this._enabledDropCard; },
+    canAttachEnery() { return this._enabledAttachEnergy; },
+    canUseMove() { return this._enabledUseMove; }
 });
 PLAYER_1 = 0;
 PLAYER_2 = 1;
@@ -77,33 +77,45 @@ GameMaster = cc.Class({
             this.onPlayPhase();
         }
     },
-    switchTurn: function () {
+    switchTurn() {
+        cc.log("CURRENT_PHASE1", this._phase,this.turnCount);
+
         this.onBetweenTurn();
         this.turnCount++;
         //Switch turn
         var temp = this.currentTurnPlayer;
         this.currentTurnPlayer = this.nextTurnPlayer;
         this.nextTurnPlayer = temp;
-        if (this.isPhase(GameMaster.PHASE.START) && this.turnCount == 2) {
-            this.onPlayPhase(); //Modify Data and send CMD
+        if (this.isPhase(GameMaster.PHASE.START) && (this.turnCount >= 2)) {
+           this.setPhase(GameMaster.PHASE.PLAY);
         } else {
-            this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,{actions: [{ type: CONST.ACTION.TYPE.END_TURN }]})
-            this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,{actions: [{ type: CONST.ACTION.TYPE.END_TURN }]})
+            this.currentTurnPlayer.setDropCardEnabled(true);
+            this.currentTurnPlayer.setAttachEnergyEnabled(true);
+            this.currentTurnPlayer.setUseMoveEnabled(true);
+            this.nextTurnPlayer.setDropCardEnabled(false);
+            this.nextTurnPlayer.setAttachEnergyEnabled(false);
+            this.nextTurnPlayer.setUseMoveEnabled(false);
+            this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,
+                { actions: [{ type: CONST.ACTION.TYPE.SWITCH_TURN, player: this.nextTurnPlayer.getId() }] });
+            this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_DO_ACTION,
+                { actions: [{ type: CONST.ACTION.TYPE.SWITCH_TURN, player: this.nextTurnPlayer.getId() }] });
         }
+        cc.log("CURRENT_PHASE2", this._phase,this.turnCount);
+       
     },
-    onBetweenTurn: function () { },
+    onBetweenTurn() { },
     onStartPhase: function () {
         this.turnCount = 0;
         this.currentTurnPlayer = this.gamePlayer[PLAYER_1];
         this.nextTurnPlayer = this.gamePlayer[PLAYER_2];
 
         this.gamePlayer[this.currentTurnPlayer.getId()].setDropCardEnabled(true); //Player can drop
-        this.gamePlayer[this.currentTurnPlayer.getId()].setUseEnergyEnabled(false);
+        this.gamePlayer[this.currentTurnPlayer.getId()].setAttachEnergyEnabled(false);
         this.gamePlayer[this.currentTurnPlayer.getId()].setUseMoveEnabled(false);
 
 
         this.gamePlayer[this.nextTurnPlayer.getId()].setDropCardEnabled(false);
-        this.gamePlayer[this.nextTurnPlayer.getId()].setUseEnergyEnabled(false);
+        this.gamePlayer[this.nextTurnPlayer.getId()].setAttachEnergyEnabled(false);
         this.gamePlayer[this.nextTurnPlayer.getId()].setUseMoveEnabled(false);
 
         //SEND CMD
@@ -136,19 +148,18 @@ GameMaster = cc.Class({
         );
     },
     onPlayPhase: function () {
-
         //Set up data
         this.turnCount = 0;
         //Set up data for current player
         this.currentTurnPlayer.setDropCardEnabled(true);
-        this.currentTurnPlayer.setUseEnergyEnabled(false);
+        this.currentTurnPlayer.setAttachEnergyEnabled(true);
         this.currentTurnPlayer.setUseMoveEnabled(false);
         this.nextTurnPlayer.setDropCardEnabled(false);
-        this.nextTurnPlayer.setUseEnergyEnabled(false);
+        this.nextTurnPlayer.setAttachEnergyEnabled(false);
         this.nextTurnPlayer.setUseMoveEnabled(false);
         //Send CMD
-        this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, {});
-        this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, {});
+        this.sendCMD(this.currentTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, { goFirst: true });
+        this.sendCMD(this.nextTurnPlayer.getId(), NW_REQUEST.CMD_ROOM_PLAY_PHASE, { goFirst: false });
 
     },
     //Process Card Dropping
@@ -169,12 +180,16 @@ GameMaster = cc.Class({
             }
         );
     },
+    onPlayerEndTurn: function (playerId) {
+        if (!this.isPlayerTurn(playerId)) return false;
+        this.switchTurn();
+    },
     processPKMCard: function (playerId, cardId, dropPlace) {
         //Show Battle Slot avaiable
         cc.log("   ", GameMaster.LOG_TAG, "RESULT_PROCESS_PKM", this.isPhase(GameMaster.PHASE.START), this.board.playerHasActivePKM(playerId), this.board.playerHasFullBench(playerId));
         if (this.isPhase(GameMaster.PHASE.START)) {//IF CURRENT PHASE IS START PHASE
-            if(!SERVER.CARD_MGR.isBasicPokemonCard(cardId)) return false;
-           
+            if (!SERVER.CARD_MGR.isBasicPokemonCard(cardId)) return false;
+
             if (!this.board.playerHasActivePKM(playerId)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
                 this.board.playerAddPokemon(playerId, cardId, dropPlace);
                 return true;
@@ -204,7 +219,8 @@ GameMaster = cc.Class({
         return { phase: this._phase, turn: this.turnCount };
     },
     //Check
-    isPhase: function (phase) { return this._phase == phase; },
+    isPhase(phase) { return this._phase == phase; },
+    isPlayerTurn(playerId) { return this.gamePlayer[playerId].getId() == this.currentTurnPlayer.getId(); },
     //Network
     sendCMD: function (playerId, cmdId, cmdData) {
         var player = this.player[playerId];
@@ -224,8 +240,10 @@ GameMaster = cc.Class({
             case NW_REQUEST.CMD_ROOM_DROP_CARD: {
                 this.onPlayerDropCard(data.playerId, data.cardId, data.idxHand, data.dropPlace);
                 this.board.showBoard();
-
                 break;
+            }
+            case NW_REQUEST.CMD_ROOM_END_TURN: {
+                this.onPlayerEndTurn(data.playerId);
             }
         }
     },

@@ -155,7 +155,7 @@ cc.Class({
     },
     onDropCardStart: function () {
         this._dropCard.node.getComponent(cc.BoxCollider).enabled = false;
-        this.board.playerDropCard(this._dropCard.getCardId(), this._dropCard.node, this._dropCard.dropPlace);
+        this.board.playerDropCard(this._dropCard.getCardId(), this._dropCard.node, this._dropCard.dropPlace, this._dropCard.benchIdx);
         this.cardIdOnHand.splice(this._dropCard.getIdx(), 1);
         this.cardUIOnHand.splice(this._dropCard.getIdx(), 1);
         this.resetCardPosOnDrop(this._dropCard.getIdx());
@@ -228,7 +228,6 @@ cc.Class({
 
 
     onActionFinish: function () {
-        cc.log(this.gm.clientId, "onDrawFinish");
         this.gm.node.emit(CONST.ACTION.EVENT.ON_FINISH);
     },
     onClickDrawBtn: function () {

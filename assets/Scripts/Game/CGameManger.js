@@ -6,12 +6,12 @@ var Player = cc.Class({
         this._gm = gm;
         this._id = id;
         this._enabledDropCard = false; //Co kha nang drop card hay khong
-        this._enabledUseEnergy = false; //Co kha nang drop energy card hay khong
+        this._enabledAttachEnergy = false; //Co kha nang drop energy card hay khong
         this._enabledUseMove = false; //Co kha nang su dung move hay khong
     },
     setFirstPlay: function (goFirst) {
         this.setDropCardEnabled(goFirst);
-        this.setUseEnergyEnabled(false);
+        this.setAttachEnergyEnabled(false);
         this.setUseMoveEnabled(false);
     },
 
@@ -19,20 +19,17 @@ var Player = cc.Class({
     getId: function () { return this._id; },
     //Set
     setDropCardEnabled: function (enabled) { this._enabledDropCard = enabled; },
-    setUseEnergyEnabled: function (enabled) { this._enabledUseEnergy = enabled; },
+    setAttachEnergyEnabled: function (enabled) { this._enabledAttachEnergy = enabled; },
     setUseMoveEnabled: function (enabled) { this._enabledUseMove = enabled; },
     registerEvent: function (eventType, cb, target) {
         this._gm.node.on(eventType, cb, target);
     },
     //Check
-    isSameId: function (id) { return this._id == id; },
-    isOpponent: function () {
-        return !this.sameId(this._gm.controllingPlayerId);
-    },
-    droppedEnergy: function () {
-        return this._droppedEnergy;
-    },
-    canUseMove: function () { return this._canUseMove; }
+    isSameId(id) { return this._id == id; },
+    isOpponent() { return !this.sameId(this._gm.controllingPlayerId); },
+    canDropCard() { return this._enabledDropCard; },
+    canUseMove() { return this._enabledUseMove; },
+    canAttachEnergy() { return this._enabledAttachEnergy; }
 }
 );
 window.GM = null;
@@ -53,6 +50,7 @@ cc.Class({
         handUI: cc.Node,
         oppHandUI: cc.Node,
         notify: cc.Label,
+        endTurnBtn: cc.Button,
         //nodes in Board UI
         boardUI: cc.Node,
 
@@ -110,17 +108,21 @@ cc.Class({
         this._colliderMgr = cc.director.getCollisionManager();
         this._colliderMgr.enabled = true;
         this._colliderMgr.enabledDebugDraw = true;
-        
+
         //Notify
-       
+
+        //End turn button
+        this.endTurnBtn.node.on("click", this.onPlayerEndTurn, this); //Bind End_Turn Action with this button
+
 
     },
-    noti(text, delay){
+
+    noti(text, delay) {
         this.notify.string = text;
-        
+
         Utils.doPop(this.notify.node.parent.parent, 0.5, 0.2, 1);
-        if(delay != undefined)
-            this.scheduleOnce(function(){Utils.doUnPop(this.notify.node.parent.parent, 0.5, 1, 0.2)}.bind(this), delay);
+        if (delay != undefined)
+            this.scheduleOnce(function () { Utils.doUnPop(this.notify.node.parent.parent, 0.5, 1, 0.2) }.bind(this), delay);
     },
     ready: function () {
         cc.log(this.clientId, "[ready]");
@@ -159,11 +161,11 @@ cc.Class({
 
                 this.player[PLAYER_ID].setFirstPlay(data.goFirst);
                 this.player[OPPONENT_ID].setFirstPlay(!data.goFirst);
-                
-                if(data.goFirst){
+
+                if (data.goFirst) {
                     this.currentPlayer = this.player[PLAYER_ID];
                     this.nextPlayer = this.player[OPPONENT_ID];
-                }else{
+                } else {
                     this.currentPlayer = this.player[OPPONENT_ID];
                     this.nextPlayer = this.player[PLAYER_ID];
                 }
@@ -184,6 +186,34 @@ cc.Class({
                 this.versusUI.getComponent("VersusUI").hide();
                 break;
             }
+            case NW_REQUEST.CMD_ROOM_PLAY_PHASE: {
+                this.turnCount = 0;
+                //Swap
+                var temp = this.currentPlayer;
+                this.currentPlayer = this.nextPlayer;
+                this.nextPlayer = temp;
+                this.noti("START PLAY", 1);
+                for (const playerId of [PLAYER_ID, OPPONENT_ID]) {
+                    cc.log("TEST_PLAYER_ID", playerId);
+                    this.player[playerId].setDropCardEnabled(this.player[playerId].isSameId(this.currentPlayer.getId()));
+                    this.player[playerId].setAttachEnergyEnabled(this.player[playerId].isSameId(this.currentPlayer.getId()));
+                    this.player[playerId].setUseMoveEnabled(this.player[playerId].isSameId(this.currentPlayer.getId()));
+                }
+                cc.log("TEST_PHASE", this.clientId, data.goFirst);
+                if (data.goFirst) {
+                    this.currentPlayer = this.player[PLAYER_ID];
+                    this.nextPlayer = this.player[OPPONENT_ID];
+
+                    this.endTurnBtn.node.active = true;
+                } else {
+                    this.currentPlayer = this.player[OPPONENT_ID];
+                    this.nextPlayer = this.player[PLAYER_ID];
+                    this.endTurnBtn.node.active = false;
+                }
+                this.changePhase(CONST.GAME_PHASE.PLAY);
+
+                break;
+            }
             case NW_REQUEST.CMD_ROOM_DO_ACTION: {
                 this.addAction(data.actions);
                 this.processActionQ();
@@ -193,7 +223,7 @@ cc.Class({
     },
     //--------------
     //PROCESS ACTION
-    isPlayerAction: function (action) {
+    isPlayerAction(action) {
         return this.playerId == action.data.player;
     },
     getPIDOfAction: function (action) {
@@ -207,8 +237,7 @@ cc.Class({
             this._actionQ.push(actions.pop());
         }
     },
-    processActionQ: function () {
-        
+    processActionQ() {
         if (this._actionQ.length > 0) {
             var action = this._actionQ.pop();
             switch (action.type) {
@@ -229,8 +258,8 @@ cc.Class({
                     }
                     break;
                 }
-                case CONST.ACTION.TYPE.END_TURN: {
-                    this.endTurn();
+                case CONST.ACTION.TYPE.SWITCH_TURN: {
+                    this.switchTurn();
                     break;
                 }
             }
@@ -241,13 +270,14 @@ cc.Class({
         cc.log("process_next_action");
         this.processActionQ(); //When an UI action finish then keep do next action
     },
-    //--------------
+    //---DROP CARD---
     onDropCard: function (cardId) {
         cc.log("receiveCard", JARVIS.getCardName(cardId), cardId);
         //this.board.receiveCard(cardId);
     },
     showSelectable: function (cardId) {
         cc.log(this.LOG_TAG, "SHOW_SELECTABLE", JARVIS.getCardName(cardId));
+        if (!this.player[PLAYER_ID].canDropCard()) return;
         var hand = this.hand[PLAYER_ID];
         var cardData = JARVIS.getCardData(cardId);
         var ret = false;;
@@ -263,45 +293,77 @@ cc.Class({
 
     },
     processPKMCard: function (cardId) {
-        
         //Show Battle Slot avaiable
+        //this.board.enableSelect(false);
         if (this.isPhase(CONST.GAME_PHASE.START)) {//IF CURRENT PHASE IS START PHASE
-            if(!JARVIS.isBasicPokemonCard(cardId)) return false;
+            if (!JARVIS.isBasicPokemonCard(cardId)) return false;
             if (!this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
                 this.board.enableSelectActive(true);
-                this.board.enableSelectBench(false);
-                return true;
             }
             else { //Should select the first empty slot on Bench
                 if (!this.board.playerHasFullBench()) {
-                    this.board.enableSelectActive(false);
                     this.board.enableSelectBench(true);
-                    return true;
                 }
-                else
-                    return false;
             }
-        } else {
-            return false;
+        } 
+        else {
+            if (!JARVIS.isBasicPokemonCard(cardId)) //Stage POKEMON
+            {
+                this.board.enabledEvolvable(true);
+            } else {
+                if (!this.board.playerHasActivePKM(PLAYER_ID)) { //USER NOT HAVE POKEMON AT ACTIVE POSITION
+                    this.board.enableSelectActive(true);
+                }
+                if (!this.board.playerHasFullBench()) {
+                    this.board.enableSelectBench(true);
+                }
+            }
         }
-        return false;
     },
-    //-------------
+    //------
+
+    //---END TURN--
+    onPlayerEndTurn: function () {
+        this.player[PLAYER_ID].setDropCardEnabled(false);
+        this.player[PLAYER_ID].setAttachEnergyEnabled(false);
+        this.player[PLAYER_ID].setUseMoveEnabled(false);
+        this._client.sendRoomPackage(NW_REQUEST.CMD_ROOM_END_TURN, {});
+    },
+    //------
+
     //ACTION
-    endTurn: function(){
-       if(this.isPlayerTurn()){
-           this.notify("YOUR TURN", 1);
-       }else{
-            this.notify("OPPONENT'S TURN", 1);
-       }
+    switchTurn() {
+        this.turnCount++;
+        //Swap
+        var temp = this.currentPlayer;
+        this.currentPlayer = this.nextPlayer;
+        this.nextPlayer = temp;
+        //UpdateData
+        this.currentPlayer.setDropCardEnabled(true);
+        this.currentPlayer.setAttachEnergyEnabled(true);
+        this.currentPlayer.setUseMoveEnabled(true);
+        this.nextPlayer.setDropCardEnabled(false);
+        this.nextPlayer.setAttachEnergyEnabled(false);
+        this.nextPlayer.setUseMoveEnabled(false);
+
+        if (this.isPlayerTurn()) {
+            this.noti("YOUR TURN", 1);
+            this.endTurnBtn.node.active = true;
+        } else {
+            this.noti("OPPONENT'S TURN", 1);
+            this.endTurnBtn.node.active = false;
+        }
+        this.node.emit(CONST.ACTION.EVENT.ON_FINISH);
     },
     //----
     //Get
-    getClientId: function () { return this.clientId; },
-    getBoard: function () { return this.board; },
-    getClient: function () { return this._client; },
-    getHand: function (id) { return this.hand[id]; },
+    getClientId() { return this.clientId; },
+    getBoard() { return this.board; },
+    getClient() { return this._client; },
+    getHand(id) { return this.hand[id]; },
+    getTurnCount() { return this.turnCount; },
     //Check
-    isPhase: function (phase) { return this.currentPhase == phase; },
-    isPlayerTurn: function(){return this.currentPlayer.getId() == this.player[PLAYER_ID]},
+    isPhase(phase) { return this.currentPhase == phase; },
+    isPlayerTurn() { return this.currentPlayer.getId() == this.player[PLAYER_ID].getId(); },
+    isFirstPlayTurn() { return this.isPhase(CONST.GAME_PHASE.PLAY) && this.turnCount == 0; }
 });

@@ -3,6 +3,7 @@ cc.Class({
 
     properties: {
         selectIndicator: cc.Node,
+        dropCheckerNode: cc.Node,
         holderNode: cc.Node
     },
     init: function (gm, holderType) {
@@ -11,13 +12,19 @@ cc.Class({
         this._card = {};
         this._card[CONST.CARD.CAT.PKM] = [];
         this._card[CONST.CARD.CAT.ENERGY] = [];
-        this.dmgCounter = 0;
+        this._dmgCounter = 0;
     },
     addCard: function (cardId) {
         //Add data
         var cardData = JARVIS.getCardData(cardId);
         this._card[cardData.category].push(cardId);
-
+        switch(cardData.category){
+            case CONST.CARD.CAT.PKM:{
+                this._card[CONST.CARD.CAT.PKM].push(cardId);
+                this._playTurn = this.gm.getTurnCount();
+                break;
+            }
+        }
     },
     doShowDropPokemonCard: function (cardId, cardNode) {
         cc.log("DO_SHOW_DROP");
@@ -70,7 +77,8 @@ cc.Class({
         }
     },
     //Check
-    hasPokemon: function () {
-        return this._card[CONST.CARD.CAT.PKM].length > 0;
-    }
+    hasPokemon() {return this._card[CONST.CARD.CAT.PKM].length > 0;},
+    isEvolvable(){return this.gm.getTurnCount() > this._playTurn && !this.gm.isFirstPlayTurn();},
+    //Get
+    getDropChecker(){return this.dropCheckerNode?this.dropCheckerNode.getComponent("DropChecker"): undefined;}
 });
