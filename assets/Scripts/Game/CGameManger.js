@@ -254,7 +254,7 @@ cc.Class({
                     if (this.isPlayerAction(action)) {
                         //this.board[PLAYER_ID].playerDropCard(action.data.idxHand, action.data.cardId, action.data.dropPlace);
                     } else {
-                        this.board.oppDropCard(action.data.idxHand, action.data.cardId, action.data.dropPlace);
+                        this.board.oppDropCard(action.data.idxHand, action.data.cardId, action.data.dropPlace, action.data.benchIdx);
                     }
                     break;
                 }
@@ -305,7 +305,7 @@ cc.Class({
                     this.board.enableSelectBench(true);
                 }
             }
-        } 
+        }
         else {
             if (!JARVIS.isBasicPokemonCard(cardId)) //Stage POKEMON
             {
@@ -318,6 +318,13 @@ cc.Class({
                     this.board.enableSelectBench(true);
                 }
             }
+        }
+    },
+    processEnergyCard: function (cardId) {
+        //Show Battle Slot avaiable
+        //this.board.enableSelect(false);
+        if (this.isPhase(CONST.GAME_PHASE.PLAY) && this.player[PLAYER_ID].canAttachEnergy()) {//IF CURRENT PHASE IS START PHASE
+            this.board.enabledPokemonsSelectable(true);
         }
     },
     //------

@@ -13,7 +13,7 @@ cc.Class({
         //Server Gate
         serverConntectionGate: cc.Node
     },
-    onLoad: function(){
+    onLoad: function () {
 
         //Keep this node after scene switching
         cc.game.addPersistRootNode(this.node);
@@ -31,49 +31,49 @@ cc.Class({
         SERVER.ROOM_MGR = new RoomManager(); SERVER.ROOM_MGR.init();
         SERVER.GATE = this.node.getChildByName("ServerGate").getComponent("ServerGate"); SERVER.GATE.init();
         //--
-  
+
         //Load Data
         this.showLoadingUI();
         this.loadData();
 
-        
+
     },
-    loadData: function(){
+    loadData: function () {
         this._loadData(
             [
-                {obj: SERVER.CARD_MGR, para: []},
-                {obj: SERVER.PLAYER_MGR, para: []}
+                { obj: SERVER.CARD_MGR, para: [] },
+                { obj: SERVER.PLAYER_MGR, para: [] }
 
             ],
-            function(){
-               //End Loading UI
-               this.hideLoadingUI();
-               //New Scene
-               cc.director.loadScene("Login");
+            function () {
+                //End Loading UI
+                this.hideLoadingUI();
+                //New Scene
+                cc.director.loadScene("Login");
             }.bind(this)
         );
     },
-    _loadData: function(objs, finishCb){
+    _loadData: function (objs, finishCb) {
         cc.log(this.LOG_TAG, "[START_LOAD_DATA]");
-        this._errorLoadedStep = 0; 
+        this._errorLoadedStep = 0;
         this._totalLoadedStep = 0;
         this._totalLoadedObj = 0;
         this._loadingObjects = objs;
         this._finishCb = finishCb;
 
-        for (const loadingObject of this._loadingObjects) 
+        for (const loadingObject of this._loadingObjects)
             loadingObject.obj.load(loadingObject.para); //Thuc hien load function cua moi object
 
-        this._checkLoadCallback = function(){ //Check load callback
-            if(this._totalLoadedObj == this._loadingObjects.length) {
-                cc.log(this.LOG_TAG, "[FINISH_LOAD_DATA]","[TOTAL]", this._totalLoadedStep, "[ERR_TOTAL]", this._errorLoadedStep);
-                this._finishCb != undefined &&  this._finishCb();
+        this._checkLoadCallback = function () { //Check load callback
+            if (this._totalLoadedObj == this._loadingObjects.length) {
+                cc.log(this.LOG_TAG, "[FINISH_LOAD_DATA]", "[TOTAL]", this._totalLoadedStep, "[ERR_TOTAL]", this._errorLoadedStep);
+                this._finishCb != undefined && this._finishCb();
                 this.unschedule(this._checkLoadCallback);
             }
-            for (var loadingObject of this._loadingObjects){
-                if(!loadingObject.obj.finishLoaded && loadingObject.obj.loadedStepCount == loadingObject.obj.totalStep){
+            for (var loadingObject of this._loadingObjects) {
+                if (!loadingObject.obj.finishLoaded && loadingObject.obj.loadedStepCount == loadingObject.obj.totalStep) {
                     this._errorLoadedStep += loadingObject.obj.totalLoadErr;
-                    this._totalLoadedStep +=  loadingObject.obj.totalStep;
+                    this._totalLoadedStep += loadingObject.obj.totalStep;
                     this._totalLoadedObj += 1;
                     loadingObject.obj.finishLoaded = true;
                 }
@@ -83,15 +83,15 @@ cc.Class({
         const interval = 0.2; //Kiem tra loading moi 0.2s
         this.schedule(this._checkLoadCallback, interval); // Thuc thi check load callback moi <interval> giay
     },
-    showLoadingUI: function(){
+    showLoadingUI: function () {
         this.loadingUI.active = true;
         var loadingBall = this.loadingUI.getChildByName("LoadingBall");
         cc.tween(loadingBall)
-        .by(1, {angle: 360})
-        .repeatForever()
-        .start(); 
+            .by(1, { angle: 360 })
+            .repeatForever()
+            .start();
     },
-    hideLoadingUI: function(){
+    hideLoadingUI: function () {
         this.loadingUI.active = false;
     },
 });

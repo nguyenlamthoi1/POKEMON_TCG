@@ -18,11 +18,16 @@ cc.Class({
     //Init
     init: function (clientId, cardData) {
         cc.log("READ_DATA", JSON.stringify(cardData));
+        if(cardData.type[0] == "fire" || cardData.type[0] == "grass"){
+            cc.log("");
+        }
         this.cardData = cardData;
+        var ssf1 = this._getTypeSF(cardData.type);
         this.type.spriteFrame = this._getTypeSF(cardData.type); //LOAD TYPE
-        this.evolutionIcon.active = cardData.stage > 0; //LOAD EVOLUTION
+        this.evolutionIcon.active = cardData.stage && cardData.stage > 0; //LOAD EVOLUTION
         this.stageTxt.string = cardData.stage;
         //Set image
+        var ssf = RES_MGR[clientId].getRes(cardData.card.image.url);
         this.img.spriteFrame = RES_MGR[clientId].getRes(cardData.card.image.url);
         this.img.node.x = cardData.card.image.transform.x;
         this.img.node.y = cardData.card.image.transform.y;

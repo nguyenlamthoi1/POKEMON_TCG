@@ -1,8 +1,12 @@
 window.ERROR_TYPE = {
-    SUCCESS: "success",
+    SUCCESS: 0,
+    ERR_NOT_DEFINED: 1,
     LOGIN: {
-        WRONG_USERNAME: "wrongusername",
-        WRONG_PASSWORD: "wrongpassword"
+        WRONG_USERNAME: 1001,
+        WRONG_PASSWORD: 1002
+    },
+    DROP_CARD:{
+        ERR_NOT_BASIC_AT_START_PHASE: 2001,
     }
 }
 window.NW_REQUEST = {

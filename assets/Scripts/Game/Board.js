@@ -98,8 +98,10 @@ cc.Class({
   playerDropCard: function (cardId, cardNode, dropPlace, benchIdx) { //Action
     if (dropPlace == BOARD.ACTIVE_PLACE) {
       cc.log("PLAYER_DROP_CARD", cardId, "AT_ACTIVE_PLACE");
-      this._activeHolder[PLAYER_ID].addCard(cardId);
-      this._activeHolder[PLAYER_ID].doShowDropPokemonCard(cardId, cardNode);
+      //this._activeHolder[PLAYER_ID].addCard(cardId);
+      //this._activeHolder[PLAYER_ID].doShowDropPokemonCard(cardId, cardNode);
+      this._processCardOnDrop(PLAYER_ID, cardId, this._activeHolder[PLAYER_ID], cardNode);
+
       //this.activeChecker.enabledCheckCollision(false);
       this.activeChecker.hideArea();
     }
@@ -107,8 +109,10 @@ cc.Class({
       cc.log("PLAYER_DROP_CARD", cardId, "AT_BENCH_PLACE");
       for (const benchHolder of this._benchHolder[PLAYER_ID]) {
         if (!benchHolder.hasPokemon()) {
-          benchHolder.addCard(cardId);
-          benchHolder.doShowDropPokemonCard(cardId, cardNode);
+          //benchHolder.addCard(cardId);
+          //benchHolder.doShowDropPokemonCard(cardId, cardNode);
+          this._processCardOnDrop(PLAYER_ID, cardId, benchHolder, cardNode);
+
           this._numBench[PLAYER_ID]++;
           break;
         }
@@ -117,24 +121,26 @@ cc.Class({
       this.benchChecker.hideArea();
     }
     else if (dropPlace == BOARD.BENCH_SLOT) {
-      var cardData = JARVIS.getCardData(cardId);
-      if(cardData.category == CONST.CARD.CAT.PKM){ //Evolution
-        cc.log("PLAYER_DROP_CARD", cardId, "AT_CARD_HOLDER");
-        var benchHolder = this._benchHolder[PLAYER_ID][benchIdx];
-        benchHolder.addCard(cardId);
-        benchHolder.doShowDropPokemonCard(cardId, cardNode);
-      }
-      
+      cc.log("PLAYER_DROP_CARD", cardId, "AT_BENCH_SLOT");
+      var benchHolder = this._benchHolder[PLAYER_ID][benchIdx];
+      var dropChecker = benchHolder.getDropChecker();
+      dropChecker.hideArea();
+      this._processCardOnDrop(PLAYER_ID, cardId, benchHolder, cardNode);
+
+      //benchHolder.addCard(cardId);
+      //benchHolder.doShowDropPokemonCard(cardId, cardNode);
+
     }
 
     this.enableSelect(false);
 
     var client = this.gm.getClient();
     var card = cardNode.getComponent("BasicCard")
-    data = {
+    var data = {
       cardId: cardId,
       idxHand: card.getIdx(),
-      dropPlace: dropPlace
+      dropPlace: dropPlace,
+      benchIdx: benchIdx
     };
     client.sendRoomPackage(NW_REQUEST.CMD_ROOM_DROP_CARD, data)
   },
@@ -143,21 +149,52 @@ cc.Class({
     var cardNode = oppHand.replaceCard(cardId, idx);
     if (dropPlace == BOARD.ACTIVE_PLACE) {
       cc.log("OPP_DROP_CARD", cardId, "AT_ACTIVE_PLACE");
-      this._activeHolder[OPPONENT_ID].addCard(cardId);
-      this._activeHolder[OPPONENT_ID].doShowDropPokemonCard(cardId, cardNode);
+      // this._activeHolder[OPPONENT_ID].addCard(cardId);
+      // this._activeHolder[OPPONENT_ID].doShowDropPokemonCard(cardId, cardNode);
+      this._processCardOnDrop(OPPONENT_ID, cardId, this._activeHolder[OPPONENT_ID], cardNode);
       oppHand.resetCardPosOnDrop(idx);
     }
     else if (dropPlace == BOARD.BENCH) {
-      cc.log("OPP_DROP_CARD", cardId, "AT_BENCH_PLACE");
+      cc.log("OPP_DROP_CARD", cardId, "AT_BENCH");
       for (const benchHolder of this._benchHolder[OPPONENT_ID]) {
         if (!benchHolder.hasPokemon()) {
-          benchHolder.addCard(cardId);
-          benchHolder.doShowDropPokemonCard(cardId, cardNode);
+          // benchHolder.addCard(cardId);
+          // benchHolder.doShowDropPokemonCard(cardId, cardNode);
+          this._processCardOnDrop(OPPONENT_ID, cardId, benchHolder, cardNode);
           this._numBench[OPPONENT_ID]++;
           oppHand.resetCardPosOnDrop(idx);
           break;
         }
       }
+    }
+    else if (dropPlace == BOARD.BENCH_SLOT) {
+      cc.log("OPP_DROP_CARD", cardId, "AT_BENCH_SLOT", benchIdx);
+      var benchHolder = this._benchHolder[OPPONENT_ID][benchIdx];
+      // benchHolder.addCard(cardId);
+      // benchHolder.doShowDropPokemonCard(cardId, cardNode);
+      this._processCardOnDrop(OPPONENT_ID, cardId, benchHolder, cardNode);
+
+      this._numBench[OPPONENT_ID]++;
+      oppHand.resetCardPosOnDrop(idx);
+    }
+
+  },
+  _processCardOnDrop(playerId, cardId, cardHolder, cardNode) {
+    var cardData = JARVIS.getCardData(cardId);
+    switch (cardData.category) {
+      case CONST.CARD.CAT.PKM:
+        {
+          cardHolder.addCard(cardId);
+          cardHolder.doShowDropPokemonCard(cardId, cardNode);
+          break;
+        }
+      case CONST.CARD.CAT.ENERGY:
+        {
+          cardHolder.addCard(cardId);
+          cardHolder.doShowAttachEnergy(cardId, cardNode);
+          this.gm.player[playerId].setAttachEnergyEnabled(false);
+          break;
+        }
     }
 
   },
@@ -183,12 +220,23 @@ cc.Class({
       }
     }
   },
+  enabledPokemonsSelectable: function (enabled) {
+    if (this._activeHolder[PLAYER_ID].hasPokemon()) {
+      this.activeChecker.enabledCheckCollision(enabled);
+    }
+    for (const benchHolder of this._benchHolder[PLAYER_ID]) {
+      if (benchHolder.hasPokemon()) {
+        var dropChecker = benchHolder.getDropChecker();
+        dropChecker.enabledCheckCollision(enabled);
+      }
+    }
+  },
   enableSelect(enabled) {
     this.activeChecker.enabledCheckCollision(enabled);
     this.benchChecker.enabledCheckCollision(enabled);
     for (const benchHolder of this._benchHolder[PLAYER_ID]) {
       var dropChecker = benchHolder.getDropChecker();
-      if(dropChecker) dropChecker.enabledCheckCollision(enabled);
+      if (dropChecker) dropChecker.enabledCheckCollision(enabled);
     }
   },
   //--

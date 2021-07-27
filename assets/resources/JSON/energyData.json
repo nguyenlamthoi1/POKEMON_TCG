@@ -2,12 +2,45 @@
   "energy_0":{
     "id": "energy_0",
     "category": "Energy",
-    "energyType": "fire",
+    "type": {
+      "0": "fire"
+    },
     "name": "Fire Energy",
     "smallCardUrl": "BetterEnergy/fire_energy_icon",
     "smallScale": 0.5,
     "energy":{
       "fire" : 1
+    },
+    "card": {
+      "image": {
+        "url": "BetterEnergy/fire_energy_icon",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 0.25
+        },
+        "transformActive":{
+          "x": 0,
+          "y": 0,
+          "scale": 0.1
+        }
+      },
+      "background": {
+        "url": "Card/Background/red_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/red_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
     }
   },
   "energy_1":{
@@ -24,12 +57,45 @@
   "energy_2":{
     "id": "energy_2",
     "category": "Energy",
-    "energyType": "grass",
+    "type": {
+      "0": "grass"
+    },
     "name": "Grass Energy",
     "smallCardUrl": "BetterEnergy/grass_energy_icon",
     "smallScale": 0.5,
     "energy":{
       "grass" : 1
+    },
+    "card": {
+      "image": {
+        "url": "BetterEnergy/grass_energy_icon",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 0.25
+        },
+        "transformActive":{
+          "x": 0,
+          "y": 0,
+          "scale": 0.08
+        }
+      },
+      "background": {
+        "url": "Card/Background/green_background",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      },
+      "frame": {
+        "url": "Card/Frame/green_frame",
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
     }
   },
   "energy_3":{

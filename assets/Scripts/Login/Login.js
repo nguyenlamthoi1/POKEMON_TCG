@@ -74,7 +74,7 @@ cc.Class({
         this.loadData(
             [
                 {
-                    obj: RES_MGR[this.clientId], para: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    obj: RES_MGR[this.clientId], para: [1, 2, 3, 4, 5, 6, 7, 8, 9, "energy_0","energy_2"]
                 }
             ],
             //this.startGame.bind(this)

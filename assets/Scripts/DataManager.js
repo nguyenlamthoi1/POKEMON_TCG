@@ -50,8 +50,11 @@ DataManager = cc.Class({
     },
     //Set
     //Check
-    isBasicPokemonCard: function(cardId){
+    isBasicPokemonCard(cardId){
         return this.cardInfo[cardId].category == CONST.CARD.CAT.PKM && this.cardInfo[cardId].stage == CONST.CARD.STAGE.BASIC; 
+    },
+    canEvolveFrom(stagePkmCardId, lowerStagePkmCardId){
+        return this.cardInfo[stagePkmCardId].evolveFrom == this.cardInfo[lowerStagePkmCardId].pkdId;
     }
 });
 

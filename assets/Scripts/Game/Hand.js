@@ -78,9 +78,8 @@ cc.Class({
             this.layoutComponent.spacingX = 0;
         }
         return false;
-
     },
-    draw: function (drawList, blind, numDraw) {
+    draw(drawList, blind, numDraw) {
         cc.log("DRAW_CLIENT", this.gm.clientId, blind);
         //numDrawCard = numDrawCard > this.deck.length ? this.deck.length : numDrawCard;
         var numDrawCard = numDraw == undefined ? drawList.length : numDraw;
